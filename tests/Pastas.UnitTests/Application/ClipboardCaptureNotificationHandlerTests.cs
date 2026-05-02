@@ -1,5 +1,8 @@
 using Pastas.Application.Services;
 using Pastas.Application.UseCases;
+using Pastas.Domain.Entities;
+using Pastas.Domain.Interfaces;
+using Pastas.Domain.ValueObjects;
 using Pastas.Shared.Result;
 
 namespace Pastas.UnitTests.Application;
@@ -12,7 +15,9 @@ public sealed class ClipboardCaptureNotificationHandlerTests
         var coordinator = new ClipboardCaptureCoordinator(
             new FakeCaptureClipboardTextUseCase(),
             new FakeCaptureClipboardImageUseCase(),
+            new ClipboardCleanupService(new FakeClipboardItemRepository(), new FakeFileStorage(), new ClipboardCleanupOptions()),
             TimeSpan.Zero);
+
         var notificationService = new FakeNotificationService();
         var handler = new ClipboardCaptureNotificationHandler(coordinator, notificationService);
 
@@ -27,7 +32,9 @@ public sealed class ClipboardCaptureNotificationHandlerTests
         var coordinator = new ClipboardCaptureCoordinator(
             new FakeCaptureClipboardTextUseCase(),
             new FakeCaptureClipboardImageUseCase(),
+            new ClipboardCleanupService(new FakeClipboardItemRepository(), new FakeFileStorage(), new ClipboardCleanupOptions()),
             TimeSpan.Zero);
+
         var notificationService = new ThrowingNotificationService();
         var handler = new ClipboardCaptureNotificationHandler(coordinator, notificationService);
 
@@ -76,5 +83,23 @@ public sealed class ClipboardCaptureNotificationHandlerTests
         public void ShowWarning(string message)
         {
         }
+    }
+
+    private sealed class FakeClipboardItemRepository : IClipboardItemRepository
+    {
+        public Task AddAsync(ClipboardItem item, CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public Task UpdateAsync(ClipboardItem item, CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public Task DeleteAsync(Guid id, CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public Task<ClipboardItem?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) => Task.FromResult<ClipboardItem?>(null);
+        public Task<ClipboardItem?> FindByHashAsync(string hash, CancellationToken cancellationToken = default) => Task.FromResult<ClipboardItem?>(null);
+        public Task<IReadOnlyList<ClipboardItem>> SearchAsync(ClipboardSearchQuery query, CancellationToken cancellationToken = default) => Task.FromResult((IReadOnlyList<ClipboardItem>)[]);
+        public Task<int> CountAsync(CancellationToken cancellationToken = default) => Task.FromResult(0);
+    }
+
+    private sealed class FakeFileStorage : IFileStorage
+    {
+        public Task<string> SaveImageAsync(byte[] bytes, Guid itemId, CancellationToken cancellationToken = default) => Task.FromResult(string.Empty);
+        public Task<string> SaveThumbnailAsync(byte[] bytes, Guid itemId, CancellationToken cancellationToken = default) => Task.FromResult(string.Empty);
+        public Task DeleteAsync(string path, CancellationToken cancellationToken = default) => Task.CompletedTask;
     }
 }

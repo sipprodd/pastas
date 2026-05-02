@@ -13,15 +13,18 @@ public sealed class CaptureClipboardTextUseCase : ICaptureClipboardTextUseCase
     private readonly IClipboardGateway _clipboardGateway;
     private readonly IClipboardItemRepository _clipboardItemRepository;
     private readonly ClipboardCaptureState _captureState;
+    private readonly ClipboardCleanupOptions _cleanupOptions;
 
     public CaptureClipboardTextUseCase(
         IClipboardGateway clipboardGateway,
         IClipboardItemRepository clipboardItemRepository,
-        ClipboardCaptureState captureState)
+        ClipboardCaptureState captureState,
+        ClipboardCleanupOptions? cleanupOptions = null)
     {
         _clipboardGateway = clipboardGateway;
         _clipboardItemRepository = clipboardItemRepository;
         _captureState = captureState;
+        _cleanupOptions = cleanupOptions ?? new ClipboardCleanupOptions();
     }
 
     public async Task<Result> ExecuteAsync(CancellationToken cancellationToken = default)
@@ -45,6 +48,13 @@ public sealed class CaptureClipboardTextUseCase : ICaptureClipboardTextUseCase
         }
 
         var hash = ClipboardTextHasher.Compute(text);
+        var sizeBytes = Encoding.UTF8.GetByteCount(text);
+
+        if (sizeBytes > _cleanupOptions.MaxSingleItemBytes)
+        {
+            return Result.Success();
+        }
+
         var now = DateTime.UtcNow;
         var existingItem = await _clipboardItemRepository.FindByHashAsync(hash, cancellationToken);
 
@@ -82,7 +92,7 @@ public sealed class CaptureClipboardTextUseCase : ICaptureClipboardTextUseCase
             PreviewText = TextPreviewBuilder.Build(text),
             Hash = hash,
             CopyCount = 1,
-            SizeBytes = Encoding.UTF8.GetByteCount(text),
+            SizeBytes = sizeBytes,
             CreatedAt = now,
             UpdatedAt = now,
             LastCopiedAt = now,

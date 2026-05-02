@@ -1,5 +1,8 @@
 using Pastas.Application.Services;
 using Pastas.Application.UseCases;
+using Pastas.Domain.Entities;
+using Pastas.Domain.Interfaces;
+using Pastas.Domain.ValueObjects;
 using Pastas.Shared.Result;
 
 namespace Pastas.UnitTests.Application;
@@ -15,14 +18,13 @@ public class ClipboardCaptureCoordinatorTests
             calls.Add("text");
             await Task.CompletedTask;
         });
-
         var imageUseCase = new FakeCaptureClipboardImageUseCase(async () =>
         {
             calls.Add("image");
             await Task.CompletedTask;
         });
 
-        var coordinator = new ClipboardCaptureCoordinator(textUseCase, imageUseCase, TimeSpan.Zero);
+        var coordinator = new ClipboardCaptureCoordinator(textUseCase, imageUseCase, CreateCleanupService(), TimeSpan.Zero);
 
         await coordinator.CaptureAsync();
 
@@ -32,9 +34,11 @@ public class ClipboardCaptureCoordinatorTests
     [Fact]
     public async Task CaptureAsync_DoesNotThrow_WhenUseCasesFail()
     {
-        var textUseCase = new FakeCaptureClipboardTextUseCase(() => throw new InvalidOperationException("text fail"));
-        var imageUseCase = new FakeCaptureClipboardImageUseCase(() => throw new InvalidOperationException("image fail"));
-        var coordinator = new ClipboardCaptureCoordinator(textUseCase, imageUseCase, TimeSpan.Zero);
+        var coordinator = new ClipboardCaptureCoordinator(
+            new FakeCaptureClipboardTextUseCase(() => throw new InvalidOperationException("text fail")),
+            new FakeCaptureClipboardImageUseCase(() => throw new InvalidOperationException("image fail")),
+            CreateCleanupService(),
+            TimeSpan.Zero);
 
         var exception = await Record.ExceptionAsync(() => coordinator.CaptureAsync());
 
@@ -62,13 +66,11 @@ public class ClipboardCaptureCoordinatorTests
             return Task.CompletedTask;
         });
 
-        var coordinator = new ClipboardCaptureCoordinator(textUseCase, imageUseCase, TimeSpan.Zero);
+        var coordinator = new ClipboardCaptureCoordinator(textUseCase, imageUseCase, CreateCleanupService(), TimeSpan.Zero);
 
         var firstCall = coordinator.CaptureAsync();
         await firstStarted.Task;
-
         await coordinator.CaptureAsync();
-
         allowFirstToFinish.TrySetResult(true);
         await firstCall;
 
@@ -82,19 +84,19 @@ public class ClipboardCaptureCoordinatorTests
         var textCallCount = 0;
         var imageCallCount = 0;
 
-        var textUseCase = new FakeCaptureClipboardTextUseCase(() =>
-        {
-            Interlocked.Increment(ref textCallCount);
-            return Task.CompletedTask;
-        });
-
-        var imageUseCase = new FakeCaptureClipboardImageUseCase(() =>
-        {
-            Interlocked.Increment(ref imageCallCount);
-            return Task.CompletedTask;
-        });
-
-        var coordinator = new ClipboardCaptureCoordinator(textUseCase, imageUseCase, TimeSpan.Zero);
+        var coordinator = new ClipboardCaptureCoordinator(
+            new FakeCaptureClipboardTextUseCase(() =>
+            {
+                Interlocked.Increment(ref textCallCount);
+                return Task.CompletedTask;
+            }),
+            new FakeCaptureClipboardImageUseCase(() =>
+            {
+                Interlocked.Increment(ref imageCallCount);
+                return Task.CompletedTask;
+            }),
+            CreateCleanupService(),
+            TimeSpan.Zero);
 
         await coordinator.CaptureAsync();
         await coordinator.CaptureAsync();
@@ -104,35 +106,61 @@ public class ClipboardCaptureCoordinatorTests
         Assert.Equal(3, imageCallCount);
     }
 
-    private sealed class FakeCaptureClipboardTextUseCase : ICaptureClipboardTextUseCase
+    [Fact]
+    public async Task CaptureAsync_DoesNotThrow_WhenCleanupFails()
     {
-        private readonly Func<Task> _action;
+        var coordinator = new ClipboardCaptureCoordinator(
+            new FakeCaptureClipboardTextUseCase(() => Task.CompletedTask),
+            new FakeCaptureClipboardImageUseCase(() => Task.CompletedTask),
+            new ClipboardCleanupService(new ThrowingClipboardItemRepository(), new FakeFileStorage(), new ClipboardCleanupOptions()),
+            TimeSpan.Zero);
 
-        public FakeCaptureClipboardTextUseCase(Func<Task> action)
-        {
-            _action = action;
-        }
+        var exception = await Record.ExceptionAsync(() => coordinator.CaptureAsync());
 
+        Assert.Null(exception);
+    }
+
+    private static ClipboardCleanupService CreateCleanupService()
+        => new(new FakeClipboardItemRepository(), new FakeFileStorage(), new ClipboardCleanupOptions());
+
+    private sealed class FakeCaptureClipboardTextUseCase(Func<Task> action) : ICaptureClipboardTextUseCase
+    {
         public async Task<Result> ExecuteAsync(CancellationToken cancellationToken = default)
         {
-            await _action();
+            await action();
             return Result.Success();
         }
     }
 
-    private sealed class FakeCaptureClipboardImageUseCase : ICaptureClipboardImageUseCase
+    private sealed class FakeCaptureClipboardImageUseCase(Func<Task> action) : ICaptureClipboardImageUseCase
     {
-        private readonly Func<Task> _action;
-
-        public FakeCaptureClipboardImageUseCase(Func<Task> action)
-        {
-            _action = action;
-        }
-
         public async Task<Result> ExecuteAsync(CancellationToken cancellationToken = default)
         {
-            await _action();
+            await action();
             return Result.Success();
         }
+    }
+
+    private class FakeClipboardItemRepository : IClipboardItemRepository
+    {
+        public Task AddAsync(ClipboardItem item, CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public Task UpdateAsync(ClipboardItem item, CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public Task DeleteAsync(Guid id, CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public Task<ClipboardItem?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) => Task.FromResult<ClipboardItem?>(null);
+        public Task<ClipboardItem?> FindByHashAsync(string hash, CancellationToken cancellationToken = default) => Task.FromResult<ClipboardItem?>(null);
+        public Task<IReadOnlyList<ClipboardItem>> SearchAsync(ClipboardSearchQuery query, CancellationToken cancellationToken = default) => Task.FromResult((IReadOnlyList<ClipboardItem>)[]);
+        public virtual Task<int> CountAsync(CancellationToken cancellationToken = default) => Task.FromResult(0);
+    }
+
+    private sealed class ThrowingClipboardItemRepository : FakeClipboardItemRepository
+    {
+        public override Task<int> CountAsync(CancellationToken cancellationToken = default) => throw new InvalidOperationException("cleanup fail");
+    }
+
+    private sealed class FakeFileStorage : IFileStorage
+    {
+        public Task<string> SaveImageAsync(byte[] bytes, Guid itemId, CancellationToken cancellationToken = default) => Task.FromResult(string.Empty);
+        public Task<string> SaveThumbnailAsync(byte[] bytes, Guid itemId, CancellationToken cancellationToken = default) => Task.FromResult(string.Empty);
+        public Task DeleteAsync(string path, CancellationToken cancellationToken = default) => Task.CompletedTask;
     }
 }
