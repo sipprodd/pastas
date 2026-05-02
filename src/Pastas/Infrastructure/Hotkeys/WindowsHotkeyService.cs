@@ -12,14 +12,16 @@ public sealed class WindowsHotkeyService : IHotkeyService, IGlobalHotkeyService
     private const int HotkeyId = 1;
 
     private readonly Window _window;
+    private readonly IDiagnosticsLogger? _diagnosticsLogger;
     private HwndSource? _source;
     private bool _isRegistered;
 
     public event EventHandler? HotkeyPressed;
 
-    public WindowsHotkeyService(Window window)
+    public WindowsHotkeyService(Window window, IDiagnosticsLogger? diagnosticsLogger = null)
     {
         _window = window;
+        _diagnosticsLogger = diagnosticsLogger;
     }
 
     public Task RegisterAsync(string hotkey, CancellationToken cancellationToken = default)
@@ -31,12 +33,14 @@ public sealed class WindowsHotkeyService : IHotkeyService, IGlobalHotkeyService
 
         if (!HotkeyGestureParser.TryParse(hotkey, out var modifiers, out var virtualKey))
         {
+            _diagnosticsLogger?.Warning("Hotkey register skipped: parse failed.");
             return Task.CompletedTask;
         }
 
         var handle = new WindowInteropHelper(_window).Handle;
         if (handle == IntPtr.Zero)
         {
+            _diagnosticsLogger?.Warning("Hotkey register skipped: window handle unavailable.");
             return Task.CompletedTask;
         }
 
@@ -48,10 +52,12 @@ public sealed class WindowsHotkeyService : IHotkeyService, IGlobalHotkeyService
         {
             _source?.RemoveHook(WndProc);
             _source = null;
+            _diagnosticsLogger?.Warning("Hotkey register failed: RegisterHotKey returned false.");
             return Task.CompletedTask;
         }
 
         _isRegistered = true;
+        _diagnosticsLogger?.Info("Hotkey registered.");
         return Task.CompletedTask;
     }
 
@@ -71,6 +77,7 @@ public sealed class WindowsHotkeyService : IHotkeyService, IGlobalHotkeyService
         _source?.RemoveHook(WndProc);
         _source = null;
         _isRegistered = false;
+        _diagnosticsLogger?.Info("Hotkey unregistered.");
         return Task.CompletedTask;
     }
 

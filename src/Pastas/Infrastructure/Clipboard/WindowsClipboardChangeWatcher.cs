@@ -8,12 +8,14 @@ namespace Pastas.Infrastructure.Clipboard;
 public sealed class WindowsClipboardChangeWatcher : IClipboardChangeWatcher
 {
     private readonly Window _window;
+    private readonly IDiagnosticsLogger? _diagnosticsLogger;
     private HwndSource? _hwndSource;
     private bool _isStarted;
 
-    public WindowsClipboardChangeWatcher(Window window)
+    public WindowsClipboardChangeWatcher(Window window, IDiagnosticsLogger? diagnosticsLogger = null)
     {
         _window = window;
+        _diagnosticsLogger = diagnosticsLogger;
     }
 
     public event EventHandler? ClipboardChanged;
@@ -29,12 +31,14 @@ public sealed class WindowsClipboardChangeWatcher : IClipboardChangeWatcher
         var handle = windowInteropHelper.Handle;
         if (handle == IntPtr.Zero)
         {
+            _diagnosticsLogger?.Warning("Watcher start skipped: window handle unavailable.");
             return;
         }
 
         _hwndSource = HwndSource.FromHwnd(handle);
         if (_hwndSource is null)
         {
+            _diagnosticsLogger?.Warning("Watcher start skipped: HwndSource unavailable.");
             return;
         }
 
@@ -43,10 +47,12 @@ public sealed class WindowsClipboardChangeWatcher : IClipboardChangeWatcher
         {
             _hwndSource.RemoveHook(WndProc);
             _hwndSource = null;
+            _diagnosticsLogger?.Warning("Watcher start failed: AddClipboardFormatListener returned false.");
             return;
         }
 
         _isStarted = true;
+        _diagnosticsLogger?.Info("Watcher started.");
     }
 
     public void Stop()
@@ -65,6 +71,7 @@ public sealed class WindowsClipboardChangeWatcher : IClipboardChangeWatcher
         _hwndSource?.RemoveHook(WndProc);
         _hwndSource = null;
         _isStarted = false;
+        _diagnosticsLogger?.Info("Watcher stopped.");
     }
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
