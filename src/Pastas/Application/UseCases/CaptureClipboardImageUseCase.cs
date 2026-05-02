@@ -7,7 +7,7 @@ using Pastas.Shared.Result;
 
 namespace Pastas.Application.UseCases;
 
-public sealed class CaptureClipboardImageUseCase
+public sealed class CaptureClipboardImageUseCase : ICaptureClipboardImageUseCase
 {
     private readonly IClipboardGateway _clipboardGateway;
     private readonly IClipboardItemRepository _clipboardItemRepository;
