@@ -23,6 +23,8 @@ public partial class MainWindow : Window
     private readonly ITrayService? _trayService;
     private bool _isExiting;
 
+    private bool _isCleanedUp;
+
     public MainWindow()
     {
         InitializeComponent();
@@ -100,20 +102,7 @@ public partial class MainWindow : Window
 
     private async void OnClosedAsync(object? sender, EventArgs e)
     {
-        _clipboardChangeWatcher?.Stop();
-
-        if (_hotkeyService is not null)
-        {
-            await _hotkeyService.UnregisterAsync();
-        }
-
-        if (_trayService is not null)
-        {
-            _trayService.ShowRequested -= OnTrayShowRequestedAsync;
-            _trayService.ExitRequested -= OnTrayExitRequestedAsync;
-            _trayService.Stop();
-            _trayService.Dispose();
-        }
+        await CleanupAsync();
     }
 
     private async Task ToggleWindowVisibilityAsync()
@@ -176,11 +165,28 @@ public partial class MainWindow : Window
         }
 
         _isExiting = true;
+        await CleanupAsync();
+        await Dispatcher.InvokeAsync(() => Application.Current.Shutdown());
+    }
 
-        _clipboardChangeWatcher?.Stop();
+    private async Task CleanupAsync()
+    {
+        if (_isCleanedUp)
+        {
+            return;
+        }
+
+        _isCleanedUp = true;
+
+        if (_clipboardChangeWatcher is not null)
+        {
+            _clipboardChangeWatcher.ClipboardChanged -= OnClipboardChangedAsync;
+            _clipboardChangeWatcher.Stop();
+        }
 
         if (_hotkeyService is not null)
         {
+            _hotkeyService.HotkeyPressed -= OnHotkeyPressedAsync;
             await _hotkeyService.UnregisterAsync();
         }
 
@@ -191,8 +197,6 @@ public partial class MainWindow : Window
             _trayService.Stop();
             _trayService.Dispose();
         }
-
-        await Dispatcher.InvokeAsync(() => Application.Current.Shutdown());
     }
 
     private static (MainViewModel ViewModel, ClipboardCaptureNotificationHandler? NotificationHandler, IClipboardChangeWatcher? Watcher, IGlobalHotkeyService? HotkeyService, ITrayService? TrayService) CreateComposition(Window window)
