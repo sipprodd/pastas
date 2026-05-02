@@ -6,11 +6,17 @@ namespace Pastas.Infrastructure.Tray;
 
 public sealed class WindowsTrayService : ITrayService
 {
+    private readonly IDiagnosticsLogger? _diagnosticsLogger;
     private NotifyIcon? _notifyIcon;
     private bool _isStarted;
 
     public event EventHandler? ShowRequested;
     public event EventHandler? ExitRequested;
+
+    public WindowsTrayService(IDiagnosticsLogger? diagnosticsLogger = null)
+    {
+        _diagnosticsLogger = diagnosticsLogger;
+    }
 
     public void Start()
     {
@@ -35,9 +41,11 @@ public sealed class WindowsTrayService : ITrayService
 
             _notifyIcon.DoubleClick += OnNotifyIconDoubleClick;
             _isStarted = true;
+            _diagnosticsLogger?.Info("Tray started.");
         }
-        catch
+        catch (Exception ex)
         {
+            _diagnosticsLogger?.Error("Tray start failed.", ex);
             Stop();
         }
     }
@@ -61,6 +69,7 @@ public sealed class WindowsTrayService : ITrayService
         _notifyIcon.Dispose();
         _notifyIcon = null;
         _isStarted = false;
+        _diagnosticsLogger?.Info("Tray stopped.");
     }
 
     public void Dispose()

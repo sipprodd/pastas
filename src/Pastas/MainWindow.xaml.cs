@@ -4,6 +4,7 @@ using Pastas.Application.Services;
 using Pastas.Application.State;
 using Pastas.Application.UseCases;
 using Pastas.Infrastructure.Clipboard;
+using Pastas.Infrastructure.Diagnostics;
 using Pastas.Infrastructure.Files;
 using Pastas.Infrastructure.Hotkeys;
 using Pastas.Infrastructure.Storage.SQLite;
@@ -17,6 +18,7 @@ namespace Pastas;
 public partial class MainWindow : Window
 {
     private readonly MainViewModel _viewModel;
+    private readonly IDiagnosticsLogger _diagnosticsLogger;
     private readonly ClipboardCaptureNotificationHandler? _clipboardCaptureNotificationHandler;
     private readonly IClipboardChangeWatcher? _clipboardChangeWatcher;
     private readonly IGlobalHotkeyService? _hotkeyService;
@@ -28,7 +30,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        (_viewModel, _clipboardCaptureNotificationHandler, _clipboardChangeWatcher, _hotkeyService, _trayService) = CreateComposition(this);
+        (_viewModel, _diagnosticsLogger, _clipboardCaptureNotificationHandler, _clipboardChangeWatcher, _hotkeyService, _trayService) = CreateComposition(this);
         DataContext = _viewModel;
 
         Loaded += OnLoadedAsync;
@@ -199,8 +201,10 @@ public partial class MainWindow : Window
         }
     }
 
-    private static (MainViewModel ViewModel, ClipboardCaptureNotificationHandler? NotificationHandler, IClipboardChangeWatcher? Watcher, IGlobalHotkeyService? HotkeyService, ITrayService? TrayService) CreateComposition(Window window)
+    private static (MainViewModel ViewModel, IDiagnosticsLogger DiagnosticsLogger, ClipboardCaptureNotificationHandler? NotificationHandler, IClipboardChangeWatcher? Watcher, IGlobalHotkeyService? HotkeyService, ITrayService? TrayService) CreateComposition(Window window)
     {
+        var diagnosticsLogger = new FileDiagnosticsLogger();
+
         try
         {
             var databasePathProvider = new SqliteDatabasePathProvider();
@@ -218,32 +222,35 @@ public partial class MainWindow : Window
 
             var captureTextUseCase = new CaptureClipboardTextUseCase(clipboardGateway, repository, captureState, cleanupOptions);
             var captureImageUseCase = new CaptureClipboardImageUseCase(clipboardGateway, repository, fileStorage, thumbnailBuilder, captureState, cleanupOptions);
+            var cleanupService = new ClipboardCleanupService(repository, fileStorage, cleanupOptions, diagnosticsLogger);
             var copyUseCase = new CopyTextItemToClipboardUseCase(repository, clipboardGateway, captureState);
-            var cleanupService = new ClipboardCleanupService(repository, fileStorage, cleanupOptions);
-            var coordinator = new ClipboardCaptureCoordinator(captureTextUseCase, captureImageUseCase, cleanupService);
-            var watcher = new WindowsClipboardChangeWatcher(window);
+            var coordinator = new ClipboardCaptureCoordinator(captureTextUseCase, captureImageUseCase, cleanupService, diagnosticsLogger);
+            var watcher = new WindowsClipboardChangeWatcher(window, diagnosticsLogger);
 
-            var hotkeyService = new WindowsHotkeyService(window);
-            var trayService = new WindowsTrayService();
+            var hotkeyService = new WindowsHotkeyService(window, diagnosticsLogger);
+            var trayService = new WindowsTrayService(diagnosticsLogger);
 
             var viewModel = new MainViewModel(repository, copyUseCase);
             var notificationService = new MainViewModelNotificationService(viewModel, window.Dispatcher);
             var notificationHandler = new ClipboardCaptureNotificationHandler(coordinator, notificationService);
 
-            return (viewModel, notificationHandler, watcher, hotkeyService, trayService);
+            diagnosticsLogger.Info("Application composition succeeded.");
+            return (viewModel, diagnosticsLogger, notificationHandler, watcher, hotkeyService, trayService);
         }
-        catch
+        catch (Exception ex)
         {
+            diagnosticsLogger.Error("Application composition failed.", ex);
+
             var repository = new EmptyClipboardItemRepository();
             var captureState = new ClipboardCaptureState();
             var retryPolicy = new ClipboardRetryPolicy();
             var clipboardGateway = new WindowsClipboardGateway(retryPolicy);
             var copyUseCase = new CopyTextItemToClipboardUseCase(repository, clipboardGateway, captureState);
 
-            var hotkeyService = new WindowsHotkeyService(window);
-            var trayService = new WindowsTrayService();
+            var hotkeyService = new WindowsHotkeyService(window, diagnosticsLogger);
+            var trayService = new WindowsTrayService(diagnosticsLogger);
 
-            return (new MainViewModel(repository, copyUseCase), null, null, hotkeyService, trayService);
+            return (new MainViewModel(repository, copyUseCase), diagnosticsLogger, null, null, hotkeyService, trayService);
         }
     }
 }
