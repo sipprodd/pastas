@@ -1,6 +1,89 @@
 <Window x:Class="Pastas.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Pastas" Height="450" Width="800">
-    <Grid />
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:domain="clr-namespace:Pastas.Domain.Enums"
+        mc:Ignorable="d"
+        Title="Pastas"
+        Width="940"
+        Height="680"
+        Background="#FF1E1E1E">
+    <Grid Margin="18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,16">
+            <TextBlock Text="pastas" FontSize="28" FontWeight="SemiBold" Foreground="#FFF4EBDD" />
+            <TextBox Margin="0,12,0,0"
+                     Padding="10"
+                     Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
+                     Background="#FF2A2A2A"
+                     Foreground="#FFF5F5F5"
+                     BorderBrush="#FF444444" />
+            <Button Margin="0,8,0,0"
+                    Padding="8,4"
+                    HorizontalAlignment="Left"
+                    Content="Search"
+                    Command="{Binding SearchCommand}" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
+            <Button Margin="0,0,6,0" Content="All" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.All}" />
+            <Button Margin="0,0,6,0" Content="Text" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Text}" />
+            <Button Margin="0,0,6,0" Content="Images" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Images}" />
+            <Button Margin="0,0,6,0" Content="Pinned" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Pinned}" />
+            <Button Margin="0,0,18,0" Content="Protected" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Protected}" />
+
+            <ComboBox Width="160"
+                      SelectedValuePath="Tag"
+                      SelectedValue="{Binding SelectedSortMode}">
+                <ComboBoxItem Content="Recent" Tag="{x:Static domain:SortMode.Recent}" />
+                <ComboBoxItem Content="Oldest" Tag="{x:Static domain:SortMode.Oldest}" />
+                <ComboBoxItem Content="Most copied" Tag="{x:Static domain:SortMode.MostCopied}" />
+            </ComboBox>
+            <Button Margin="8,0,0,0" Content="Apply" Command="{Binding SetSortModeCommand}" CommandParameter="{Binding SelectedSortMode}" />
+            <Button Margin="8,0,0,0" Content="Refresh" Command="{Binding RefreshCommand}" />
+        </StackPanel>
+
+        <Grid Grid.Row="2">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding Items}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Margin="0,0,0,10" Padding="12" Background="#FF2B2B2B" CornerRadius="10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding TypeLabel}" Foreground="#FFE8DAC3" FontWeight="SemiBold" />
+                                        <TextBlock Text="{Binding PreviewText}" Foreground="#FFF3F3F3" Margin="0,5,0,4" TextWrapping="Wrap" />
+                                        <TextBlock Text="{Binding SourceLabel}" Foreground="#FFB6B6B6" FontSize="12" />
+                                        <TextBlock Text="{Binding TimeLabel}" Foreground="#FFB6B6B6" FontSize="12" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
+                                        <Button Margin="0,0,6,0" Padding="8,2" Content="Pin" Command="{Binding DataContext.TogglePinCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                        <Button Padding="8,2" Content="Delete" Command="{Binding DataContext.DeleteItemCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <TextBlock HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Foreground="#FFF0E5D4"
+                       FontSize="14"
+                       Text="{Binding EmptyStateText}" />
+        </Grid>
+    </Grid>
 </Window>
