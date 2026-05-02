@@ -14,6 +14,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Margin="0,0,0,16">
@@ -49,7 +50,7 @@
             <Button Margin="8,0,0,0" Content="Refresh" Command="{Binding RefreshCommand}" />
         </StackPanel>
 
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="2" Margin="0,0,0,8">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <ItemsControl ItemsSource="{Binding Items}">
                     <ItemsControl.ItemTemplate>
@@ -69,6 +70,7 @@
                                     </StackPanel>
 
                                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
+                                        <Button Margin="0,0,6,0" Padding="8,2" Content="Copy" Command="{Binding DataContext.CopyItemCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
                                         <Button Margin="0,0,6,0" Padding="8,2" Content="Pin" Command="{Binding DataContext.TogglePinCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
                                         <Button Padding="8,2" Content="Delete" Command="{Binding DataContext.DeleteItemCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
                                     </StackPanel>
@@ -85,5 +87,10 @@
                        FontSize="14"
                        Text="{Binding EmptyStateText}" />
         </Grid>
+
+        <TextBlock Grid.Row="3"
+                   Foreground="#FFB6B6B6"
+                   FontSize="12"
+                   Text="{Binding StatusMessage}" />
     </Grid>
 </Window>

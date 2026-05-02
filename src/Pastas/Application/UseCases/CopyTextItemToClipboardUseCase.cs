@@ -4,7 +4,7 @@ using Pastas.Shared.Result;
 
 namespace Pastas.Application.UseCases;
 
-public sealed class CopyTextItemToClipboardUseCase
+public sealed class CopyTextItemToClipboardUseCase : ICopyTextItemToClipboardUseCase
 {
     private readonly IClipboardItemRepository _clipboardItemRepository;
     private readonly IClipboardGateway _clipboardGateway;

@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using Pastas.Application.UseCases;
 using Pastas.Domain.Entities;
 using Pastas.Domain.Enums;
 using Pastas.Domain.Interfaces;
@@ -11,15 +12,20 @@ namespace Pastas.Presentation.ViewModels;
 public sealed class MainViewModel : ViewModelBase
 {
     private readonly IClipboardItemRepository _clipboardItemRepository;
+    private readonly ICopyTextItemToClipboardUseCase _copyTextItemToClipboardUseCase;
     private string _searchQuery = string.Empty;
     private ClipboardFilter _selectedFilter = ClipboardFilter.All;
     private SortMode _selectedSortMode = SortMode.Recent;
     private bool _isLoading;
     private string _emptyStateText = "No clipboard items yet.";
+    private string _statusMessage = string.Empty;
 
-    public MainViewModel(IClipboardItemRepository clipboardItemRepository)
+    public MainViewModel(
+        IClipboardItemRepository clipboardItemRepository,
+        ICopyTextItemToClipboardUseCase copyTextItemToClipboardUseCase)
     {
         _clipboardItemRepository = clipboardItemRepository;
+        _copyTextItemToClipboardUseCase = copyTextItemToClipboardUseCase;
 
         RefreshCommand = new AsyncRelayCommand(RefreshAsync);
         SearchCommand = new AsyncRelayCommand(RefreshAsync);
@@ -27,6 +33,7 @@ public sealed class MainViewModel : ViewModelBase
         SetSortModeCommand = new AsyncRelayCommand(SetSortModeAsync);
         DeleteItemCommand = new AsyncRelayCommand(DeleteItemAsync);
         TogglePinCommand = new AsyncRelayCommand(TogglePinAsync);
+        CopyItemCommand = new AsyncRelayCommand(CopyItemAsync);
     }
 
     public ObservableCollection<ClipboardItemViewModel> Items { get; } = new();
@@ -61,12 +68,19 @@ public sealed class MainViewModel : ViewModelBase
         private set => SetProperty(ref _emptyStateText, value);
     }
 
+    public string StatusMessage
+    {
+        get => _statusMessage;
+        private set => SetProperty(ref _statusMessage, value);
+    }
+
     public ICommand RefreshCommand { get; }
     public ICommand SearchCommand { get; }
     public ICommand SetFilterCommand { get; }
     public ICommand SetSortModeCommand { get; }
     public ICommand DeleteItemCommand { get; }
     public ICommand TogglePinCommand { get; }
+    public ICommand CopyItemCommand { get; }
 
     public async Task RefreshAsync()
     {
@@ -141,6 +155,24 @@ public sealed class MainViewModel : ViewModelBase
         var updated = CloneWithPinned(entity, !entity.IsPinned);
         await _clipboardItemRepository.UpdateAsync(updated);
         await RefreshAsync();
+    }
+
+    private async Task CopyItemAsync(object? parameter)
+    {
+        if (parameter is not ClipboardItemViewModel item)
+        {
+            return;
+        }
+
+        try
+        {
+            var result = await _copyTextItemToClipboardUseCase.ExecuteAsync(item.Id);
+            StatusMessage = result.IsSuccess ? "Copied to clipboard." : "Could not copy item.";
+        }
+        catch
+        {
+            StatusMessage = "Could not copy item.";
+        }
     }
 
     private void ApplyItems(IReadOnlyList<ClipboardItem> items)

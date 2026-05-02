@@ -1,8 +1,10 @@
+using Pastas.Application.UseCases;
 using Pastas.Domain.Entities;
 using Pastas.Domain.Enums;
 using Pastas.Domain.Interfaces;
 using Pastas.Domain.ValueObjects;
 using Pastas.Presentation.ViewModels;
+using Pastas.Shared.Result;
 
 namespace Pastas.UnitTests.Presentation;
 
@@ -18,7 +20,7 @@ public sealed class MainViewModelTests
                 new ClipboardItem { PreviewText = "hello", ContentText = "hello", Hash = "a" }
             }
         };
-        var viewModel = new MainViewModel(repository);
+        var viewModel = CreateViewModel(repository);
 
         await viewModel.RefreshAsync();
 
@@ -29,10 +31,8 @@ public sealed class MainViewModelTests
     public async Task SearchCommand_UsesSearchQuery()
     {
         var repository = new FakeClipboardItemRepository();
-        var viewModel = new MainViewModel(repository)
-        {
-            SearchQuery = "term"
-        };
+        var viewModel = CreateViewModel(repository);
+        viewModel.SearchQuery = "term";
 
         await viewModel.RefreshAsync();
 
@@ -43,10 +43,8 @@ public sealed class MainViewModelTests
     public async Task RefreshAsync_UsesSelectedFilter()
     {
         var repository = new FakeClipboardItemRepository();
-        var viewModel = new MainViewModel(repository)
-        {
-            SelectedFilter = ClipboardFilter.Protected
-        };
+        var viewModel = CreateViewModel(repository);
+        viewModel.SelectedFilter = ClipboardFilter.Protected;
 
         await viewModel.RefreshAsync();
 
@@ -58,7 +56,7 @@ public sealed class MainViewModelTests
     {
         var item = new ClipboardItem { Id = Guid.NewGuid(), PreviewText = "x", ContentText = "x", Hash = "x" };
         var repository = new FakeClipboardItemRepository { SearchResults = { item } };
-        var viewModel = new MainViewModel(repository);
+        var viewModel = CreateViewModel(repository);
         await viewModel.RefreshAsync();
 
         viewModel.DeleteItemCommand.Execute(viewModel.Items[0]);
@@ -73,7 +71,7 @@ public sealed class MainViewModelTests
     {
         var item = new ClipboardItem { Id = Guid.NewGuid(), PreviewText = "x", ContentText = "x", Hash = "x", IsPinned = false };
         var repository = new FakeClipboardItemRepository { SearchResults = { item }, ItemsById = { [item.Id] = item } };
-        var viewModel = new MainViewModel(repository);
+        var viewModel = CreateViewModel(repository);
         await viewModel.RefreshAsync();
 
         viewModel.TogglePinCommand.Execute(viewModel.Items[0]);
@@ -82,6 +80,105 @@ public sealed class MainViewModelTests
         Assert.Single(repository.UpdatedItems);
         Assert.True(repository.UpdatedItems[0].IsPinned);
         Assert.True(repository.SearchCallCount >= 2);
+    }
+
+    [Fact]
+    public async Task CopyItemCommand_CallsUseCase_ForValidItem()
+    {
+        var itemId = Guid.NewGuid();
+        var useCase = new FakeCopyTextItemToClipboardUseCase();
+        var viewModel = CreateViewModel(copyUseCase: useCase);
+
+        await viewModel.RefreshAsync();
+        var vmItem = ClipboardItemViewModel.FromEntity(new ClipboardItem
+        {
+            Id = itemId,
+            Type = ClipboardItemType.Text,
+            PreviewText = "preview",
+            ContentText = "preview",
+            Hash = "hash-1",
+            LastCopiedAt = DateTime.UtcNow
+        });
+        viewModel.CopyItemCommand.Execute(vmItem);
+        await Task.Delay(20);
+
+        Assert.Equal(itemId, useCase.LastItemId);
+    }
+
+    [Fact]
+    public async Task CopyItemCommand_SetsSuccessStatusMessage()
+    {
+        var useCase = new FakeCopyTextItemToClipboardUseCase { ResultToReturn = Result.Success() };
+        var viewModel = CreateViewModel(copyUseCase: useCase);
+
+        var vmItem = ClipboardItemViewModel.FromEntity(new ClipboardItem
+        {
+            Id = Guid.NewGuid(),
+            Type = ClipboardItemType.Text,
+            PreviewText = "preview",
+            ContentText = "preview",
+            Hash = "hash-2",
+            LastCopiedAt = DateTime.UtcNow
+        });
+        viewModel.CopyItemCommand.Execute(vmItem);
+        await Task.Delay(20);
+
+        Assert.Equal("Copied to clipboard.", viewModel.StatusMessage);
+    }
+
+    [Fact]
+    public async Task CopyItemCommand_SetsFailureStatusMessage()
+    {
+        var useCase = new FakeCopyTextItemToClipboardUseCase
+        {
+            ResultToReturn = Result.Failure(new Error("copy.failed", "secret clipboard text"))
+        };
+        var viewModel = CreateViewModel(copyUseCase: useCase);
+
+        var vmItem = ClipboardItemViewModel.FromEntity(new ClipboardItem
+        {
+            Id = Guid.NewGuid(),
+            Type = ClipboardItemType.Text,
+            PreviewText = "preview",
+            ContentText = "secret clipboard text",
+            Hash = "hash-3",
+            LastCopiedAt = DateTime.UtcNow
+        });
+        viewModel.CopyItemCommand.Execute(vmItem);
+        await Task.Delay(20);
+
+        Assert.Equal("Could not copy item.", viewModel.StatusMessage);
+        Assert.DoesNotContain("secret clipboard text", viewModel.StatusMessage, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task CopyItemCommand_InvalidParameter_DoesNotThrow()
+    {
+        var viewModel = CreateViewModel();
+
+        var exception = Record.Exception(() => viewModel.CopyItemCommand.Execute("invalid"));
+        await Task.Delay(20);
+
+        Assert.Null(exception);
+    }
+
+    private static MainViewModel CreateViewModel(
+        FakeClipboardItemRepository? repository = null,
+        FakeCopyTextItemToClipboardUseCase? copyUseCase = null)
+    {
+        return new MainViewModel(repository ?? new FakeClipboardItemRepository(), copyUseCase ?? new FakeCopyTextItemToClipboardUseCase());
+    }
+
+    private sealed class FakeCopyTextItemToClipboardUseCase : ICopyTextItemToClipboardUseCase
+    {
+        public Guid? LastItemId { get; private set; }
+        public Result ResultToReturn { get; set; } = Result.Success();
+
+        public Task<Result> ExecuteAsync(Guid itemId, CancellationToken cancellationToken = default)
+        {
+            LastItemId = itemId;
+            return Task.FromResult(ResultToReturn);
+        }
     }
 
     private sealed class FakeClipboardItemRepository : IClipboardItemRepository
