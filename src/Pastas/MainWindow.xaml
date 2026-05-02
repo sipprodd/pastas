@@ -9,6 +9,10 @@
         Width="940"
         Height="680"
         Background="#FF1E1E1E">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Window.Resources>
+
     <Grid Margin="18">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -112,9 +116,16 @@
                        Text="{Binding EmptyStateText}" />
         </Grid>
 
-        <TextBlock Grid.Row="3"
-                   Foreground="#FFB6B6B6"
-                   FontSize="12"
-                   Text="{Binding StatusMessage}" />
+        <Border Grid.Row="3"
+                HorizontalAlignment="Right"
+                Padding="10,6"
+                CornerRadius="8"
+                Background="#FF3A332B"
+                MaxWidth="300"
+                Visibility="{Binding HasStatusMessage, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
+            <TextBlock Foreground="#FFF0E5D4"
+                       FontSize="12"
+                       Text="{Binding StatusMessage}" />
+        </Border>
     </Grid>
 </Window>

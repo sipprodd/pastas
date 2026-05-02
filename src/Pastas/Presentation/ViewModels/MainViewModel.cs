@@ -74,6 +74,8 @@ public sealed class MainViewModel : ViewModelBase
         private set => SetProperty(ref _statusMessage, value);
     }
 
+    public bool HasStatusMessage => !string.IsNullOrWhiteSpace(StatusMessage);
+
     public ICommand RefreshCommand { get; }
     public ICommand SearchCommand { get; }
     public ICommand SetFilterCommand { get; }
@@ -81,6 +83,12 @@ public sealed class MainViewModel : ViewModelBase
     public ICommand DeleteItemCommand { get; }
     public ICommand TogglePinCommand { get; }
     public ICommand CopyItemCommand { get; }
+
+    public void SetStatusMessage(string message)
+    {
+        StatusMessage = message;
+        OnPropertyChanged(nameof(HasStatusMessage));
+    }
 
     public async Task RefreshAsync()
     {
@@ -167,11 +175,11 @@ public sealed class MainViewModel : ViewModelBase
         try
         {
             var result = await _copyTextItemToClipboardUseCase.ExecuteAsync(item.Id);
-            StatusMessage = result.IsSuccess ? "Copied to clipboard." : "Could not copy item.";
+            SetStatusMessage(result.IsSuccess ? "Copied to clipboard." : "Could not copy item.");
         }
         catch
         {
-            StatusMessage = "Could not copy item.";
+            SetStatusMessage("Could not copy item.");
         }
     }
 
