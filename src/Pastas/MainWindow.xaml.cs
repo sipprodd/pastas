@@ -9,6 +9,7 @@ using Pastas.Infrastructure.Hotkeys;
 using Pastas.Infrastructure.Storage.SQLite;
 using Pastas.Infrastructure.Tray;
 using Pastas.Presentation.Design;
+using Pastas.Presentation.Services;
 using Pastas.Presentation.ViewModels;
 
 namespace Pastas;
@@ -16,7 +17,7 @@ namespace Pastas;
 public partial class MainWindow : Window
 {
     private readonly MainViewModel _viewModel;
-    private readonly ClipboardCaptureCoordinator? _clipboardCaptureCoordinator;
+    private readonly ClipboardCaptureNotificationHandler? _clipboardCaptureNotificationHandler;
     private readonly IClipboardChangeWatcher? _clipboardChangeWatcher;
     private readonly IGlobalHotkeyService? _hotkeyService;
     private readonly ITrayService? _trayService;
@@ -25,12 +26,12 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        (_viewModel, _clipboardCaptureCoordinator, _clipboardChangeWatcher, _hotkeyService, _trayService) = CreateComposition(this);
+        (_viewModel, _clipboardCaptureNotificationHandler, _clipboardChangeWatcher, _hotkeyService, _trayService) = CreateComposition(this);
         DataContext = _viewModel;
 
         Loaded += OnLoadedAsync;
 
-        if (_clipboardCaptureCoordinator is not null && _clipboardChangeWatcher is not null)
+        if (_clipboardCaptureNotificationHandler is not null && _clipboardChangeWatcher is not null)
         {
             _clipboardChangeWatcher.ClipboardChanged += OnClipboardChangedAsync;
         }
@@ -62,12 +63,12 @@ public partial class MainWindow : Window
 
     private async void OnClipboardChangedAsync(object? sender, EventArgs e)
     {
-        if (_clipboardCaptureCoordinator is null)
+        if (_clipboardCaptureNotificationHandler is null)
         {
             return;
         }
 
-        await _clipboardCaptureCoordinator.CaptureAsync();
+        await _clipboardCaptureNotificationHandler.HandleClipboardChangedAsync();
         await _viewModel.RefreshAsync();
     }
 
@@ -100,6 +101,7 @@ public partial class MainWindow : Window
     private async void OnClosedAsync(object? sender, EventArgs e)
     {
         _clipboardChangeWatcher?.Stop();
+
         if (_hotkeyService is not null)
         {
             await _hotkeyService.UnregisterAsync();
@@ -176,6 +178,7 @@ public partial class MainWindow : Window
         _isExiting = true;
 
         _clipboardChangeWatcher?.Stop();
+
         if (_hotkeyService is not null)
         {
             await _hotkeyService.UnregisterAsync();
@@ -192,7 +195,7 @@ public partial class MainWindow : Window
         await Dispatcher.InvokeAsync(() => Application.Current.Shutdown());
     }
 
-    private static (MainViewModel ViewModel, ClipboardCaptureCoordinator? Coordinator, IClipboardChangeWatcher? Watcher, IGlobalHotkeyService? HotkeyService, ITrayService? TrayService) CreateComposition(Window window)
+    private static (MainViewModel ViewModel, ClipboardCaptureNotificationHandler? NotificationHandler, IClipboardChangeWatcher? Watcher, IGlobalHotkeyService? HotkeyService, ITrayService? TrayService) CreateComposition(Window window)
     {
         try
         {
@@ -217,7 +220,11 @@ public partial class MainWindow : Window
             var hotkeyService = new WindowsHotkeyService(window);
             var trayService = new WindowsTrayService();
 
-            return (new MainViewModel(repository, copyUseCase), coordinator, watcher, hotkeyService, trayService);
+            var viewModel = new MainViewModel(repository, copyUseCase);
+            var notificationService = new MainViewModelNotificationService(viewModel, window.Dispatcher);
+            var notificationHandler = new ClipboardCaptureNotificationHandler(coordinator, notificationService);
+
+            return (viewModel, notificationHandler, watcher, hotkeyService, trayService);
         }
         catch
         {
