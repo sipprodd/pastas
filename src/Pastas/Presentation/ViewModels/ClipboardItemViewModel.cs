@@ -19,11 +19,16 @@ public sealed class ClipboardItemViewModel
     public bool IsProtected { get; private init; }
     public bool IsImage { get; private init; }
     public bool IsText { get; private init; }
+    public string? ThumbnailPath { get; private init; }
+    public bool HasThumbnail { get; private init; }
 
     public static ClipboardItemViewModel FromEntity(ClipboardItem item)
     {
         var isImage = item.Type is ClipboardItemType.Image or ClipboardItemType.Screenshot;
         var isProtected = item.IsProtected || item.Type == ClipboardItemType.ProtectedText;
+        var thumbnailPath = isImage && !string.IsNullOrWhiteSpace(item.ThumbnailPath)
+            ? item.ThumbnailPath
+            : null;
 
         return new ClipboardItemViewModel
         {
@@ -36,7 +41,9 @@ public sealed class ClipboardItemViewModel
             IsPinned = item.IsPinned,
             IsProtected = isProtected,
             IsImage = isImage,
-            IsText = !isImage
+            IsText = !isImage,
+            ThumbnailPath = thumbnailPath,
+            HasThumbnail = !string.IsNullOrWhiteSpace(thumbnailPath)
         };
     }
 

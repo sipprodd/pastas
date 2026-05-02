@@ -58,18 +58,42 @@
                             <Border Margin="0,0,0,10" Padding="12" Background="#FF2B2B2B" CornerRadius="10">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
 
-                                    <StackPanel>
+                                    <Border Grid.Column="0"
+                                            Width="80"
+                                            Height="80"
+                                            Margin="0,0,12,0"
+                                            CornerRadius="8"
+                                            Background="#FF232323"
+                                            Visibility="Collapsed">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding HasThumbnail}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <Image Source="{Binding ThumbnailPath}"
+                                               Stretch="Uniform"
+                                               MaxWidth="72"
+                                               MaxHeight="72" />
+                                    </Border>
+
+                                    <StackPanel Grid.Column="1">
                                         <TextBlock Text="{Binding TypeLabel}" Foreground="#FFE8DAC3" FontWeight="SemiBold" />
                                         <TextBlock Text="{Binding PreviewText}" Foreground="#FFF3F3F3" Margin="0,5,0,4" TextWrapping="Wrap" />
                                         <TextBlock Text="{Binding SourceLabel}" Foreground="#FFB6B6B6" FontSize="12" />
                                         <TextBlock Text="{Binding TimeLabel}" Foreground="#FFB6B6B6" FontSize="12" />
                                     </StackPanel>
 
-                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Top">
                                         <Button Margin="0,0,6,0" Padding="8,2" Content="Copy" Command="{Binding DataContext.CopyItemCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
                                         <Button Margin="0,0,6,0" Padding="8,2" Content="Pin" Command="{Binding DataContext.TogglePinCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
                                         <Button Padding="8,2" Content="Delete" Command="{Binding DataContext.DeleteItemCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
