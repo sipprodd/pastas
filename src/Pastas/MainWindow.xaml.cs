@@ -1,4 +1,8 @@
 using System.Windows;
+using Pastas.Application.Services;
+using Pastas.Application.State;
+using Pastas.Application.UseCases;
+using Pastas.Infrastructure.Clipboard;
 using Pastas.Infrastructure.Storage.SQLite;
 using Pastas.Presentation.Design;
 using Pastas.Presentation.ViewModels;
@@ -31,11 +35,22 @@ public partial class MainWindow : Window
             migrationRunner.RunAsync().GetAwaiter().GetResult();
 
             var repository = new SqliteClipboardItemRepository(connectionFactory);
-            return new MainViewModel(repository);
+            var retryPolicy = new ClipboardRetryPolicy();
+            var captureState = new ClipboardCaptureState();
+            var clipboardGateway = new WindowsClipboardGateway(retryPolicy);
+            var copyUseCase = new CopyTextItemToClipboardUseCase(repository, clipboardGateway, captureState);
+
+            return new MainViewModel(repository, copyUseCase);
         }
         catch
         {
-            return new MainViewModel(new EmptyClipboardItemRepository());
+            var repository = new EmptyClipboardItemRepository();
+            var captureState = new ClipboardCaptureState();
+            var retryPolicy = new ClipboardRetryPolicy();
+            var clipboardGateway = new WindowsClipboardGateway(retryPolicy);
+            var copyUseCase = new CopyTextItemToClipboardUseCase(repository, clipboardGateway, captureState);
+
+            return new MainViewModel(repository, copyUseCase);
         }
     }
 }
