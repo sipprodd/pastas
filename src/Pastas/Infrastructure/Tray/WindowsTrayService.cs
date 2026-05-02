@@ -65,6 +65,12 @@ public sealed class WindowsTrayService : ITrayService
 
     public void Dispose()
     {
+        if (!_isStarted && _notifyIcon is null)
+        {
+            GC.SuppressFinalize(this);
+            return;
+        }
+
         Stop();
         GC.SuppressFinalize(this);
     }
