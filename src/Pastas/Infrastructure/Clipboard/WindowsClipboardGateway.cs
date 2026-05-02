@@ -1,4 +1,6 @@
+using System.IO;
 using System.Windows;
+using System.Windows.Media.Imaging;
 using Pastas.Application.Services;
 using Pastas.Domain.Enums;
 using Pastas.Domain.Interfaces;
@@ -20,22 +22,45 @@ public sealed class WindowsClipboardGateway : IClipboardGateway
         return await _retryPolicy.ExecuteAsync(
             () => StaClipboardRunner.Run(() =>
             {
-                if (!Clipboard.ContainsText(TextDataFormat.UnicodeText))
+                if (Clipboard.ContainsText(TextDataFormat.UnicodeText))
+                {
+                    var text = Clipboard.GetText(TextDataFormat.UnicodeText);
+                    if (string.IsNullOrEmpty(text))
+                    {
+                        return null;
+                    }
+
+                    return new ClipboardCaptureData
+                    {
+                        Type = ClipboardItemType.Text,
+                        Text = text,
+                        SizeBytes = System.Text.Encoding.UTF8.GetByteCount(text)
+                    };
+                }
+
+                if (!Clipboard.ContainsImage())
                 {
                     return null;
                 }
 
-                var text = Clipboard.GetText(TextDataFormat.UnicodeText);
-                if (string.IsNullOrEmpty(text))
+                var bitmap = Clipboard.GetImage();
+                if (bitmap is null)
                 {
                     return null;
                 }
+
+                var encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(bitmap));
+
+                using var stream = new MemoryStream();
+                encoder.Save(stream);
+                var imageBytes = stream.ToArray();
 
                 return new ClipboardCaptureData
                 {
-                    Type = ClipboardItemType.Text,
-                    Text = text,
-                    SizeBytes = System.Text.Encoding.UTF8.GetByteCount(text)
+                    Type = ClipboardItemType.Image,
+                    ImageBytes = imageBytes,
+                    SizeBytes = imageBytes.LongLength
                 };
             }),
             cancellationToken);
