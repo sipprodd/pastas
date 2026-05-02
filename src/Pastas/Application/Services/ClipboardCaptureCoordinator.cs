@@ -8,16 +8,19 @@ public sealed class ClipboardCaptureCoordinator
 
     private readonly ICaptureClipboardTextUseCase _captureClipboardTextUseCase;
     private readonly ICaptureClipboardImageUseCase _captureClipboardImageUseCase;
+    private readonly ClipboardCleanupService _clipboardCleanupService;
     private readonly SemaphoreSlim _captureGate = new(1, 1);
     private readonly TimeSpan _debounceDelay;
 
     public ClipboardCaptureCoordinator(
         ICaptureClipboardTextUseCase captureClipboardTextUseCase,
         ICaptureClipboardImageUseCase captureClipboardImageUseCase,
+        ClipboardCleanupService clipboardCleanupService,
         TimeSpan? debounceDelay = null)
     {
         _captureClipboardTextUseCase = captureClipboardTextUseCase;
         _captureClipboardImageUseCase = captureClipboardImageUseCase;
+        _clipboardCleanupService = clipboardCleanupService;
         _debounceDelay = debounceDelay ?? DefaultDebounceDelay;
     }
 
@@ -33,6 +36,7 @@ public sealed class ClipboardCaptureCoordinator
             await Task.Delay(_debounceDelay, cancellationToken);
             await SafeExecuteAsync(() => _captureClipboardTextUseCase.ExecuteAsync(cancellationToken));
             await SafeExecuteAsync(() => _captureClipboardImageUseCase.ExecuteAsync(cancellationToken));
+            await SafeExecuteAsync(() => _clipboardCleanupService.CleanupAsync(cancellationToken));
         }
         catch (OperationCanceledException)
         {

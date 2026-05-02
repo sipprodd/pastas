@@ -140,6 +140,19 @@ public class ClipboardPipelineTests
     }
 
     [Fact]
+    public async Task CaptureClipboardTextUseCase_SkipsWhenItemExceedsMaxSize()
+    {
+        var gateway = new FakeClipboardGateway { ReadValue = new ClipboardCaptureData { Text = "too-big" } };
+        var repo = new FakeClipboardItemRepository();
+        var options = new ClipboardCleanupOptions { MaxSingleItemBytes = 1 };
+        var useCase = new CaptureClipboardTextUseCase(gateway, repo, new ClipboardCaptureState(), options);
+
+        await useCase.ExecuteAsync();
+
+        Assert.Empty(repo.Items);
+    }
+
+    [Fact]
     public async Task CopyTextItemToClipboardUseCase_WritesTextAndSetsInternalGuard()
     {
         var item = new ClipboardItem { ContentText = "copied", Hash = ClipboardTextHasher.Compute("copied") };

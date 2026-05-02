@@ -14,19 +14,22 @@ public sealed class CaptureClipboardImageUseCase : ICaptureClipboardImageUseCase
     private readonly IFileStorage _fileStorage;
     private readonly IImageThumbnailBuilder _imageThumbnailBuilder;
     private readonly ClipboardCaptureState _captureState;
+    private readonly ClipboardCleanupOptions _cleanupOptions;
 
     public CaptureClipboardImageUseCase(
         IClipboardGateway clipboardGateway,
         IClipboardItemRepository clipboardItemRepository,
         IFileStorage fileStorage,
         IImageThumbnailBuilder imageThumbnailBuilder,
-        ClipboardCaptureState captureState)
+        ClipboardCaptureState captureState,
+        ClipboardCleanupOptions? cleanupOptions = null)
     {
         _clipboardGateway = clipboardGateway;
         _clipboardItemRepository = clipboardItemRepository;
         _fileStorage = fileStorage;
         _imageThumbnailBuilder = imageThumbnailBuilder;
         _captureState = captureState;
+        _cleanupOptions = cleanupOptions ?? new ClipboardCleanupOptions();
     }
 
     public async Task<Result> ExecuteAsync(CancellationToken cancellationToken = default)
@@ -43,10 +46,15 @@ public sealed class CaptureClipboardImageUseCase : ICaptureClipboardImageUseCase
         }
 
         var imageBytes = captureData.ImageBytes;
+        if (imageBytes.LongLength > _cleanupOptions.MaxSingleItemBytes)
+        {
+            return Result.Success();
+        }
+
         var hash = ClipboardImageHasher.Compute(imageBytes);
         var now = DateTime.UtcNow;
-
         var existingItem = await _clipboardItemRepository.FindByHashAsync(hash, cancellationToken);
+
         if (existingItem is not null)
         {
             var updatedItem = new ClipboardItem

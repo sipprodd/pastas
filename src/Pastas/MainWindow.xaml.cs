@@ -214,11 +214,13 @@ public partial class MainWindow : Window
             var clipboardGateway = new WindowsClipboardGateway(retryPolicy);
             var fileStorage = new LocalFileStorage();
             var thumbnailBuilder = new ImageThumbnailBuilder();
+            var cleanupOptions = new ClipboardCleanupOptions();
 
-            var captureTextUseCase = new CaptureClipboardTextUseCase(clipboardGateway, repository, captureState);
-            var captureImageUseCase = new CaptureClipboardImageUseCase(clipboardGateway, repository, fileStorage, thumbnailBuilder, captureState);
+            var captureTextUseCase = new CaptureClipboardTextUseCase(clipboardGateway, repository, captureState, cleanupOptions);
+            var captureImageUseCase = new CaptureClipboardImageUseCase(clipboardGateway, repository, fileStorage, thumbnailBuilder, captureState, cleanupOptions);
             var copyUseCase = new CopyTextItemToClipboardUseCase(repository, clipboardGateway, captureState);
-            var coordinator = new ClipboardCaptureCoordinator(captureTextUseCase, captureImageUseCase);
+            var cleanupService = new ClipboardCleanupService(repository, fileStorage, cleanupOptions);
+            var coordinator = new ClipboardCaptureCoordinator(captureTextUseCase, captureImageUseCase, cleanupService);
             var watcher = new WindowsClipboardChangeWatcher(window);
 
             var hotkeyService = new WindowsHotkeyService(window);

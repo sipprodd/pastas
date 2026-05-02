@@ -130,6 +130,21 @@ public class ClipboardImagePipelineTests
         Assert.False(state.ConsumeDoNotSaveNextFlag());
     }
 
+    [Fact]
+    public async Task CaptureClipboardImageUseCase_SkipsWhenItemExceedsMaxSize()
+    {
+        var gateway = new FakeClipboardGateway { ReadValue = new ClipboardCaptureData { Type = ClipboardItemType.Image, ImageBytes = [1, 2, 3] } };
+        var repo = new FakeClipboardItemRepository();
+        var storage = new FakeFileStorage();
+        var options = new ClipboardCleanupOptions { MaxSingleItemBytes = 2 };
+        var useCase = new CaptureClipboardImageUseCase(gateway, repo, storage, new FakeThumbnailBuilder(), new ClipboardCaptureState(), options);
+
+        await useCase.ExecuteAsync();
+
+        Assert.Empty(repo.Items);
+        Assert.Empty(storage.SavedImages);
+    }
+
     private sealed class FakeThumbnailBuilder : IImageThumbnailBuilder
     {
         public Task<byte[]> BuildAsync(byte[] originalImageBytes, CancellationToken cancellationToken = default)
