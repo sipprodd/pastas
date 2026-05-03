@@ -51,6 +51,22 @@ public sealed class MainViewModelTests
         Assert.Equal(ClipboardFilter.Protected, repository.LastSearchQuery?.Filter);
     }
 
+
+    [Fact]
+    public async Task SelectedSortMode_RefreshesImmediately()
+    {
+        var repository = new FakeClipboardItemRepository();
+        var viewModel = CreateViewModel(repository);
+
+        await viewModel.RefreshAsync();
+        var initialCalls = repository.SearchCallCount;
+
+        viewModel.SelectedSortMode = SortMode.Oldest;
+        await Task.Delay(20);
+
+        Assert.True(repository.SearchCallCount > initialCalls);
+        Assert.Equal(SortMode.Oldest, repository.LastSearchQuery?.SortMode);
+    }
     [Fact]
     public async Task DeleteItemAsync_CallsRepositoryAndRefreshes()
     {
