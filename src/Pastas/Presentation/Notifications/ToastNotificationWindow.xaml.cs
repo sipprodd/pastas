@@ -13,29 +13,17 @@ public partial class ToastNotificationWindow : Window
         Opacity = 0;
     }
 
-    public void PlayShowAnimation(double finalTop)
+    public void PlayShowAnimation()
     {
-        var storyboard = new Storyboard();
+        BeginAnimation(OpacityProperty, null);
 
-        var fade = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(180));
-        Storyboard.SetTarget(fade, this);
-        Storyboard.SetTargetProperty(fade, new PropertyPath(Window.OpacityProperty));
-
-        var slide = new DoubleAnimation(finalTop + 12, finalTop, TimeSpan.FromMilliseconds(180))
+        var fade = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(180))
         {
             FillBehavior = FillBehavior.Stop
         };
-        Storyboard.SetTarget(slide, this);
-        Storyboard.SetTargetProperty(slide, new PropertyPath(Window.TopProperty));
 
-        storyboard.Completed += (_, _) =>
-        {
-            Top = finalTop;
-            Opacity = 1;
-        };
+        fade.Completed += (_, _) => Opacity = 1;
 
-        storyboard.Children.Add(fade);
-        storyboard.Children.Add(slide);
-        storyboard.Begin();
+        BeginAnimation(OpacityProperty, fade);
     }
 }
