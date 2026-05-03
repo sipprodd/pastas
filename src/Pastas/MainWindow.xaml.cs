@@ -29,30 +29,52 @@ public partial class MainWindow : Window
 
     public MainWindow()
     {
+        var startupLogger = new FileDiagnosticsLogger();
+        startupLogger.Info("MainWindow ctor: before InitializeComponent().");
         InitializeComponent();
+        startupLogger.Info("MainWindow ctor: after InitializeComponent().");
+
+        startupLogger.Info("MainWindow ctor: before CreateComposition(this).");
         (_viewModel, _diagnosticsLogger, _clipboardCaptureNotificationHandler, _clipboardChangeWatcher, _hotkeyService, _trayService) = CreateComposition(this);
+        startupLogger.Info("MainWindow ctor: after CreateComposition(this).");
+
+        _diagnosticsLogger.Info("MainWindow ctor: before DataContext assignment.");
         DataContext = _viewModel;
+        _diagnosticsLogger.Info("MainWindow ctor: after DataContext assignment.");
 
+        _diagnosticsLogger.Info("MainWindow ctor: before Loaded event subscription.");
         Loaded += OnLoadedAsync;
+        _diagnosticsLogger.Info("MainWindow ctor: after Loaded event subscription.");
 
+        _diagnosticsLogger.Info("MainWindow ctor: before clipboard watcher event subscription.");
         if (_clipboardCaptureNotificationHandler is not null && _clipboardChangeWatcher is not null)
         {
             _clipboardChangeWatcher.ClipboardChanged += OnClipboardChangedAsync;
         }
+        _diagnosticsLogger.Info("MainWindow ctor: after clipboard watcher event subscription.");
 
+        _diagnosticsLogger.Info("MainWindow ctor: before hotkey event subscription.");
         if (_hotkeyService is not null)
         {
             _hotkeyService.HotkeyPressed += OnHotkeyPressedAsync;
         }
+        _diagnosticsLogger.Info("MainWindow ctor: after hotkey event subscription.");
 
+        _diagnosticsLogger.Info("MainWindow ctor: before tray event subscription.");
         if (_trayService is not null)
         {
             _trayService.ShowRequested += OnTrayShowRequestedAsync;
             _trayService.ExitRequested += OnTrayExitRequestedAsync;
         }
+        _diagnosticsLogger.Info("MainWindow ctor: after tray event subscription.");
 
+        _diagnosticsLogger.Info("MainWindow ctor: before Closing event subscription.");
         Closing += OnClosing;
+        _diagnosticsLogger.Info("MainWindow ctor: after Closing event subscription.");
+
+        _diagnosticsLogger.Info("MainWindow ctor: before Closed event subscription.");
         Closed += OnClosedAsync;
+        _diagnosticsLogger.Info("MainWindow ctor: after Closed event subscription.");
     }
 
     private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
@@ -210,32 +232,93 @@ public partial class MainWindow : Window
 
         try
         {
+            diagnosticsLogger.Info("CreateComposition: before SqliteDatabasePathProvider.");
             var databasePathProvider = new SqliteDatabasePathProvider();
+            diagnosticsLogger.Info("CreateComposition: after SqliteDatabasePathProvider.");
+
+            diagnosticsLogger.Info("CreateComposition: before SqliteConnectionFactory.");
             var connectionFactory = new SqliteConnectionFactory(databasePathProvider);
+            diagnosticsLogger.Info("CreateComposition: after SqliteConnectionFactory.");
+
+            diagnosticsLogger.Info("CreateComposition: before SqliteMigrationRunner creation.");
             var migrationRunner = new SqliteMigrationRunner(connectionFactory);
+            diagnosticsLogger.Info("CreateComposition: after SqliteMigrationRunner creation.");
+
+            diagnosticsLogger.Info("CreateComposition: before migrationRunner.RunAsync().GetAwaiter().GetResult().");
             migrationRunner.RunAsync().GetAwaiter().GetResult();
+            diagnosticsLogger.Info("CreateComposition: after migrationRunner.RunAsync().GetAwaiter().GetResult().");
 
+            diagnosticsLogger.Info("CreateComposition: before SqliteClipboardItemRepository.");
             var repository = new SqliteClipboardItemRepository(connectionFactory);
+            diagnosticsLogger.Info("CreateComposition: after SqliteClipboardItemRepository.");
+
+            diagnosticsLogger.Info("CreateComposition: before ClipboardRetryPolicy.");
             var retryPolicy = new ClipboardRetryPolicy();
+            diagnosticsLogger.Info("CreateComposition: after ClipboardRetryPolicy.");
+
+            diagnosticsLogger.Info("CreateComposition: before ClipboardCaptureState.");
             var captureState = new ClipboardCaptureState();
+            diagnosticsLogger.Info("CreateComposition: after ClipboardCaptureState.");
+
+            diagnosticsLogger.Info("CreateComposition: before WindowsClipboardGateway.");
             var clipboardGateway = new WindowsClipboardGateway(retryPolicy);
+            diagnosticsLogger.Info("CreateComposition: after WindowsClipboardGateway.");
+
+            diagnosticsLogger.Info("CreateComposition: before LocalFileStorage.");
             var fileStorage = new LocalFileStorage();
+            diagnosticsLogger.Info("CreateComposition: after LocalFileStorage.");
+
+            diagnosticsLogger.Info("CreateComposition: before ImageThumbnailBuilder.");
             var thumbnailBuilder = new ImageThumbnailBuilder();
+            diagnosticsLogger.Info("CreateComposition: after ImageThumbnailBuilder.");
+
+            diagnosticsLogger.Info("CreateComposition: before ClipboardCleanupOptions.");
             var cleanupOptions = new ClipboardCleanupOptions();
+            diagnosticsLogger.Info("CreateComposition: after ClipboardCleanupOptions.");
 
+            diagnosticsLogger.Info("CreateComposition: before CaptureClipboardTextUseCase.");
             var captureTextUseCase = new CaptureClipboardTextUseCase(clipboardGateway, repository, captureState, cleanupOptions);
+            diagnosticsLogger.Info("CreateComposition: after CaptureClipboardTextUseCase.");
+
+            diagnosticsLogger.Info("CreateComposition: before CaptureClipboardImageUseCase.");
             var captureImageUseCase = new CaptureClipboardImageUseCase(clipboardGateway, repository, fileStorage, thumbnailBuilder, captureState, cleanupOptions);
-            var cleanupService = new ClipboardCleanupService(repository, fileStorage, cleanupOptions, diagnosticsLogger);
+            diagnosticsLogger.Info("CreateComposition: after CaptureClipboardImageUseCase.");
+
+            diagnosticsLogger.Info("CreateComposition: before CopyTextItemToClipboardUseCase.");
             var copyUseCase = new CopyTextItemToClipboardUseCase(repository, clipboardGateway, captureState);
+            diagnosticsLogger.Info("CreateComposition: after CopyTextItemToClipboardUseCase.");
+
+            diagnosticsLogger.Info("CreateComposition: before ClipboardCleanupService.");
+            var cleanupService = new ClipboardCleanupService(repository, fileStorage, cleanupOptions, diagnosticsLogger);
+            diagnosticsLogger.Info("CreateComposition: after ClipboardCleanupService.");
+
+            diagnosticsLogger.Info("CreateComposition: before ClipboardCaptureCoordinator.");
             var coordinator = new ClipboardCaptureCoordinator(captureTextUseCase, captureImageUseCase, cleanupService, diagnosticsLogger);
+            diagnosticsLogger.Info("CreateComposition: after ClipboardCaptureCoordinator.");
+
+            diagnosticsLogger.Info("CreateComposition: before WindowsClipboardChangeWatcher.");
             var watcher = new WindowsClipboardChangeWatcher(window, diagnosticsLogger);
+            diagnosticsLogger.Info("CreateComposition: after WindowsClipboardChangeWatcher.");
 
+            diagnosticsLogger.Info("CreateComposition: before WindowsHotkeyService.");
             var hotkeyService = new WindowsHotkeyService(window, diagnosticsLogger);
-            var trayService = new WindowsTrayService(diagnosticsLogger);
+            diagnosticsLogger.Info("CreateComposition: after WindowsHotkeyService.");
 
+            diagnosticsLogger.Info("CreateComposition: before WindowsTrayService.");
+            var trayService = new WindowsTrayService(diagnosticsLogger);
+            diagnosticsLogger.Info("CreateComposition: after WindowsTrayService.");
+
+            diagnosticsLogger.Info("CreateComposition: before MainViewModel.");
             var viewModel = new MainViewModel(repository, copyUseCase);
+            diagnosticsLogger.Info("CreateComposition: after MainViewModel.");
+
+            diagnosticsLogger.Info("CreateComposition: before MainViewModelNotificationService.");
             var notificationService = new MainViewModelNotificationService(viewModel, window.Dispatcher);
+            diagnosticsLogger.Info("CreateComposition: after MainViewModelNotificationService.");
+
+            diagnosticsLogger.Info("CreateComposition: before ClipboardCaptureNotificationHandler.");
             var notificationHandler = new ClipboardCaptureNotificationHandler(coordinator, notificationService);
+            diagnosticsLogger.Info("CreateComposition: after ClipboardCaptureNotificationHandler.");
 
             diagnosticsLogger.Info("Application composition succeeded.");
             return (viewModel, diagnosticsLogger, notificationHandler, watcher, hotkeyService, trayService);
