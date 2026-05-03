@@ -39,7 +39,7 @@ public sealed class MainViewModel : ViewModelBase
         TogglePinCommand = new AsyncRelayCommand(TogglePinAsync);
         CopyItemCommand = new AsyncRelayCommand(CopyItemAsync);
         SelectItemCommand = new RelayCommand(SelectItem);
-        OpenPreviewCommand = new RelayCommand(_ => OpenPreview());
+        OpenPreviewCommand = new RelayCommand(OpenPreview);
         ClosePreviewCommand = new RelayCommand(_ => ClosePreview());
         OpenSettingsCommand = new RelayCommand(_ => OpenSettings());
         CloseSettingsCommand = new RelayCommand(_ => CloseSettings());
@@ -88,14 +88,28 @@ public sealed class MainViewModel : ViewModelBase
     public bool IsPreviewOpen
     {
         get => _isPreviewOpen;
-        private set => SetProperty(ref _isPreviewOpen, value);
+        private set
+        {
+            if (SetProperty(ref _isPreviewOpen, value))
+            {
+                OnPropertyChanged(nameof(IsMainContentVisible));
+            }
+        }
     }
 
     public bool IsSettingsOpen
     {
         get => _isSettingsOpen;
-        private set => SetProperty(ref _isSettingsOpen, value);
+        private set
+        {
+            if (SetProperty(ref _isSettingsOpen, value))
+            {
+                OnPropertyChanged(nameof(IsMainContentVisible));
+            }
+        }
     }
+
+    public bool IsMainContentVisible => !IsPreviewOpen && !IsSettingsOpen;
 
     public string EmptyStateText
     {
@@ -238,8 +252,13 @@ public sealed class MainViewModel : ViewModelBase
         }
     }
 
-    public void OpenPreview()
+    public void OpenPreview(object? parameter = null)
     {
+        if (parameter is ClipboardItemViewModel item)
+        {
+            SelectItem(item);
+        }
+
         if (SelectedItem is null)
         {
             return;
