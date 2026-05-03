@@ -15,12 +15,15 @@
         WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+        <SolidColorBrush x:Key="ShellBrush" Color="#FF171613" />
         <SolidColorBrush x:Key="SurfaceBrush" Color="#FF23201C" />
         <SolidColorBrush x:Key="SurfaceElevatedBrush" Color="#FF2A2622" />
+        <SolidColorBrush x:Key="CardHoverBrush" Color="#FF2F2A25" />
         <SolidColorBrush x:Key="SubtleBorderBrush" Color="#FF3F3932" />
         <SolidColorBrush x:Key="CreamTextBrush" Color="#FFF4EBDD" />
         <SolidColorBrush x:Key="MutedTextBrush" Color="#FFC6B9A6" />
         <SolidColorBrush x:Key="AccentBrush" Color="#FFD1A764" />
+
         <Style x:Key="ChipButtonStyle" TargetType="Button">
             <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
             <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}" />
@@ -28,9 +31,11 @@
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Padding" Value="10,6" />
             <Setter Property="Margin" Value="0,0,8,0" />
+            <Setter Property="Cursor" Value="Hand" />
         </Style>
+
         <Style x:Key="RoundedTextBoxStyle" TargetType="TextBox">
-            <Setter Property="Height" Value="34" />
+            <Setter Property="Height" Value="35" />
             <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
             <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
             <Setter Property="BorderBrush" Value="{StaticResource SubtleBorderBrush}" />
@@ -41,61 +46,243 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
-                        <Border CornerRadius="10" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-                            <ScrollViewer x:Name="PART_ContentHost"/>
+                        <Border x:Name="SearchBorder"
+                                CornerRadius="10"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ScrollViewer x:Name="PART_ContentHost" />
                         </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="SearchBorder" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style x:Key="DarkComboBoxItemStyle" TargetType="ComboBoxItem">
+            <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
+            <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}" />
+            <Setter Property="Padding" Value="8,4" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Style.Triggers>
+                <Trigger Property="IsHighlighted" Value="True">
+                    <Setter Property="Background" Value="{StaticResource CardHoverBrush}" />
+                    <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+                    <Setter Property="Foreground" Value="#FF1A1612" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
         <Style x:Key="RoundedComboBoxStyle" TargetType="ComboBox">
             <Setter Property="Width" Value="150" />
-            <Setter Property="Height" Value="34" />
+            <Setter Property="Height" Value="35" />
             <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
             <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}" />
             <Setter Property="BorderBrush" Value="{StaticResource SubtleBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Padding" Value="10,4" />
+            <Setter Property="ItemContainerStyle" Value="{StaticResource DarkComboBoxItemStyle}" />
         </Style>
     </Window.Resources>
 
-    <Border CornerRadius="22" Background="#FF171613" BorderBrush="#FF3A342D" BorderThickness="1" Padding="16">
-        <Grid>
-            <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+    <Border CornerRadius="22" Background="{StaticResource ShellBrush}" BorderBrush="#FF3A342D" BorderThickness="1" Padding="16">
+        <Grid Width="760">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
             <Grid Grid.Row="0" Margin="0,0,0,10">
-                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                <StackPanel Orientation="Horizontal"><TextBlock Text="pastas" FontSize="24" FontWeight="SemiBold" Foreground="{StaticResource CreamTextBrush}"/><TextBlock Text=" clipboard" Margin="8,0,0,0" VerticalAlignment="Bottom" Foreground="{StaticResource MutedTextBrush}"/></StackPanel>
-                <StackPanel Grid.Column="1" Orientation="Horizontal"><Button Content="Settings" Command="{Binding OpenSettingsCommand}" Style="{StaticResource ChipButtonStyle}"/><Button Content="Close" Style="{StaticResource ChipButtonStyle}" Click="CloseButton_OnClick"/></StackPanel>
+                <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="pastas" FontSize="24" FontWeight="SemiBold" Foreground="{StaticResource CreamTextBrush}" />
+                    <TextBlock Text="clipboard" Margin="8,0,0,0" VerticalAlignment="Bottom" Foreground="{StaticResource MutedTextBrush}" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="Settings" Command="{Binding OpenSettingsCommand}" Style="{StaticResource ChipButtonStyle}" />
+                    <Button Content="Close" Style="{StaticResource ChipButtonStyle}" Margin="0" Click="CloseButton_OnClick" />
+                </StackPanel>
             </Grid>
 
             <Grid Grid.Row="1" Visibility="{Binding IsMainContentVisible, Converter={StaticResource BoolToVisibility}}" Margin="0,0,0,8">
-                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                <TextBox Style="{StaticResource RoundedTextBoxStyle}" MinWidth="300" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" />
-                <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="8,0,0,0">
-                    <Button Content="Search" Command="{Binding SearchCommand}" Style="{StaticResource ChipButtonStyle}"/>
-                    <ComboBox Style="{StaticResource RoundedComboBoxStyle}" SelectedValuePath="Tag" SelectedValue="{Binding SelectedSortMode}">
-                        <ComboBoxItem Content="Recent" Tag="{x:Static domain:SortMode.Recent}"/>
-                        <ComboBoxItem Content="Oldest" Tag="{x:Static domain:SortMode.Oldest}"/>
-                        <ComboBoxItem Content="Most copied" Tag="{x:Static domain:SortMode.MostCopied}"/>
-                    </ComboBox>
-                    <Button Content="Refresh" Command="{Binding RefreshCommand}" Style="{StaticResource ChipButtonStyle}" Margin="8,0,0,0"/>
-                </StackPanel>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="420" />
+                    <ColumnDefinition Width="12" />
+                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="12" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="12" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0">
+                    <TextBox x:Name="SearchTextBox" Style="{StaticResource RoundedTextBoxStyle}" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Text="Search in clipboard" Margin="14,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource MutedTextBrush}" IsHitTestVisible="False">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SearchQuery}" Value="">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+                <ComboBox Grid.Column="2" Style="{StaticResource RoundedComboBoxStyle}" SelectedValuePath="Tag" SelectedValue="{Binding SelectedSortMode}">
+                    <ComboBox.Resources>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#FF2A2622" />
+                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#FF2A2622" />
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFD1A764" />
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#FF1A1612" />
+                    </ComboBox.Resources>
+                    <ComboBoxItem Content="Recent" Tag="{x:Static domain:SortMode.Recent}" />
+                    <ComboBoxItem Content="Oldest" Tag="{x:Static domain:SortMode.Oldest}" />
+                    <ComboBoxItem Content="Most copied" Tag="{x:Static domain:SortMode.MostCopied}" />
+                </ComboBox>
+                <Button Grid.Column="4" Content="Search" Command="{Binding SearchCommand}" Style="{StaticResource ChipButtonStyle}" Margin="0" />
+                <Button Grid.Column="6" Content="Refresh" Command="{Binding RefreshCommand}" Style="{StaticResource ChipButtonStyle}" Margin="0" />
             </Grid>
 
             <Grid Grid.Row="2">
                 <Grid Visibility="{Binding IsMainContentVisible, Converter={StaticResource BoolToVisibility}}">
-                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-                    <WrapPanel Margin="0,0,0,8"><Button Content="All" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.All}"/><Button Content="Text" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Text}"/><Button Content="Images" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Images}"/><Button Content="Pinned" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Pinned}"/><Button Content="Protected" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Protected}"/></WrapPanel>
-                    <Grid Grid.Row="1"><ScrollViewer><ItemsControl ItemsSource="{Binding Items}"><ItemsControl.ItemTemplate><DataTemplate><Border x:Name="ItemCard" Margin="0,0,0,8" Padding="10" CornerRadius="12" MinHeight="76" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource SubtleBorderBrush}" BorderThickness="1"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><Border Width="28" Height="28" CornerRadius="8" Background="#FF1E1B17" BorderBrush="{StaticResource SubtleBorderBrush}" BorderThickness="1"><TextBlock Text="{Binding ItemGlyph}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource AccentBrush}"/></Border><Button Grid.Column="1" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" Command="{Binding DataContext.SelectItemCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"><Button.InputBindings><MouseBinding Gesture="RightClick" Command="{Binding DataContext.OpenPreviewCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"/></Button.InputBindings><StackPanel Margin="10,0,0,0"><TextBlock Text="{Binding PreviewText}" Foreground="{StaticResource CreamTextBrush}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" MaxWidth="430"/><TextBlock Text="{Binding SourceLabel}" Foreground="{StaticResource MutedTextBrush}" FontSize="11"/><TextBlock Text="{Binding TimeLabel}" Foreground="{StaticResource MutedTextBrush}" FontSize="11"/></StackPanel></Button><StackPanel x:Name="Actions" Grid.Column="2" Orientation="Horizontal" Visibility="Collapsed" Panel.ZIndex="5"><Button Content="Preview" Style="{StaticResource ChipButtonStyle}" Command="{Binding DataContext.OpenPreviewCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"/><Button Command="{Binding DataContext.TogglePinCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"><Button.Style><Style TargetType="Button" BasedOn="{StaticResource ChipButtonStyle}"><Setter Property="Content" Value="Pin"/><Style.Triggers><DataTrigger Binding="{Binding IsPinned}" Value="True"><Setter Property="Content" Value="Unpin"/></DataTrigger></Style.Triggers></Style></Button.Style></Button><Button Content="Delete" Style="{StaticResource ChipButtonStyle}" Command="{Binding DataContext.DeleteItemCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"/></StackPanel></Grid></Border><DataTemplate.Triggers><Trigger SourceName="ItemCard" Property="IsMouseOver" Value="True"><Setter TargetName="Actions" Property="Visibility" Value="Visible"/></Trigger><DataTrigger Binding="{Binding IsSelected}" Value="True"><Setter TargetName="ItemCard" Property="BorderBrush" Value="{StaticResource AccentBrush}"/></DataTrigger><DataTrigger Binding="{Binding IsSelected}" Value="True"><Setter TargetName="ItemCard" Property="Background" Value="#FF2D2823"/></DataTrigger></DataTemplate.Triggers></DataTemplate></ItemsControl.ItemTemplate></ItemsControl></ScrollViewer><TextBlock Text="{Binding EmptyStateText}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource MutedTextBrush}"/></Grid>
+                    <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+                    <WrapPanel Margin="0,0,0,8">
+                        <Button Content="All" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.All}" />
+                        <Button Content="Text" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Text}" />
+                        <Button Content="Images" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Images}" />
+                        <Button Content="Pinned" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Pinned}" />
+                        <Button Content="Protected" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Protected}" Margin="0" />
+                    </WrapPanel>
+                    <Grid Grid.Row="1">
+                        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" CanContentScroll="True">
+                            <ItemsControl ItemsSource="{Binding Items}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border x:Name="ItemCard" Margin="0,0,0,8" Padding="10" CornerRadius="12" Height="78" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource SubtleBorderBrush}" BorderThickness="1">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                                <Border Width="28" Height="28" CornerRadius="8" Background="#FF1E1B17" BorderBrush="{StaticResource SubtleBorderBrush}" BorderThickness="1">
+                                                    <TextBlock Text="{Binding ItemGlyph}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource AccentBrush}" FontSize="13" />
+                                                </Border>
+                                                <Button Grid.Column="1" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" Command="{Binding DataContext.SelectItemCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}">
+                                                    <Button.InputBindings>
+                                                        <MouseBinding Gesture="RightClick" Command="{Binding DataContext.OpenPreviewCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                                    </Button.InputBindings>
+                                                    <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding PreviewText}" Foreground="{StaticResource CreamTextBrush}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="{Binding SourceLabel}" Foreground="{StaticResource MutedTextBrush}" FontSize="11" />
+                                                            <TextBlock Text=" · " Foreground="{StaticResource MutedTextBrush}" FontSize="11" />
+                                                            <TextBlock Text="{Binding TimeLabel}" Foreground="{StaticResource MutedTextBrush}" FontSize="11" />
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </Button>
+                                                <StackPanel x:Name="Actions" Grid.Column="2" Orientation="Horizontal" Visibility="Collapsed">
+                                                    <Button Content="Preview" Style="{StaticResource ChipButtonStyle}" Command="{Binding DataContext.OpenPreviewCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                                    <Button Command="{Binding DataContext.TogglePinCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}">
+                                                        <Button.Style>
+                                                            <Style TargetType="Button" BasedOn="{StaticResource ChipButtonStyle}">
+                                                                <Setter Property="Content" Value="Pin" />
+                                                                <Style.Triggers><DataTrigger Binding="{Binding IsPinned}" Value="True"><Setter Property="Content" Value="Unpin" /></DataTrigger></Style.Triggers>
+                                                            </Style>
+                                                        </Button.Style>
+                                                    </Button>
+                                                    <Button Content="Delete" Style="{StaticResource ChipButtonStyle}" Command="{Binding DataContext.DeleteItemCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Margin="0" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                        <DataTemplate.Triggers>
+                                            <Trigger SourceName="ItemCard" Property="IsMouseOver" Value="True"><Setter TargetName="Actions" Property="Visibility" Value="Visible" /></Trigger>
+                                            <DataTrigger Binding="{Binding IsSelected}" Value="True"><Setter TargetName="ItemCard" Property="BorderBrush" Value="{StaticResource AccentBrush}" /></DataTrigger>
+                                            <DataTrigger Binding="{Binding IsSelected}" Value="True"><Setter TargetName="ItemCard" Property="Background" Value="#FF2D2823" /></DataTrigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                        <TextBlock Text="{Binding EmptyStateText}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource MutedTextBrush}" IsHitTestVisible="False" />
+                    </Grid>
                 </Grid>
 
-                <Border Visibility="{Binding IsPreviewOpen, Converter={StaticResource BoolToVisibility}}" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource SubtleBorderBrush}" BorderThickness="1" CornerRadius="14" Padding="12"><Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><Button Content="Back" Style="{StaticResource ChipButtonStyle}" Command="{Binding ClosePreviewCommand}"/><TextBlock Grid.Column="1" Text="Preview" Foreground="{StaticResource CreamTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/><Button Grid.Column="2" Content="Close" Style="{StaticResource ChipButtonStyle}" Command="{Binding ClosePreviewCommand}"/></Grid><Border Grid.Row="1" Margin="0,10" Background="{StaticResource SurfaceElevatedBrush}" CornerRadius="10" Padding="12"><ScrollViewer><StackPanel><TextBlock Text="Protected item" Foreground="{StaticResource CreamTextBrush}" FontSize="16" FontWeight="SemiBold"><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding SelectedItem.IsProtected}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock><TextBlock Text="Content is hidden" Foreground="{StaticResource MutedTextBrush}" Margin="0,4,0,0"><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding SelectedItem.IsProtected}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock><Image MaxHeight="310" Stretch="Uniform" Source="{Binding SelectedItem.ImagePath}"><Image.Style><Style TargetType="Image"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><MultiDataTrigger><MultiDataTrigger.Conditions><Condition Binding="{Binding SelectedItem.IsImage}" Value="True"/><Condition Binding="{Binding SelectedItem.IsProtected}" Value="False"/></MultiDataTrigger.Conditions><Setter Property="Visibility" Value="Visible"/></MultiDataTrigger></Style.Triggers></Style></Image.Style></Image><TextBlock Text="Image item" Foreground="{StaticResource CreamTextBrush}"><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><MultiDataTrigger><MultiDataTrigger.Conditions><Condition Binding="{Binding SelectedItem.IsImage}" Value="True"/><Condition Binding="{Binding SelectedItem.IsProtected}" Value="False"/><Condition Binding="{Binding SelectedItem.HasImagePath}" Value="False"/></MultiDataTrigger.Conditions><Setter Property="Visibility" Value="Visible"/></MultiDataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock><TextBlock Foreground="{StaticResource CreamTextBrush}" TextWrapping="Wrap"><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Setter Property="Text" Value="{Binding SelectedItem.PreviewText}"/><Style.Triggers><MultiDataTrigger><MultiDataTrigger.Conditions><Condition Binding="{Binding SelectedItem.IsText}" Value="True"/><Condition Binding="{Binding SelectedItem.IsProtected}" Value="False"/></MultiDataTrigger.Conditions><Setter Property="Visibility" Value="Visible"/><Setter Property="Text" Value="{Binding SelectedItem.FullText}"/></MultiDataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock></StackPanel></ScrollViewer></Border><StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right"><Button Content="Copy" Style="{StaticResource ChipButtonStyle}" Command="{Binding CopyItemCommand}" CommandParameter="{Binding SelectedItem}"/><Button Command="{Binding TogglePinCommand}" CommandParameter="{Binding SelectedItem}"><Button.Style><Style TargetType="Button" BasedOn="{StaticResource ChipButtonStyle}"><Setter Property="Content" Value="Pin"/><Style.Triggers><DataTrigger Binding="{Binding SelectedItem.IsPinned}" Value="True"><Setter Property="Content" Value="Unpin"/></DataTrigger></Style.Triggers></Style></Button.Style></Button><Button Content="Delete" Style="{StaticResource ChipButtonStyle}" Command="{Binding DeleteItemCommand}" CommandParameter="{Binding SelectedItem}"/><Button Content="Close" Style="{StaticResource ChipButtonStyle}" Command="{Binding ClosePreviewCommand}"/></StackPanel></Grid></Border>
+                <Border Visibility="{Binding IsPreviewOpen, Converter={StaticResource BoolToVisibility}}" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource SubtleBorderBrush}" BorderThickness="1" CornerRadius="14" Padding="12">
+                    <Grid>
+                        <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                            <Button Content="Back" Style="{StaticResource ChipButtonStyle}" Command="{Binding ClosePreviewCommand}" />
+                            <TextBlock Grid.Column="1" Text="Preview" Foreground="{StaticResource CreamTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold" />
+                            <Button Grid.Column="2" Content="X" Style="{StaticResource ChipButtonStyle}" Command="{Binding ClosePreviewCommand}" Margin="0" />
+                        </Grid>
+                        <Border Grid.Row="1" Margin="0,10" Background="{StaticResource SurfaceElevatedBrush}" CornerRadius="10" Padding="12">
+                            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                                <StackPanel>
+                                    <StackPanel>
+                                        <StackPanel.Style>
+                                            <Style TargetType="StackPanel"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding SelectedItem.IsProtected}" Value="True"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style>
+                                        </StackPanel.Style>
+                                        <TextBlock Text="Protected item" Foreground="{StaticResource CreamTextBrush}" FontSize="16" FontWeight="SemiBold" />
+                                        <TextBlock Text="Content is hidden" Foreground="{StaticResource MutedTextBrush}" Margin="0,4,0,0" />
+                                    </StackPanel>
 
-                <Border Visibility="{Binding IsSettingsOpen, Converter={StaticResource BoolToVisibility}}" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource SubtleBorderBrush}" BorderThickness="1" CornerRadius="14" Padding="14"><StackPanel><TextBlock Text="Settings" FontSize="22" Foreground="{StaticResource CreamTextBrush}"/><WrapPanel Margin="0,10,0,14"><TextBlock Text="General" Foreground="{StaticResource AccentBrush}" Margin="0,0,14,0"/><TextBlock Text="Storage" Foreground="{StaticResource MutedTextBrush}" Margin="0,0,14,0"/><TextBlock Text="Security" Foreground="{StaticResource MutedTextBrush}" Margin="0,0,14,0"/><TextBlock Text="Notifications" Foreground="{StaticResource MutedTextBrush}"/></WrapPanel><TextBlock Text="Hotkey: Alt+V" Foreground="{StaticResource CreamTextBrush}" Margin="0,0,0,6"/><TextBlock Text="Max items: 500" Foreground="{StaticResource CreamTextBrush}" Margin="0,0,0,6"/><TextBlock Text="Notifications: enabled" Foreground="{StaticResource CreamTextBrush}" Margin="0,0,0,6"/><TextBlock Text="Protected items: masked" Foreground="{StaticResource CreamTextBrush}" Margin="0,0,0,12"/><Button Content="Close" Width="90" Style="{StaticResource ChipButtonStyle}" Command="{Binding CloseSettingsCommand}"/></StackPanel></Border>
+                                    <StackPanel>
+                                        <StackPanel.Style>
+                                            <Style TargetType="StackPanel"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><MultiDataTrigger><MultiDataTrigger.Conditions><Condition Binding="{Binding SelectedItem.IsText}" Value="True" /><Condition Binding="{Binding SelectedItem.IsProtected}" Value="False" /></MultiDataTrigger.Conditions><Setter Property="Visibility" Value="Visible" /></MultiDataTrigger></Style.Triggers></Style>
+                                        </StackPanel.Style>
+                                        <TextBlock Text="{Binding SelectedItem.PreviewBodyText}" Foreground="{StaticResource CreamTextBrush}" TextWrapping="Wrap" />
+                                    </StackPanel>
+
+                                    <StackPanel>
+                                        <StackPanel.Style>
+                                            <Style TargetType="StackPanel"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><MultiDataTrigger><MultiDataTrigger.Conditions><Condition Binding="{Binding SelectedItem.IsImage}" Value="True" /><Condition Binding="{Binding SelectedItem.IsProtected}" Value="False" /></MultiDataTrigger.Conditions><Setter Property="Visibility" Value="Visible" /></MultiDataTrigger></Style.Triggers></Style>
+                                        </StackPanel.Style>
+                                        <Image MaxHeight="340" Stretch="Uniform" Source="{Binding SelectedItem.ImagePath}">
+                                            <Image.Style>
+                                                <Style TargetType="Image"><Setter Property="Visibility" Value="Collapsed" /><DataTrigger Binding="{Binding SelectedItem.HasImagePath}" Value="True"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style>
+                                            </Image.Style>
+                                        </Image>
+                                        <StackPanel>
+                                            <StackPanel.Style>
+                                                <Style TargetType="StackPanel"><Setter Property="Visibility" Value="Collapsed" /><DataTrigger Binding="{Binding SelectedItem.HasImagePath}" Value="False"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style>
+                                            </StackPanel.Style>
+                                            <TextBlock Text="Image item" Foreground="{StaticResource CreamTextBrush}" FontSize="16" />
+                                            <TextBlock Text="Image unavailable" Foreground="{StaticResource MutedTextBrush}" Margin="0,4,0,0" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </Border>
+                        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button Content="Copy" Style="{StaticResource ChipButtonStyle}" Command="{Binding CopyItemCommand}" CommandParameter="{Binding SelectedItem}" />
+                            <Button Command="{Binding TogglePinCommand}" CommandParameter="{Binding SelectedItem}">
+                                <Button.Style><Style TargetType="Button" BasedOn="{StaticResource ChipButtonStyle}"><Setter Property="Content" Value="Pin" /><Style.Triggers><DataTrigger Binding="{Binding SelectedItem.IsPinned}" Value="True"><Setter Property="Content" Value="Unpin" /></DataTrigger></Style.Triggers></Style></Button.Style>
+                            </Button>
+                            <Button Content="Delete" Style="{StaticResource ChipButtonStyle}" Command="{Binding DeleteItemCommand}" CommandParameter="{Binding SelectedItem}" Margin="0" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <Border Visibility="{Binding IsSettingsOpen, Converter={StaticResource BoolToVisibility}}" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource SubtleBorderBrush}" BorderThickness="1" CornerRadius="14" Padding="14">
+                    <StackPanel>
+                        <TextBlock Text="Settings" FontSize="22" Foreground="{StaticResource CreamTextBrush}" />
+                        <TextBlock Text="Settings panel placeholder for MVP shell." Foreground="{StaticResource MutedTextBrush}" Margin="0,10,0,14" />
+                        <Button Content="Close" Width="90" Style="{StaticResource ChipButtonStyle}" Command="{Binding CloseSettingsCommand}" Margin="0" />
+                    </StackPanel>
+                </Border>
             </Grid>
 
-            <Border Grid.Row="3" Margin="0,10,0,0" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource SubtleBorderBrush}" BorderThickness="1" CornerRadius="10" Padding="10,6"><TextBlock Foreground="{StaticResource MutedTextBrush}" Text="Enter — copy    Space — preview    Esc — close"/></Border>
+            <Border Grid.Row="3" Margin="0,10,0,0" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource SubtleBorderBrush}" BorderThickness="1" CornerRadius="10" Padding="10,6">
+                <TextBlock Foreground="{StaticResource MutedTextBrush}" Text="Enter — copy    Space — preview    Esc — close" />
+            </Border>
         </Grid>
     </Border>
 </Window>
