@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Windows.Input;
 using Pastas.Application.UseCases;
 using Pastas.Domain.Entities;
@@ -23,6 +24,7 @@ public sealed class MainViewModel : ViewModelBase
     private ClipboardItemViewModel? _selectedItem;
     private string _emptyStateText = "No clipboard items yet.";
     private string _statusMessage = string.Empty;
+    private CancellationTokenSource? _searchDebounceCts;
 
     public MainViewModel(
         IClipboardItemRepository clipboardItemRepository,
@@ -50,7 +52,15 @@ public sealed class MainViewModel : ViewModelBase
     public string SearchQuery
     {
         get => _searchQuery;
-        set => SetProperty(ref _searchQuery, value);
+        set
+        {
+            if (!SetProperty(ref _searchQuery, value))
+            {
+                return;
+            }
+
+            _ = DebouncedRefreshAsync();
+        }
     }
 
     public ClipboardFilter SelectedFilter
@@ -169,6 +179,26 @@ public sealed class MainViewModel : ViewModelBase
         finally
         {
             IsLoading = false;
+        }
+    }
+
+
+    private async Task DebouncedRefreshAsync()
+    {
+        _searchDebounceCts?.Cancel();
+        var cts = new CancellationTokenSource();
+        _searchDebounceCts = cts;
+
+        try
+        {
+            await Task.Delay(250, cts.Token);
+            if (!cts.IsCancellationRequested)
+            {
+                await RefreshAsync();
+            }
+        }
+        catch (TaskCanceledException)
+        {
         }
     }
 
