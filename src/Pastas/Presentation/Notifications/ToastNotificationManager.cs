@@ -6,11 +6,11 @@ namespace Pastas.Presentation.Notifications;
 public sealed class ToastNotificationManager
 {
     private const int MaxToasts = 3;
+    private const double ToastWidth = 300;
+    private const double ToastHeight = 82;
     private const double RightMargin = 16;
     private const double BottomMargin = 16;
     private const double VerticalSpacing = 10;
-    private const double ToastWidth = 300;
-    private const double ToastHeight = 82;
 
     private static readonly TimeSpan Lifetime = TimeSpan.FromSeconds(2.5);
 
@@ -26,7 +26,7 @@ public sealed class ToastNotificationManager
     {
         _ = _dispatcher.BeginInvoke(() =>
         {
-            PruneInactiveToasts();
+            PruneClosedToasts();
 
             while (_toasts.Count >= MaxToasts)
             {
@@ -34,15 +34,21 @@ public sealed class ToastNotificationManager
             }
 
             var toast = new ToastNotificationWindow(title, subtitle);
-            toast.Closed += (_, _) => RemoveToast(toast);
+
+            toast.Closed += (_, _) =>
+            {
+                _toasts.Remove(toast);
+                PositionToasts();
+            };
 
             _toasts.Insert(0, toast);
-            PositionToasts();
 
+            PositionToasts();
             toast.Show();
             PositionToasts();
 
-            toast.PlayShowAnimation(toast.Top);
+            toast.PlayShowAnimation();
+
             _ = AutoDismissAsync(toast);
         });
     }
@@ -53,12 +59,13 @@ public sealed class ToastNotificationManager
         await _dispatcher.InvokeAsync(() => RemoveToast(toast));
     }
 
-    private void PruneInactiveToasts()
+    private void PruneClosedToasts()
     {
         for (var i = _toasts.Count - 1; i >= 0; i--)
         {
             var toast = _toasts[i];
-            if (toast.IsLoaded && !toast.IsVisible)
+
+            if (!toast.IsLoaded && !toast.IsVisible)
             {
                 _toasts.RemoveAt(i);
             }
@@ -92,6 +99,9 @@ public sealed class ToastNotificationManager
 
             toast.BeginAnimation(Window.LeftProperty, null);
             toast.BeginAnimation(Window.TopProperty, null);
+
+            toast.Width = ToastWidth;
+            toast.Height = ToastHeight;
 
             toast.Left = workArea.Right - ToastWidth - RightMargin;
             toast.Top = workArea.Bottom - ((i + 1) * ToastHeight) - (i * VerticalSpacing) - BottomMargin;
