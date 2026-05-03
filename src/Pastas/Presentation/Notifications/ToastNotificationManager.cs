@@ -25,12 +25,12 @@ public sealed class ToastNotificationManager
         {
             if (_toasts.Count >= MaxToasts)
             {
-                CloseToast(_toasts[0]);
+                CloseToast(_toasts[^1]);
             }
 
             var toast = new ToastNotificationWindow(title, subtitle);
             toast.Closed += (_, _) => _toasts.Remove(toast);
-            _toasts.Add(toast);
+            _toasts.Insert(0, toast);
             PositionToasts();
 
             toast.Show();
