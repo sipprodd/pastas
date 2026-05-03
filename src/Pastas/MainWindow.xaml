@@ -247,12 +247,12 @@
                                         </StackPanel.Style>
                                         <Image MaxHeight="340" Stretch="Uniform" Source="{Binding SelectedItem.ImagePath}">
                                             <Image.Style>
-                                                <Style TargetType="Image"><Setter Property="Visibility" Value="Collapsed" /><DataTrigger Binding="{Binding SelectedItem.HasImagePath}" Value="True"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style>
+                                                <Style TargetType="Image"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding SelectedItem.HasImagePath}" Value="True"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style>
                                             </Image.Style>
                                         </Image>
                                         <StackPanel>
                                             <StackPanel.Style>
-                                                <Style TargetType="StackPanel"><Setter Property="Visibility" Value="Collapsed" /><DataTrigger Binding="{Binding SelectedItem.HasImagePath}" Value="False"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style>
+                                                <Style TargetType="StackPanel"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding SelectedItem.HasImagePath}" Value="False"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style>
                                             </StackPanel.Style>
                                             <TextBlock Text="Image item" Foreground="{StaticResource CreamTextBrush}" FontSize="16" />
                                             <TextBlock Text="Image unavailable" Foreground="{StaticResource MutedTextBrush}" Margin="0,4,0,0" />
