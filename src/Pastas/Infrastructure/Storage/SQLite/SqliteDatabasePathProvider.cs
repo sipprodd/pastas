@@ -1,3 +1,5 @@
+using System.IO;
+
 namespace Pastas.Infrastructure.Storage.SQLite;
 
 public sealed class SqliteDatabasePathProvider

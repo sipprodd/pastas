@@ -1,6 +1,7 @@
 using System.IO;
-using System.Windows;
 using System.Windows.Media.Imaging;
+using WpfClipboard = System.Windows.Clipboard;
+using WpfTextDataFormat = System.Windows.TextDataFormat;
 using Pastas.Application.Services;
 using Pastas.Domain.Enums;
 using Pastas.Domain.Interfaces;
@@ -22,9 +23,9 @@ public sealed class WindowsClipboardGateway : IClipboardGateway
         return await _retryPolicy.ExecuteAsync(
             () => StaClipboardRunner.Run(() =>
             {
-                if (Clipboard.ContainsText(TextDataFormat.UnicodeText))
+                if (WpfClipboard.ContainsText(WpfTextDataFormat.UnicodeText))
                 {
-                    var text = Clipboard.GetText(TextDataFormat.UnicodeText);
+                    var text = WpfClipboard.GetText(WpfTextDataFormat.UnicodeText);
                     if (string.IsNullOrEmpty(text))
                     {
                         return null;
@@ -38,12 +39,12 @@ public sealed class WindowsClipboardGateway : IClipboardGateway
                     };
                 }
 
-                if (!Clipboard.ContainsImage())
+                if (!WpfClipboard.ContainsImage())
                 {
                     return null;
                 }
 
-                var bitmap = Clipboard.GetImage();
+                var bitmap = WpfClipboard.GetImage();
                 if (bitmap is null)
                 {
                     return null;
@@ -71,7 +72,7 @@ public sealed class WindowsClipboardGateway : IClipboardGateway
         ArgumentNullException.ThrowIfNull(text);
 
         var wrote = await _retryPolicy.ExecuteAsync(
-            () => StaClipboardRunner.Run(() => Clipboard.SetText(text, TextDataFormat.UnicodeText)),
+            () => StaClipboardRunner.Run(() => WpfClipboard.SetText(text, WpfTextDataFormat.UnicodeText)),
             cancellationToken);
 
         if (!wrote)

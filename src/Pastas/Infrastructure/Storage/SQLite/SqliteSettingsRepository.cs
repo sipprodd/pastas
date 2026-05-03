@@ -1,3 +1,4 @@
+using Microsoft.Data.Sqlite;
 using Pastas.Domain.Entities;
 using Pastas.Domain.Enums;
 using Pastas.Domain.Interfaces;
@@ -64,7 +65,7 @@ public sealed class SqliteSettingsRepository : ISettingsRepository
         };
 
         await using var connection = await _connectionFactory.OpenConnectionAsync(cancellationToken);
-        await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
+        await using SqliteTransaction transaction = await connection.BeginTransactionAsync(cancellationToken);
 
         foreach (var entry in values)
         {

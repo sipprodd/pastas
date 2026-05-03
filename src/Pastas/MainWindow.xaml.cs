@@ -40,7 +40,10 @@ public partial class MainWindow : Window
             _clipboardChangeWatcher.ClipboardChanged += OnClipboardChangedAsync;
         }
 
-        _hotkeyService?.HotkeyPressed += OnHotkeyPressedAsync;
+        if (_hotkeyService is not null)
+        {
+            _hotkeyService.HotkeyPressed += OnHotkeyPressedAsync;
+        }
 
         if (_trayService is not null)
         {
@@ -168,7 +171,7 @@ public partial class MainWindow : Window
 
         _isExiting = true;
         await CleanupAsync();
-        await Dispatcher.InvokeAsync(() => Application.Current.Shutdown());
+        await Dispatcher.InvokeAsync(() => System.Windows.Application.Current.Shutdown());
     }
 
     private async Task CleanupAsync()
