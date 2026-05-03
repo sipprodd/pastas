@@ -346,7 +346,7 @@ public partial class MainWindow : Window
             diagnosticsLogger.Info("CreateComposition: after MainViewModelNotificationService.");
 
             diagnosticsLogger.Info("CreateComposition: before ClipboardCaptureNotificationHandler.");
-            var notificationHandler = new ClipboardCaptureNotificationHandler(coordinator, notificationService);
+            var notificationHandler = new ClipboardCaptureNotificationHandler(coordinator, notificationService, repository);
             diagnosticsLogger.Info("CreateComposition: after ClipboardCaptureNotificationHandler.");
 
             diagnosticsLogger.Info("Application composition succeeded.");
