@@ -27,6 +27,8 @@ public sealed class ClipboardItemViewModel : ViewModelBase
     public bool HasThumbnail { get; private init; }
     public bool HasImagePath { get; private init; }
 
+    public string PreviewBodyText => string.IsNullOrWhiteSpace(FullText) ? PreviewText : FullText;
+
     public bool IsSelected
     {
         get => _isSelected;
