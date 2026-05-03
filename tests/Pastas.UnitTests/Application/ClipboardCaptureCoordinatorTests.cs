@@ -24,7 +24,7 @@ public class ClipboardCaptureCoordinatorTests
             await Task.CompletedTask;
         });
 
-        var coordinator = new ClipboardCaptureCoordinator(textUseCase, imageUseCase, CreateCleanupService(), TimeSpan.Zero);
+        var coordinator = new ClipboardCaptureCoordinator(textUseCase, imageUseCase, CreateCleanupService(), null, TimeSpan.Zero);
 
         await coordinator.CaptureAsync();
 
@@ -38,6 +38,7 @@ public class ClipboardCaptureCoordinatorTests
             new FakeCaptureClipboardTextUseCase(() => throw new InvalidOperationException("text fail")),
             new FakeCaptureClipboardImageUseCase(() => throw new InvalidOperationException("image fail")),
             CreateCleanupService(),
+            null,
             TimeSpan.Zero);
 
         var exception = await Record.ExceptionAsync(() => coordinator.CaptureAsync());
@@ -66,7 +67,7 @@ public class ClipboardCaptureCoordinatorTests
             return Task.CompletedTask;
         });
 
-        var coordinator = new ClipboardCaptureCoordinator(textUseCase, imageUseCase, CreateCleanupService(), TimeSpan.Zero);
+        var coordinator = new ClipboardCaptureCoordinator(textUseCase, imageUseCase, CreateCleanupService(), null, TimeSpan.Zero);
 
         var firstCall = coordinator.CaptureAsync();
         await firstStarted.Task;
@@ -96,6 +97,7 @@ public class ClipboardCaptureCoordinatorTests
                 return Task.CompletedTask;
             }),
             CreateCleanupService(),
+            null,
             TimeSpan.Zero);
 
         await coordinator.CaptureAsync();
@@ -113,6 +115,7 @@ public class ClipboardCaptureCoordinatorTests
             new FakeCaptureClipboardTextUseCase(() => Task.CompletedTask),
             new FakeCaptureClipboardImageUseCase(() => Task.CompletedTask),
             new ClipboardCleanupService(new ThrowingClipboardItemRepository(), new FakeFileStorage(), new ClipboardCleanupOptions()),
+            null,
             TimeSpan.Zero);
 
         var exception = await Record.ExceptionAsync(() => coordinator.CaptureAsync());

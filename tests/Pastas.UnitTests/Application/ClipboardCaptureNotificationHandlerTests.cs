@@ -16,6 +16,7 @@ public sealed class ClipboardCaptureNotificationHandlerTests
             new FakeCaptureClipboardTextUseCase(),
             new FakeCaptureClipboardImageUseCase(),
             new ClipboardCleanupService(new FakeClipboardItemRepository(), new FakeFileStorage(), new ClipboardCleanupOptions()),
+            null,
             TimeSpan.Zero);
 
         var notificationService = new FakeNotificationService();
@@ -33,6 +34,7 @@ public sealed class ClipboardCaptureNotificationHandlerTests
             new FakeCaptureClipboardTextUseCase(),
             new FakeCaptureClipboardImageUseCase(),
             new ClipboardCleanupService(new FakeClipboardItemRepository(), new FakeFileStorage(), new ClipboardCleanupOptions()),
+            null,
             TimeSpan.Zero);
 
         var notificationService = new ThrowingNotificationService();
