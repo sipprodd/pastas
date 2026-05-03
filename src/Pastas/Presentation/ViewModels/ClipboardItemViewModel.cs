@@ -25,6 +25,7 @@ public sealed class ClipboardItemViewModel : ViewModelBase
     public string? ImagePath { get; private init; }
     public string FullText { get; private init; } = string.Empty;
     public bool HasThumbnail { get; private init; }
+    public bool HasImagePath { get; private init; }
 
     public bool IsSelected
     {
@@ -57,7 +58,8 @@ public sealed class ClipboardItemViewModel : ViewModelBase
             ThumbnailPath = thumbnailPath,
             ImagePath = isImage ? item.ImagePath : null,
             FullText = item.ContentText ?? string.Empty,
-            HasThumbnail = !string.IsNullOrWhiteSpace(thumbnailPath)
+            HasThumbnail = !string.IsNullOrWhiteSpace(thumbnailPath),
+            HasImagePath = isImage && !string.IsNullOrWhiteSpace(item.ImagePath)
         };
     }
 
@@ -70,7 +72,7 @@ public sealed class ClipboardItemViewModel : ViewModelBase
 
         if (isImage)
         {
-            return "Image item";
+            return string.IsNullOrWhiteSpace(item.ImagePath) ? "Image unavailable" : "Image item";
         }
 
         var text = string.IsNullOrWhiteSpace(item.PreviewText) ? item.ContentText : item.PreviewText;
