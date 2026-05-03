@@ -23,13 +23,14 @@ public partial class MainWindow : Window
     private readonly IClipboardChangeWatcher? _clipboardChangeWatcher;
     private readonly IGlobalHotkeyService? _hotkeyService;
     private readonly ITrayService? _trayService;
-    private bool _isExiting;
 
+    private bool _isExiting;
     private bool _isCleanedUp;
 
     public MainWindow()
     {
         var startupLogger = new FileDiagnosticsLogger();
+
         startupLogger.Info("MainWindow ctor: before InitializeComponent().");
         InitializeComponent();
         startupLogger.Info("MainWindow ctor: after InitializeComponent().");
@@ -42,28 +43,39 @@ public partial class MainWindow : Window
         DataContext = _viewModel;
         _diagnosticsLogger.Info("MainWindow ctor: after DataContext assignment.");
 
-        _diagnosticsLogger.Info("MainWindow ctor: before event subscriptions.");
+        _diagnosticsLogger.Info("MainWindow ctor: before Loaded event subscription.");
         Loaded += OnLoadedAsync;
+        _diagnosticsLogger.Info("MainWindow ctor: after Loaded event subscription.");
 
+        _diagnosticsLogger.Info("MainWindow ctor: before clipboard watcher event subscription.");
         if (_clipboardCaptureNotificationHandler is not null && _clipboardChangeWatcher is not null)
         {
             _clipboardChangeWatcher.ClipboardChanged += OnClipboardChangedAsync;
         }
+        _diagnosticsLogger.Info("MainWindow ctor: after clipboard watcher event subscription.");
 
+        _diagnosticsLogger.Info("MainWindow ctor: before hotkey event subscription.");
         if (_hotkeyService is not null)
         {
             _hotkeyService.HotkeyPressed += OnHotkeyPressedAsync;
         }
+        _diagnosticsLogger.Info("MainWindow ctor: after hotkey event subscription.");
 
+        _diagnosticsLogger.Info("MainWindow ctor: before tray event subscription.");
         if (_trayService is not null)
         {
             _trayService.ShowRequested += OnTrayShowRequestedAsync;
             _trayService.ExitRequested += OnTrayExitRequestedAsync;
         }
+        _diagnosticsLogger.Info("MainWindow ctor: after tray event subscription.");
 
+        _diagnosticsLogger.Info("MainWindow ctor: before Closing event subscription.");
         Closing += OnClosing;
+        _diagnosticsLogger.Info("MainWindow ctor: after Closing event subscription.");
+
+        _diagnosticsLogger.Info("MainWindow ctor: before Closed event subscription.");
         Closed += OnClosedAsync;
-        _diagnosticsLogger.Info("MainWindow ctor: after event subscriptions.");
+        _diagnosticsLogger.Info("MainWindow ctor: after Closed event subscription.");
     }
 
     private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
@@ -265,17 +277,23 @@ public partial class MainWindow : Window
             var cleanupOptions = new ClipboardCleanupOptions();
             diagnosticsLogger.Info("CreateComposition: after ClipboardCleanupOptions.");
 
-            diagnosticsLogger.Info("CreateComposition: before use case creation.");
+            diagnosticsLogger.Info("CreateComposition: before CaptureClipboardTextUseCase.");
             var captureTextUseCase = new CaptureClipboardTextUseCase(clipboardGateway, repository, captureState, cleanupOptions);
+            diagnosticsLogger.Info("CreateComposition: after CaptureClipboardTextUseCase.");
+
+            diagnosticsLogger.Info("CreateComposition: before CaptureClipboardImageUseCase.");
             var captureImageUseCase = new CaptureClipboardImageUseCase(clipboardGateway, repository, fileStorage, thumbnailBuilder, captureState, cleanupOptions);
-            diagnosticsLogger.Info("CreateComposition: after use case creation.");
+            diagnosticsLogger.Info("CreateComposition: after CaptureClipboardImageUseCase.");
+
+            diagnosticsLogger.Info("CreateComposition: before CopyTextItemToClipboardUseCase.");
+            var copyUseCase = new CopyTextItemToClipboardUseCase(repository, clipboardGateway, captureState);
+            diagnosticsLogger.Info("CreateComposition: after CopyTextItemToClipboardUseCase.");
 
             diagnosticsLogger.Info("CreateComposition: before ClipboardCleanupService.");
             var cleanupService = new ClipboardCleanupService(repository, fileStorage, cleanupOptions, diagnosticsLogger);
             diagnosticsLogger.Info("CreateComposition: after ClipboardCleanupService.");
 
             diagnosticsLogger.Info("CreateComposition: before ClipboardCaptureCoordinator.");
-            var copyUseCase = new CopyTextItemToClipboardUseCase(repository, clipboardGateway, captureState);
             var coordinator = new ClipboardCaptureCoordinator(captureTextUseCase, captureImageUseCase, cleanupService, diagnosticsLogger);
             diagnosticsLogger.Info("CreateComposition: after ClipboardCaptureCoordinator.");
 
