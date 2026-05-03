@@ -9,7 +9,8 @@
         Background="Transparent"
         ShowInTaskbar="False"
         Topmost="True"
-        ShowActivated="False">
+        ShowActivated="False"
+        WindowStartupLocation="Manual">
     <Border CornerRadius="14" Background="#FF1F1F1F" BorderBrush="#FF2F2F2F" BorderThickness="1" Padding="12">
         <StackPanel>
             <TextBlock x:Name="TitleText" FontWeight="SemiBold" Foreground="#FFF1F1F1" FontSize="14"/>
