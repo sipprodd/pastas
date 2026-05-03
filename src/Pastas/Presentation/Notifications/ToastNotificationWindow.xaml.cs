@@ -21,9 +21,18 @@ public partial class ToastNotificationWindow : Window
         Storyboard.SetTarget(fade, this);
         Storyboard.SetTargetProperty(fade, new PropertyPath(Window.OpacityProperty));
 
-        var slide = new DoubleAnimation(finalTop + 12, finalTop, TimeSpan.FromMilliseconds(180));
+        var slide = new DoubleAnimation(finalTop + 12, finalTop, TimeSpan.FromMilliseconds(180))
+        {
+            FillBehavior = FillBehavior.Stop
+        };
         Storyboard.SetTarget(slide, this);
         Storyboard.SetTargetProperty(slide, new PropertyPath(Window.TopProperty));
+
+        storyboard.Completed += (_, _) =>
+        {
+            Top = finalTop;
+            Opacity = 1;
+        };
 
         storyboard.Children.Add(fade);
         storyboard.Children.Add(slide);

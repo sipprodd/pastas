@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Media.Animation;
 using System.Windows.Threading;
 
 namespace Pastas.Presentation.Notifications;
@@ -9,8 +10,8 @@ public sealed class ToastNotificationManager
     private const double RightMargin = 16;
     private const double BottomMargin = 16;
     private const double VerticalSpacing = 10;
-    private const double FallbackWidth = 300;
-    private const double FallbackHeight = 82;
+    private const double ToastWidth = 300;
+    private const double ToastHeight = 82;
 
     private static readonly TimeSpan Lifetime = TimeSpan.FromSeconds(2.5);
 
@@ -26,7 +27,7 @@ public sealed class ToastNotificationManager
     {
         _ = _dispatcher.BeginInvoke(() =>
         {
-            RemoveInvisibleToasts();
+            PruneInactiveToasts();
 
             while (_toasts.Count >= MaxToasts)
             {
@@ -34,11 +35,7 @@ public sealed class ToastNotificationManager
             }
 
             var toast = new ToastNotificationWindow(title, subtitle);
-            toast.Closed += (_, _) =>
-            {
-                _toasts.Remove(toast);
-                PositionToasts();
-            };
+            toast.Closed += (_, _) => RemoveToast(toast);
 
             _toasts.Insert(0, toast);
             PositionToasts();
@@ -57,20 +54,26 @@ public sealed class ToastNotificationManager
         await _dispatcher.InvokeAsync(() => RemoveToast(toast));
     }
 
-    private void RemoveInvisibleToasts()
+    private void PruneInactiveToasts()
     {
         for (var i = _toasts.Count - 1; i >= 0; i--)
         {
-            if (!_toasts[i].IsVisible)
+            var toast = _toasts[i];
+            if (toast.IsLoaded && !toast.IsVisible)
             {
                 _toasts.RemoveAt(i);
             }
         }
+
+        PositionToasts();
     }
 
     private void RemoveToast(ToastNotificationWindow toast)
     {
-        _toasts.Remove(toast);
+        if (!_toasts.Remove(toast))
+        {
+            return;
+        }
 
         if (toast.IsVisible)
         {
@@ -87,11 +90,11 @@ public sealed class ToastNotificationManager
         for (var i = 0; i < _toasts.Count; i++)
         {
             var toast = _toasts[i];
-            var width = toast.Width > 0 ? toast.Width : FallbackWidth;
-            var height = toast.Height > 0 ? toast.Height : FallbackHeight;
+            toast.BeginAnimation(Window.LeftProperty, null);
+            toast.BeginAnimation(Window.TopProperty, null);
 
-            toast.Left = workArea.Right - width - RightMargin;
-            toast.Top = workArea.Bottom - ((i + 1) * height) - (i * VerticalSpacing) - BottomMargin;
+            toast.Left = workArea.Right - ToastWidth - RightMargin;
+            toast.Top = workArea.Bottom - ((i + 1) * ToastHeight) - (i * VerticalSpacing) - BottomMargin;
         }
     }
 }
