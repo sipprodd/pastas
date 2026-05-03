@@ -10,6 +10,8 @@ public partial class App : System.Windows.Application
 
     protected override void OnStartup(StartupEventArgs e)
     {
+        base.OnStartup(e);
+
         ShutdownMode = ShutdownMode.OnMainWindowClose;
         DispatcherUnhandledException += OnDispatcherUnhandledException;
 
@@ -21,11 +23,11 @@ public partial class App : System.Windows.Application
             MainWindow = mainWindow;
             mainWindow.Show();
             _diagnosticsLogger.Info("MainWindow created and shown.");
-            base.OnStartup(e);
         }
         catch (Exception ex)
         {
             _diagnosticsLogger.Error("MainWindow creation failed.", ex);
+            System.Windows.MessageBox.Show(ex.ToString(), "Pastas startup error", MessageBoxButton.OK, MessageBoxImage.Error);
             Shutdown(-1);
         }
     }
