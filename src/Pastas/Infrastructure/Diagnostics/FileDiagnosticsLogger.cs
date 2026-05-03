@@ -1,3 +1,4 @@
+using System.IO;
 using Pastas.Application.Services;
 
 namespace Pastas.Infrastructure.Diagnostics;

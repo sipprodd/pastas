@@ -1,3 +1,4 @@
+using System.IO;
 using Microsoft.Data.Sqlite;
 
 namespace Pastas.Infrastructure.Storage.SQLite;
@@ -22,7 +23,7 @@ public sealed class SqliteMigrationRunner
             await migrationCommand.ExecuteNonQueryAsync(cancellationToken);
         }
 
-        await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
+        await using SqliteTransaction transaction = await connection.BeginTransactionAsync(cancellationToken);
         await using var versionCommand = connection.CreateCommand();
         versionCommand.Transaction = transaction;
         versionCommand.CommandText = @"

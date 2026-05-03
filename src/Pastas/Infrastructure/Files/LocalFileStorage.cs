@@ -1,3 +1,4 @@
+using System.IO;
 using Pastas.Domain.Interfaces;
 
 namespace Pastas.Infrastructure.Files;
