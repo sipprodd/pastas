@@ -19,6 +19,7 @@ public sealed class MainViewModel : ViewModelBase
     private SortMode _selectedSortMode = SortMode.Recent;
     private bool _isLoading;
     private bool _isPreviewOpen;
+    private bool _isSettingsOpen;
     private ClipboardItemViewModel? _selectedItem;
     private string _emptyStateText = "No clipboard items yet.";
     private string _statusMessage = string.Empty;
@@ -38,8 +39,10 @@ public sealed class MainViewModel : ViewModelBase
         TogglePinCommand = new AsyncRelayCommand(TogglePinAsync);
         CopyItemCommand = new AsyncRelayCommand(CopyItemAsync);
         SelectItemCommand = new RelayCommand(SelectItem);
-        OpenPreviewCommand = new RelayCommand(_ => OpenPreview());
+        OpenPreviewCommand = new RelayCommand(OpenPreview);
         ClosePreviewCommand = new RelayCommand(_ => ClosePreview());
+        OpenSettingsCommand = new RelayCommand(_ => OpenSettings());
+        CloseSettingsCommand = new RelayCommand(_ => CloseSettings());
     }
 
     public ObservableCollection<ClipboardItemViewModel> Items { get; } = new();
@@ -85,8 +88,28 @@ public sealed class MainViewModel : ViewModelBase
     public bool IsPreviewOpen
     {
         get => _isPreviewOpen;
-        private set => SetProperty(ref _isPreviewOpen, value);
+        private set
+        {
+            if (SetProperty(ref _isPreviewOpen, value))
+            {
+                OnPropertyChanged(nameof(IsMainContentVisible));
+            }
+        }
     }
+
+    public bool IsSettingsOpen
+    {
+        get => _isSettingsOpen;
+        private set
+        {
+            if (SetProperty(ref _isSettingsOpen, value))
+            {
+                OnPropertyChanged(nameof(IsMainContentVisible));
+            }
+        }
+    }
+
+    public bool IsMainContentVisible => !IsPreviewOpen && !IsSettingsOpen;
 
     public string EmptyStateText
     {
@@ -112,6 +135,8 @@ public sealed class MainViewModel : ViewModelBase
     public ICommand SelectItemCommand { get; }
     public ICommand OpenPreviewCommand { get; }
     public ICommand ClosePreviewCommand { get; }
+    public ICommand OpenSettingsCommand { get; }
+    public ICommand CloseSettingsCommand { get; }
 
     public void SetStatusMessage(string message)
     {
@@ -227,19 +252,36 @@ public sealed class MainViewModel : ViewModelBase
         }
     }
 
-    public void OpenPreview()
+    public void OpenPreview(object? parameter = null)
     {
+        if (parameter is ClipboardItemViewModel item)
+        {
+            SelectItem(item);
+        }
+
         if (SelectedItem is null)
         {
             return;
         }
 
+        IsSettingsOpen = false;
         IsPreviewOpen = true;
     }
 
     public void ClosePreview()
     {
         IsPreviewOpen = false;
+    }
+
+    public void OpenSettings()
+    {
+        IsPreviewOpen = false;
+        IsSettingsOpen = true;
+    }
+
+    public void CloseSettings()
+    {
+        IsSettingsOpen = false;
     }
 
     private void ApplyItems(IReadOnlyList<ClipboardItem> items)
