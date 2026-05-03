@@ -319,7 +319,7 @@
                                             BorderThickness="0"
                                             HorizontalContentAlignment="Stretch"
                                             VerticalContentAlignment="Stretch"
-                                            Command="{Binding DataContext.CopyItemCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            Command="{Binding DataContext.SelectItemCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                             CommandParameter="{Binding}"
                                             Focusable="False">
                                         <Button.Style>
@@ -387,6 +387,11 @@
                                     <Setter TargetName="ActionButtons" Property="Visibility" Value="Visible" />
                                     <Setter TargetName="ItemCard" Property="Background" Value="#FF2A2622" />
                                 </Trigger>
+
+                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                    <Setter TargetName="ItemCard" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                                    <Setter TargetName="ItemCard" Property="Background" Value="#FF2A2622" />
+                                </DataTrigger>
                             </DataTemplate.Triggers>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -399,6 +404,127 @@
                        FontSize="15"
                        FontStyle="Italic"
                        Text="{Binding EmptyStateText}" />
+
+            <Border Background="#B2161512"
+                    Visibility="{Binding IsPreviewOpen, Converter={StaticResource BooleanToVisibilityConverter}}"
+                    Panel.ZIndex="15">
+                <Grid HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Width="700"
+                      MaxWidth="700"
+                      Margin="20">
+                    <Border Background="{StaticResource SurfaceElevatedBrush}"
+                            BorderBrush="{StaticResource SubtleBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="14"
+                            Padding="16">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding SelectedItem.TypeLabel}"
+                                               Foreground="{StaticResource AccentBrush}"
+                                               FontWeight="SemiBold"
+                                               FontSize="13" />
+                                    <TextBlock Text="{Binding SelectedItem.SourceLabel}"
+                                               Foreground="{StaticResource MutedTextBrush}"
+                                               Margin="0,2,0,10"
+                                               FontSize="12" />
+
+                                    <TextBlock Text="Protected item"
+                                               Foreground="{StaticResource CreamTextBrush}"
+                                               FontSize="15">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding SelectedItem.IsProtected}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+
+                                    <Image MaxHeight="420"
+                                           Stretch="Uniform"
+                                           Source="{Binding SelectedItem.ImagePath}">
+                                        <Image.Style>
+                                            <Style TargetType="Image">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding SelectedItem.IsImage}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Image.Style>
+                                    </Image>
+
+                                    <TextBlock Foreground="{StaticResource CreamTextBrush}"
+                                               FontSize="14"
+                                               TextWrapping="Wrap">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Setter Property="Text" Value="{Binding SelectedItem.PreviewText}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding SelectedItem.IsText}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                        <Setter Property="Text" Value="{Binding SelectedItem.FullText}" />
+                                                    </DataTrigger>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding SelectedItem.IsText}" Value="True" />
+                                                            <Condition Binding="{Binding SelectedItem.FullText}" Value="" />
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter Property="Text" Value="{Binding SelectedItem.PreviewText}" />
+                                                    </MultiDataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
+                            </ScrollViewer>
+
+                            <StackPanel Grid.Row="1"
+                                        Orientation="Horizontal"
+                                        HorizontalAlignment="Right"
+                                        Margin="0,14,0,0">
+                                <Button Content="Copy"
+                                        Style="{StaticResource PrimaryButtonStyle}"
+                                        Command="{Binding CopyItemCommand}"
+                                        CommandParameter="{Binding SelectedItem}" />
+                                <Button Command="{Binding TogglePinCommand}"
+                                        CommandParameter="{Binding SelectedItem}">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}">
+                                            <Setter Property="Content" Value="Pin" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SelectedItem.IsPinned}" Value="True">
+                                                    <Setter Property="Content" Value="Unpin" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                                <Button Content="Delete"
+                                        Style="{StaticResource PrimaryButtonStyle}"
+                                        Command="{Binding DeleteItemCommand}"
+                                        CommandParameter="{Binding SelectedItem}" />
+                                <Button Margin="0"
+                                        Content="Close"
+                                        Style="{StaticResource PrimaryButtonStyle}"
+                                        Command="{Binding ClosePreviewCommand}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
         </Grid>
 
         <Border Grid.Row="3"

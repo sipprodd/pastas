@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Input;
 using Pastas.Application.Services;
 using Pastas.Application.State;
 using Pastas.Application.UseCases;
@@ -50,6 +51,28 @@ public partial class MainWindow : Window
         _diagnosticsLogger.Info("MainWindow ctor: after Closed event subscription.");
 
         Deactivated += OnDeactivated;
+        PreviewKeyDown += OnPreviewKeyDown;
+    }
+
+    private void OnPreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (_viewModel is null)
+        {
+            return;
+        }
+
+        if (e.Key == Key.Space && !_viewModel.IsPreviewOpen)
+        {
+            _viewModel.OpenPreview();
+            e.Handled = true;
+            return;
+        }
+
+        if (e.Key == Key.Escape && _viewModel.IsPreviewOpen)
+        {
+            _viewModel.ClosePreview();
+            e.Handled = true;
+        }
     }
 
     private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
