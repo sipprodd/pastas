@@ -17,57 +17,29 @@ namespace Pastas;
 
 public partial class MainWindow : Window
 {
-    private readonly MainViewModel _viewModel;
-    private readonly IDiagnosticsLogger _diagnosticsLogger;
-    private readonly ClipboardCaptureNotificationHandler? _clipboardCaptureNotificationHandler;
-    private readonly IClipboardChangeWatcher? _clipboardChangeWatcher;
-    private readonly IGlobalHotkeyService? _hotkeyService;
-    private readonly ITrayService? _trayService;
+    private MainViewModel? _viewModel;
+    private IDiagnosticsLogger _diagnosticsLogger;
+    private ClipboardCaptureNotificationHandler? _clipboardCaptureNotificationHandler;
+    private IClipboardChangeWatcher? _clipboardChangeWatcher;
+    private IGlobalHotkeyService? _hotkeyService;
+    private ITrayService? _trayService;
 
     private bool _isExiting;
     private bool _isCleanedUp;
+    private bool _isCompositionInitialized;
 
     public MainWindow()
     {
         var startupLogger = new FileDiagnosticsLogger();
+        _diagnosticsLogger = startupLogger;
 
         startupLogger.Info("MainWindow ctor: before InitializeComponent().");
         InitializeComponent();
         startupLogger.Info("MainWindow ctor: after InitializeComponent().");
 
-        startupLogger.Info("MainWindow ctor: before CreateComposition(this).");
-        (_viewModel, _diagnosticsLogger, _clipboardCaptureNotificationHandler, _clipboardChangeWatcher, _hotkeyService, _trayService) = CreateComposition(this);
-        startupLogger.Info("MainWindow ctor: after CreateComposition(this).");
-
-        _diagnosticsLogger.Info("MainWindow ctor: before DataContext assignment.");
-        DataContext = _viewModel;
-        _diagnosticsLogger.Info("MainWindow ctor: after DataContext assignment.");
-
         _diagnosticsLogger.Info("MainWindow ctor: before Loaded event subscription.");
         Loaded += OnLoadedAsync;
         _diagnosticsLogger.Info("MainWindow ctor: after Loaded event subscription.");
-
-        _diagnosticsLogger.Info("MainWindow ctor: before clipboard watcher event subscription.");
-        if (_clipboardCaptureNotificationHandler is not null && _clipboardChangeWatcher is not null)
-        {
-            _clipboardChangeWatcher.ClipboardChanged += OnClipboardChangedAsync;
-        }
-        _diagnosticsLogger.Info("MainWindow ctor: after clipboard watcher event subscription.");
-
-        _diagnosticsLogger.Info("MainWindow ctor: before hotkey event subscription.");
-        if (_hotkeyService is not null)
-        {
-            _hotkeyService.HotkeyPressed += OnHotkeyPressedAsync;
-        }
-        _diagnosticsLogger.Info("MainWindow ctor: after hotkey event subscription.");
-
-        _diagnosticsLogger.Info("MainWindow ctor: before tray event subscription.");
-        if (_trayService is not null)
-        {
-            _trayService.ShowRequested += OnTrayShowRequestedAsync;
-            _trayService.ExitRequested += OnTrayExitRequestedAsync;
-        }
-        _diagnosticsLogger.Info("MainWindow ctor: after tray event subscription.");
 
         _diagnosticsLogger.Info("MainWindow ctor: before Closing event subscription.");
         Closing += OnClosing;
@@ -80,6 +52,41 @@ public partial class MainWindow : Window
 
     private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
     {
+        if (!_isCompositionInitialized)
+        {
+            _diagnosticsLogger.Info("MainWindow loaded: before CreateCompositionAsync(this).");
+            (_viewModel, _diagnosticsLogger, _clipboardCaptureNotificationHandler, _clipboardChangeWatcher, _hotkeyService, _trayService) = await CreateCompositionAsync(this);
+            _diagnosticsLogger.Info("MainWindow loaded: after CreateCompositionAsync(this).");
+
+            _diagnosticsLogger.Info("MainWindow loaded: before DataContext assignment.");
+            DataContext = _viewModel;
+            _diagnosticsLogger.Info("MainWindow loaded: after DataContext assignment.");
+
+            _diagnosticsLogger.Info("MainWindow loaded: before clipboard watcher event subscription.");
+            if (_clipboardCaptureNotificationHandler is not null && _clipboardChangeWatcher is not null)
+            {
+                _clipboardChangeWatcher.ClipboardChanged += OnClipboardChangedAsync;
+            }
+            _diagnosticsLogger.Info("MainWindow loaded: after clipboard watcher event subscription.");
+
+            _diagnosticsLogger.Info("MainWindow loaded: before hotkey event subscription.");
+            if (_hotkeyService is not null)
+            {
+                _hotkeyService.HotkeyPressed += OnHotkeyPressedAsync;
+            }
+            _diagnosticsLogger.Info("MainWindow loaded: after hotkey event subscription.");
+
+            _diagnosticsLogger.Info("MainWindow loaded: before tray event subscription.");
+            if (_trayService is not null)
+            {
+                _trayService.ShowRequested += OnTrayShowRequestedAsync;
+                _trayService.ExitRequested += OnTrayExitRequestedAsync;
+            }
+            _diagnosticsLogger.Info("MainWindow loaded: after tray event subscription.");
+
+            _isCompositionInitialized = true;
+        }
+
         _clipboardChangeWatcher?.Start();
         _trayService?.Start();
 
@@ -88,7 +95,10 @@ public partial class MainWindow : Window
             await _hotkeyService.RegisterAsync("Alt+V");
         }
 
-        await _viewModel.RefreshAsync();
+        if (_viewModel is not null)
+        {
+            await _viewModel.RefreshAsync();
+        }
     }
 
     private async void OnClipboardChangedAsync(object? sender, EventArgs e)
@@ -99,7 +109,10 @@ public partial class MainWindow : Window
         }
 
         await _clipboardCaptureNotificationHandler.HandleClipboardChangedAsync();
-        await _viewModel.RefreshAsync();
+        if (_viewModel is not null)
+        {
+            await _viewModel.RefreshAsync();
+        }
     }
 
     private async void OnHotkeyPressedAsync(object? sender, EventArgs e)
@@ -159,7 +172,7 @@ public partial class MainWindow : Window
             shouldRefresh = true;
         });
 
-        if (shouldRefresh)
+        if (shouldRefresh && _viewModel is not null)
         {
             await _viewModel.RefreshAsync();
         }
@@ -182,7 +195,10 @@ public partial class MainWindow : Window
             Activate();
         });
 
-        await _viewModel.RefreshAsync();
+        if (_viewModel is not null)
+        {
+            await _viewModel.RefreshAsync();
+        }
     }
 
     private async Task ExitApplicationAsync()
@@ -227,7 +243,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private static (MainViewModel ViewModel, IDiagnosticsLogger DiagnosticsLogger, ClipboardCaptureNotificationHandler? NotificationHandler, IClipboardChangeWatcher? Watcher, IGlobalHotkeyService? HotkeyService, ITrayService? TrayService) CreateComposition(Window window)
+    private static async Task<(MainViewModel ViewModel, IDiagnosticsLogger DiagnosticsLogger, ClipboardCaptureNotificationHandler? NotificationHandler, IClipboardChangeWatcher? Watcher, IGlobalHotkeyService? HotkeyService, ITrayService? TrayService)> CreateCompositionAsync(Window window)
     {
         var diagnosticsLogger = new FileDiagnosticsLogger();
 
@@ -245,9 +261,9 @@ public partial class MainWindow : Window
             var migrationRunner = new SqliteMigrationRunner(connectionFactory);
             diagnosticsLogger.Info("CreateComposition: after SqliteMigrationRunner creation.");
 
-            diagnosticsLogger.Info("CreateComposition: before migrationRunner.RunAsync().GetAwaiter().GetResult().");
-            migrationRunner.RunAsync().GetAwaiter().GetResult();
-            diagnosticsLogger.Info("CreateComposition: after migrationRunner.RunAsync().GetAwaiter().GetResult().");
+            diagnosticsLogger.Info("CreateCompositionAsync: before await migrationRunner.RunAsync().");
+            await migrationRunner.RunAsync();
+            diagnosticsLogger.Info("CreateCompositionAsync: after await migrationRunner.RunAsync().");
 
             diagnosticsLogger.Info("CreateComposition: before SqliteClipboardItemRepository.");
             var repository = new SqliteClipboardItemRepository(connectionFactory);
