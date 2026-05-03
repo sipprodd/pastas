@@ -1,4 +1,5 @@
 using System.Windows;
+using Pastas.Application.Services;
 using Pastas.Infrastructure.Diagnostics;
 
 namespace Pastas;
