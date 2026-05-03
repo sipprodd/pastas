@@ -59,7 +59,7 @@ public sealed class ClipboardCaptureNotificationHandlerTests
         }
     }
 
-    private sealed class FakeNotificationService : INotificationService
+    private sealed class FakeNotificationService : Pastas.Application.Services.INotificationService
     {
         public string? LastInfoMessage { get; private set; }
 
@@ -73,7 +73,7 @@ public sealed class ClipboardCaptureNotificationHandlerTests
         }
     }
 
-    private sealed class ThrowingNotificationService : INotificationService
+    private sealed class ThrowingNotificationService : Pastas.Application.Services.INotificationService
     {
         public void ShowInfo(string message)
         {
