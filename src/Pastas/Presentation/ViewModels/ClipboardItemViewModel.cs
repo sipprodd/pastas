@@ -20,7 +20,10 @@ public sealed class ClipboardItemViewModel
     public bool IsImage { get; private init; }
     public bool IsText { get; private init; }
     public string? ThumbnailPath { get; private init; }
+    public string? ImagePath { get; private init; }
+    public string FullText { get; private init; } = string.Empty;
     public bool HasThumbnail { get; private init; }
+    public bool IsSelected { get; set; }
 
     public static ClipboardItemViewModel FromEntity(ClipboardItem item)
     {
@@ -43,6 +46,8 @@ public sealed class ClipboardItemViewModel
             IsImage = isImage,
             IsText = !isImage,
             ThumbnailPath = thumbnailPath,
+            ImagePath = isImage ? item.ImagePath : null,
+            FullText = item.ContentText ?? string.Empty,
             HasThumbnail = !string.IsNullOrWhiteSpace(thumbnailPath)
         };
     }

@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Input;
 using Pastas.Application.UseCases;
 using Pastas.Domain.Entities;
@@ -17,6 +18,8 @@ public sealed class MainViewModel : ViewModelBase
     private ClipboardFilter _selectedFilter = ClipboardFilter.All;
     private SortMode _selectedSortMode = SortMode.Recent;
     private bool _isLoading;
+    private bool _isPreviewOpen;
+    private ClipboardItemViewModel? _selectedItem;
     private string _emptyStateText = "No clipboard items yet.";
     private string _statusMessage = string.Empty;
 
@@ -34,6 +37,9 @@ public sealed class MainViewModel : ViewModelBase
         DeleteItemCommand = new AsyncRelayCommand(DeleteItemAsync);
         TogglePinCommand = new AsyncRelayCommand(TogglePinAsync);
         CopyItemCommand = new AsyncRelayCommand(CopyItemAsync);
+        SelectItemCommand = new RelayCommand(SelectItem);
+        OpenPreviewCommand = new RelayCommand(_ => OpenPreview());
+        ClosePreviewCommand = new RelayCommand(_ => ClosePreview());
     }
 
     public ObservableCollection<ClipboardItemViewModel> Items { get; } = new();
@@ -70,6 +76,18 @@ public sealed class MainViewModel : ViewModelBase
         private set => SetProperty(ref _isLoading, value);
     }
 
+    public ClipboardItemViewModel? SelectedItem
+    {
+        get => _selectedItem;
+        private set => SetProperty(ref _selectedItem, value);
+    }
+
+    public bool IsPreviewOpen
+    {
+        get => _isPreviewOpen;
+        private set => SetProperty(ref _isPreviewOpen, value);
+    }
+
     public string EmptyStateText
     {
         get => _emptyStateText;
@@ -91,6 +109,9 @@ public sealed class MainViewModel : ViewModelBase
     public ICommand DeleteItemCommand { get; }
     public ICommand TogglePinCommand { get; }
     public ICommand CopyItemCommand { get; }
+    public ICommand SelectItemCommand { get; }
+    public ICommand OpenPreviewCommand { get; }
+    public ICommand ClosePreviewCommand { get; }
 
     public void SetStatusMessage(string message)
     {
@@ -192,12 +213,60 @@ public sealed class MainViewModel : ViewModelBase
         }
     }
 
+    private void SelectItem(object? parameter)
+    {
+        foreach (var entry in Items)
+        {
+            entry.IsSelected = false;
+        }
+
+        if (parameter is ClipboardItemViewModel item)
+        {
+            item.IsSelected = true;
+            SelectedItem = item;
+        }
+    }
+
+    public void OpenPreview()
+    {
+        if (SelectedItem is null)
+        {
+            return;
+        }
+
+        IsPreviewOpen = true;
+    }
+
+    public void ClosePreview()
+    {
+        IsPreviewOpen = false;
+    }
+
     private void ApplyItems(IReadOnlyList<ClipboardItem> items)
     {
         Items.Clear();
         foreach (var item in items)
         {
             Items.Add(ClipboardItemViewModel.FromEntity(item));
+        }
+
+        if (SelectedItem is not null)
+        {
+            var selectedId = SelectedItem.Id;
+            SelectedItem = Items.FirstOrDefault(x => x.Id == SelectedItem.Id);
+            if (SelectedItem is null)
+            {
+                IsPreviewOpen = false;
+            }
+            else
+            {
+                SelectedItem.IsSelected = true;
+            }
+
+            foreach (var item in Items.Where(x => x.Id != selectedId))
+            {
+                item.IsSelected = false;
+            }
         }
 
         EmptyStateText = Items.Count == 0
