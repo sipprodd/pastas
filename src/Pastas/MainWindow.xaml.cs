@@ -23,13 +23,14 @@ public partial class MainWindow : Window
     private readonly IClipboardChangeWatcher? _clipboardChangeWatcher;
     private readonly IGlobalHotkeyService? _hotkeyService;
     private readonly ITrayService? _trayService;
-    private bool _isExiting;
 
+    private bool _isExiting;
     private bool _isCleanedUp;
 
     public MainWindow()
     {
         var startupLogger = new FileDiagnosticsLogger();
+
         startupLogger.Info("MainWindow ctor: before InitializeComponent().");
         InitializeComponent();
         startupLogger.Info("MainWindow ctor: after InitializeComponent().");
