@@ -13,10 +13,10 @@ public partial class ToastNotificationWindow : Window
         Opacity = 0;
     }
 
-
     public void PlayShowAnimation(double finalTop)
     {
         var storyboard = new Storyboard();
+
         var fade = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(180));
         Storyboard.SetTarget(fade, this);
         Storyboard.SetTargetProperty(fade, new PropertyPath(Window.OpacityProperty));
