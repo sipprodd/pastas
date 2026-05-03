@@ -8,14 +8,15 @@ namespace Pastas.UnitTests.Infrastructure.Storage;
 
 public sealed class SqliteStorageTests : IDisposable
 {
+    private readonly string _tempDirectory;
     private readonly string _dbPath;
     private readonly SqliteConnectionFactory _connectionFactory;
 
     public SqliteStorageTests()
     {
-        var tempDirectory = Path.Combine(Path.GetTempPath(), "pastas-tests", Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(tempDirectory);
-        _dbPath = Path.Combine(tempDirectory, "pastas-test.db");
+        _tempDirectory = Path.Combine(Path.GetTempPath(), "pastas-tests", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(_tempDirectory);
+        _dbPath = Path.Combine(_tempDirectory, "pastas-test.db");
         _connectionFactory = new SqliteConnectionFactory(_dbPath);
 
         var migrationRunner = new SqliteMigrationRunner(_connectionFactory);
@@ -179,10 +180,22 @@ public sealed class SqliteStorageTests : IDisposable
 
     public void Dispose()
     {
-        var directory = Path.GetDirectoryName(_dbPath);
-        if (!string.IsNullOrWhiteSpace(directory) && Directory.Exists(directory))
+        SqliteConnection.ClearAllPools();
+
+        if (Directory.Exists(_tempDirectory))
         {
-            Directory.Delete(directory, recursive: true);
+            try
+            {
+                Directory.Delete(_tempDirectory, recursive: true);
+            }
+            catch (IOException)
+            {
+                // Best-effort cleanup only. Avoid failing tests on transient file locks.
+            }
+            catch (UnauthorizedAccessException)
+            {
+                // Best-effort cleanup only. Avoid failing tests on transient file locks.
+            }
         }
     }
 
