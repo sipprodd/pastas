@@ -1,5 +1,4 @@
 using System.Windows;
-using System.Windows.Media.Animation;
 using System.Windows.Threading;
 
 namespace Pastas.Presentation.Notifications;
@@ -90,6 +89,7 @@ public sealed class ToastNotificationManager
         for (var i = 0; i < _toasts.Count; i++)
         {
             var toast = _toasts[i];
+
             toast.BeginAnimation(Window.LeftProperty, null);
             toast.BeginAnimation(Window.TopProperty, null);
 
