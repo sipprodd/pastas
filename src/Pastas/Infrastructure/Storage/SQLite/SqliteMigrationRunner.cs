@@ -23,7 +23,7 @@ public sealed class SqliteMigrationRunner
             await migrationCommand.ExecuteNonQueryAsync(cancellationToken);
         }
 
-        await using SqliteTransaction transaction = await connection.BeginTransactionAsync(cancellationToken);
+        await using var transaction = (SqliteTransaction)await connection.BeginTransactionAsync(cancellationToken);
         await using var versionCommand = connection.CreateCommand();
         versionCommand.Transaction = transaction;
         versionCommand.CommandText = @"
