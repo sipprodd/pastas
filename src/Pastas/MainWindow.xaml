@@ -63,8 +63,8 @@
             <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
             <Setter Property="BorderBrush" Value="{StaticResource SubtleBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="14,10" />
-            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Padding" Value="12,7" />
+            <Setter Property="FontSize" Value="13" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
@@ -72,7 +72,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="14">
+                                CornerRadius="12">
                             <ScrollViewer x:Name="PART_ContentHost" />
                         </Border>
                         <ControlTemplate.Triggers>
@@ -84,7 +84,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
 
         <Style x:Key="SortComboBoxStyle" TargetType="ComboBox">
             <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}" />
@@ -126,6 +125,9 @@
                                             </MultiTrigger.Conditions>
                                             <Setter TargetName="ItemRoot" Property="Background" Value="#FF474036" />
                                         </MultiTrigger>
+                                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                            <Setter TargetName="ItemRoot" Property="Background" Value="#FF35312C" />
+                                        </Trigger>
                                         <Trigger Property="IsEnabled" Value="False">
                                             <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
                                             <Setter TargetName="ItemRoot" Property="Opacity" Value="0.6" />
@@ -137,67 +139,13 @@
                     </Style>
                 </Setter.Value>
             </Setter>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ComboBox">
-                        <Grid>
-                            <Border x:Name="Root"
-                                    Background="{TemplateBinding Background}"
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    CornerRadius="12">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="28" />
-                                    </Grid.ColumnDefinitions>
-                                    <ContentPresenter Margin="10,0,0,0"
-                                                      VerticalAlignment="Center"
-                                                      HorizontalAlignment="Left"
-                                                      Content="{TemplateBinding SelectionBoxItem}"
-                                                      ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" />
-                                    <Path Grid.Column="1"
-                                          Width="10"
-                                          Height="6"
-                                          VerticalAlignment="Center"
-                                          HorizontalAlignment="Center"
-                                          Fill="{StaticResource MutedTextBrush}"
-                                          Data="M 0 0 L 5 6 L 10 0 Z" />
-                                </Grid>
-                            </Border>
-                            <Popup x:Name="PART_Popup"
-                                   Placement="Bottom"
-                                   IsOpen="{TemplateBinding IsDropDownOpen}"
-                                   AllowsTransparency="True"
-                                   Focusable="False"
-                                   PopupAnimation="Fade">
-                                <Border Margin="0,4,0,0"
-                                        MinWidth="{TemplateBinding ActualWidth}"
-                                        Background="{StaticResource SurfaceElevatedBrush}"
-                                        BorderBrush="{StaticResource SubtleBorderBrush}"
-                                        BorderThickness="1"
-                                        CornerRadius="10">
-                                    <ScrollViewer SnapsToDevicePixels="True">
-                                        <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained" />
-                                    </ScrollViewer>
-                                </Border>
-                            </Popup>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
-                            </Trigger>
-                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                                <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
-                                <Setter TargetName="Root" Property="Opacity" Value="0.6" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+            <Style.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#FF2A2622" />
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF3C352D" />
+                <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#FF2A2622" />
+                <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="#FFF4EBDD" />
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#FFF4EBDD" />
+            </Style.Resources>
         </Style>
 
         <Style x:Key="CardBorderStyle" TargetType="Border">
@@ -225,23 +173,59 @@
                        Margin="0,2,0,0"
                        FontSize="13"
                        Foreground="{StaticResource MutedTextBrush}" />
-            <TextBox Margin="0,14,0,0"
-                     Style="{StaticResource SearchTextBoxStyle}"
-                     Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" />
-            <Button Margin="0,10,0,0"
-                    Padding="14,7"
-                    HorizontalAlignment="Left"
-                    Content="Search"
-                    Style="{StaticResource PrimaryButtonStyle}"
-                    Command="{Binding SearchCommand}" />
+
+            <Grid Margin="0,12,0,0"
+                  HorizontalAlignment="Left"
+                  Width="430">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBox Grid.Column="0"
+                         Margin="0,0,8,0"
+                         Height="36"
+                         VerticalContentAlignment="Center"
+                         Style="{StaticResource SearchTextBoxStyle}"
+                         Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" />
+
+                <Button Grid.Column="1"
+                        Margin="0"
+                        Padding="12,6"
+                        MinWidth="86"
+                        Height="36"
+                        Content="Search"
+                        Style="{StaticResource PrimaryButtonStyle}"
+                        Command="{Binding SearchCommand}" />
+            </Grid>
         </StackPanel>
 
         <WrapPanel Grid.Row="1" Margin="0,0,0,14" ItemHeight="32">
-            <Button Content="All" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.All}" />
-            <Button Content="Text" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Text}" />
-            <Button Content="Images" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Images}" />
-            <Button Content="Pinned" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Pinned}" />
-            <Button Margin="0,0,16,0" Content="Protected" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Protected}" />
+            <Button Content="All"
+                    Style="{StaticResource PrimaryButtonStyle}"
+                    Command="{Binding SetFilterCommand}"
+                    CommandParameter="{x:Static domain:ClipboardFilter.All}" />
+
+            <Button Content="Text"
+                    Style="{StaticResource PrimaryButtonStyle}"
+                    Command="{Binding SetFilterCommand}"
+                    CommandParameter="{x:Static domain:ClipboardFilter.Text}" />
+
+            <Button Content="Images"
+                    Style="{StaticResource PrimaryButtonStyle}"
+                    Command="{Binding SetFilterCommand}"
+                    CommandParameter="{x:Static domain:ClipboardFilter.Images}" />
+
+            <Button Content="Pinned"
+                    Style="{StaticResource PrimaryButtonStyle}"
+                    Command="{Binding SetFilterCommand}"
+                    CommandParameter="{x:Static domain:ClipboardFilter.Pinned}" />
+
+            <Button Margin="0,0,16,0"
+                    Content="Protected"
+                    Style="{StaticResource PrimaryButtonStyle}"
+                    Command="{Binding SetFilterCommand}"
+                    CommandParameter="{x:Static domain:ClipboardFilter.Protected}" />
 
             <ComboBox Width="170"
                       Height="32"
@@ -253,7 +237,10 @@
                 <ComboBoxItem Content="Oldest" Tag="{x:Static domain:SortMode.Oldest}" />
                 <ComboBoxItem Content="Most copied" Tag="{x:Static domain:SortMode.MostCopied}" />
             </ComboBox>
-            <Button Content="Refresh" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding RefreshCommand}" />
+
+            <Button Content="Refresh"
+                    Style="{StaticResource PrimaryButtonStyle}"
+                    Command="{Binding RefreshCommand}" />
         </WrapPanel>
 
         <Grid Grid.Row="2" Margin="0,0,0,10">
@@ -294,6 +281,7 @@
                                                 </Style.Triggers>
                                             </Style>
                                         </Border.Style>
+
                                         <Image Source="{Binding ThumbnailPath}"
                                                Stretch="UniformToFill"
                                                Margin="4"
@@ -305,12 +293,14 @@
                                                    Foreground="{StaticResource AccentBrush}"
                                                    FontWeight="SemiBold"
                                                    FontSize="12" />
+
                                         <TextBlock Text="{Binding PreviewText}"
                                                    Foreground="{StaticResource CreamTextBrush}"
                                                    Margin="0,6,0,6"
                                                    FontSize="14"
                                                    TextWrapping="Wrap"
                                                    MaxHeight="62" />
+
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="{Binding SourceLabel}"
                                                        Foreground="{StaticResource MutedTextBrush}"
@@ -354,8 +344,13 @@
                                                 VerticalAlignment="Top"
                                                 Visibility="Collapsed"
                                                 Panel.ZIndex="2">
-                                        <Button Content="Copy" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding DataContext.CopyItemCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
-                                        <Button Command="{Binding DataContext.TogglePinCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}">
+                                        <Button Content="Copy"
+                                                Style="{StaticResource PrimaryButtonStyle}"
+                                                Command="{Binding DataContext.CopyItemCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}" />
+
+                                        <Button Command="{Binding DataContext.TogglePinCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}">
                                             <Button.Style>
                                                 <Style TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}">
                                                     <Setter Property="Content" Value="Pin" />
@@ -368,18 +363,26 @@
                                                 </Style>
                                             </Button.Style>
                                         </Button>
-                                        <Button Margin="0" Content="Delete" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding DataContext.DeleteItemCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+
+                                        <Button Margin="0"
+                                                Content="Delete"
+                                                Style="{StaticResource PrimaryButtonStyle}"
+                                                Command="{Binding DataContext.DeleteItemCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}" />
                                     </StackPanel>
                                 </Grid>
                             </Border>
+
                             <DataTemplate.Triggers>
                                 <DataTrigger Binding="{Binding IsPinned}" Value="True">
                                     <Setter TargetName="ItemCard" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
                                 </DataTrigger>
+
                                 <Trigger SourceName="ItemCard" Property="IsMouseOver" Value="True">
                                     <Setter TargetName="ActionButtons" Property="Visibility" Value="Visible" />
                                     <Setter TargetName="ItemCard" Property="Background" Value="#FF2A2622" />
                                 </Trigger>
+
                                 <Trigger SourceName="ItemCard" Property="IsKeyboardFocusWithin" Value="True">
                                     <Setter TargetName="ActionButtons" Property="Visibility" Value="Visible" />
                                     <Setter TargetName="ItemCard" Property="Background" Value="#FF2A2622" />
