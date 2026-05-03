@@ -85,6 +85,20 @@
             </Setter>
         </Style>
 
+
+        <Style x:Key="SortComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource SubtleBorderBrush}" />
+            <Setter Property="Padding" Value="8,2" />
+            <Style.Resources>
+                <Style TargetType="ComboBoxItem">
+                    <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
+                    <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}" />
+                </Style>
+            </Style.Resources>
+        </Style>
+
         <Style x:Key="CardBorderStyle" TargetType="Border">
             <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
             <Setter Property="BorderBrush" Value="{StaticResource SubtleBorderBrush}" />
@@ -131,17 +145,13 @@
             <ComboBox Width="170"
                       Height="32"
                       Margin="0,0,8,0"
-                      Padding="8,2"
-                      Background="{StaticResource SurfaceElevatedBrush}"
-                      Foreground="{StaticResource CreamTextBrush}"
-                      BorderBrush="{StaticResource SubtleBorderBrush}"
+                      Style="{StaticResource SortComboBoxStyle}"
                       SelectedValuePath="Tag"
                       SelectedValue="{Binding SelectedSortMode}">
                 <ComboBoxItem Content="Recent" Tag="{x:Static domain:SortMode.Recent}" />
                 <ComboBoxItem Content="Oldest" Tag="{x:Static domain:SortMode.Oldest}" />
                 <ComboBoxItem Content="Most copied" Tag="{x:Static domain:SortMode.MostCopied}" />
             </ComboBox>
-            <Button Content="Apply" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SetSortModeCommand}" CommandParameter="{Binding SelectedSortMode}" />
             <Button Content="Refresh" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding RefreshCommand}" />
         </WrapPanel>
 
@@ -150,7 +160,13 @@
                 <ItemsControl ItemsSource="{Binding Items}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border Margin="0,0,0,12" Padding="14" Style="{StaticResource CardBorderStyle}">
+                            <Border x:Name="ItemCard"
+                                    Margin="0,0,0,12"
+                                    Padding="14"
+                                    Background="{StaticResource SurfaceBrush}"
+                                    BorderBrush="{StaticResource SubtleBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="14">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
@@ -207,13 +223,50 @@
                                         </StackPanel>
                                     </StackPanel>
 
-                                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Top">
+                                    <Button Grid.ColumnSpan="3"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            HorizontalContentAlignment="Stretch"
+                                            VerticalContentAlignment="Stretch"
+                                            Command="{Binding DataContext.CopyItemCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}"
+                                            Focusable="False" />
+
+                                    <StackPanel x:Name="ActionButtons"
+                                                Grid.Column="2"
+                                                Orientation="Horizontal"
+                                                VerticalAlignment="Top"
+                                                Visibility="Collapsed"
+                                                Panel.ZIndex="2">
                                         <Button Content="Copy" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding DataContext.CopyItemCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
-                                        <Button Content="Pin" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding DataContext.TogglePinCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                        <Button Command="{Binding DataContext.TogglePinCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}">
+                                                    <Setter Property="Content" Value="Pin" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsPinned}" Value="True">
+                                                            <Setter Property="Content" Value="Unpin" />
+                                                            <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
                                         <Button Margin="0" Content="Delete" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding DataContext.DeleteItemCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
                                     </StackPanel>
                                 </Grid>
                             </Border>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding IsPinned}" Value="True">
+                                    <Setter TargetName="ItemCard" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                                </DataTrigger>
+                                <Trigger SourceName="ItemCard" Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="ActionButtons" Property="Visibility" Value="Visible" />
+                                </Trigger>
+                                <Trigger SourceName="ItemCard" Property="IsKeyboardFocusWithin" Value="True">
+                                    <Setter TargetName="ActionButtons" Property="Visibility" Value="Visible" />
+                                </Trigger>
+                            </DataTemplate.Triggers>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

@@ -53,7 +53,15 @@ public sealed class MainViewModel : ViewModelBase
     public SortMode SelectedSortMode
     {
         get => _selectedSortMode;
-        set => SetProperty(ref _selectedSortMode, value);
+        set
+        {
+            if (!SetProperty(ref _selectedSortMode, value))
+            {
+                return;
+            }
+
+            _ = RefreshAsync();
+        }
     }
 
     public bool IsLoading
@@ -127,13 +135,14 @@ public sealed class MainViewModel : ViewModelBase
         }
     }
 
-    private async Task SetSortModeAsync(object? parameter)
+    private Task SetSortModeAsync(object? parameter)
     {
         if (parameter is SortMode sortMode)
         {
             SelectedSortMode = sortMode;
-            await RefreshAsync();
         }
+
+        return Task.CompletedTask;
     }
 
     private async Task DeleteItemAsync(object? parameter)

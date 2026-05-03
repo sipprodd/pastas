@@ -48,6 +48,8 @@ public partial class MainWindow : Window
         _diagnosticsLogger.Info("MainWindow ctor: before Closed event subscription.");
         Closed += OnClosedAsync;
         _diagnosticsLogger.Info("MainWindow ctor: after Closed event subscription.");
+
+        Deactivated += OnDeactivated;
     }
 
     private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
@@ -128,6 +130,16 @@ public partial class MainWindow : Window
     private async void OnTrayExitRequestedAsync(object? sender, EventArgs e)
     {
         await ExitApplicationAsync();
+    }
+
+    private void OnDeactivated(object? sender, EventArgs e)
+    {
+        if (_isExiting || !IsVisible)
+        {
+            return;
+        }
+
+        Hide();
     }
 
     private void OnClosing(object? sender, CancelEventArgs e)
