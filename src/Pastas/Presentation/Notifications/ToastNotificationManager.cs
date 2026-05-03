@@ -11,6 +11,7 @@ public sealed class ToastNotificationManager
     private const double VerticalSpacing = 10;
     private const double FallbackWidth = 300;
     private const double FallbackHeight = 82;
+
     private static readonly TimeSpan Lifetime = TimeSpan.FromSeconds(2.5);
 
     private readonly Dispatcher _dispatcher;
