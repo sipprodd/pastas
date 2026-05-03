@@ -54,10 +54,22 @@ public partial class MainWindow : Window
         PreviewKeyDown += OnPreviewKeyDown;
     }
 
+
+    private void CloseButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        Hide();
+    }
     private void OnPreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {
         if (_viewModel is null)
         {
+            return;
+        }
+
+        if (e.Key == Key.Enter && _viewModel.SelectedItem is not null)
+        {
+            _viewModel.CopyItemCommand.Execute(_viewModel.SelectedItem);
+            e.Handled = true;
             return;
         }
 
@@ -68,9 +80,23 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (e.Key == Key.Escape && _viewModel.IsPreviewOpen)
+        if (e.Key == Key.Escape)
         {
-            _viewModel.ClosePreview();
+            if (_viewModel.IsPreviewOpen)
+            {
+                _viewModel.ClosePreview();
+                e.Handled = true;
+                return;
+            }
+
+            if (_viewModel.IsSettingsOpen)
+            {
+                _viewModel.CloseSettings();
+                e.Handled = true;
+                return;
+            }
+
+            Hide();
             e.Handled = true;
         }
     }

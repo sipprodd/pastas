@@ -3,8 +3,10 @@ using Pastas.Domain.Enums;
 
 namespace Pastas.Presentation.ViewModels;
 
-public sealed class ClipboardItemViewModel
+public sealed class ClipboardItemViewModel : ViewModelBase
 {
+    private bool _isSelected;
+
     private ClipboardItemViewModel()
     {
     }
@@ -23,7 +25,14 @@ public sealed class ClipboardItemViewModel
     public string? ImagePath { get; private init; }
     public string FullText { get; private init; } = string.Empty;
     public bool HasThumbnail { get; private init; }
-    public bool IsSelected { get; set; }
+
+    public bool IsSelected
+    {
+        get => _isSelected;
+        set => SetProperty(ref _isSelected, value);
+    }
+
+    public string ItemGlyph => IsProtected ? "🔒" : IsImage ? "🖼" : "T";
 
     public static ClipboardItemViewModel FromEntity(ClipboardItem item)
     {
