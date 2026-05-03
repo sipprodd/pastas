@@ -1,5 +1,4 @@
 using System.Windows;
-using System.Windows.Media.Animation;
 using System.Windows.Threading;
 
 namespace Pastas.Presentation.Notifications;
@@ -7,11 +6,11 @@ namespace Pastas.Presentation.Notifications;
 public sealed class ToastNotificationManager
 {
     private const int MaxToasts = 3;
+    private const double ToastWidth = 300;
+    private const double ToastHeight = 82;
     private const double RightMargin = 16;
     private const double BottomMargin = 16;
     private const double VerticalSpacing = 10;
-    private const double ToastWidth = 300;
-    private const double ToastHeight = 82;
 
     private static readonly TimeSpan Lifetime = TimeSpan.FromSeconds(2.5);
     private static readonly List<ToastNotificationWindow> ActiveToasts = [];
@@ -38,12 +37,13 @@ public sealed class ToastNotificationManager
             toast.Closed += (_, _) => RemoveToast(toast);
 
             ActiveToasts.Insert(0, toast);
-            PositionToasts();
 
+            PositionToasts();
             toast.Show();
             PositionToasts();
 
             toast.PlayShowAnimation();
+
             _ = AutoDismissAsync(toast);
         });
     }
@@ -59,6 +59,7 @@ public sealed class ToastNotificationManager
         for (var i = ActiveToasts.Count - 1; i >= 0; i--)
         {
             var toast = ActiveToasts[i];
+
             if (toast.IsLoaded && !toast.IsVisible)
             {
                 ActiveToasts.RemoveAt(i);
@@ -90,8 +91,12 @@ public sealed class ToastNotificationManager
         for (var i = 0; i < ActiveToasts.Count; i++)
         {
             var toast = ActiveToasts[i];
+
             toast.BeginAnimation(Window.LeftProperty, null);
             toast.BeginAnimation(Window.TopProperty, null);
+
+            toast.Width = ToastWidth;
+            toast.Height = ToastHeight;
 
             toast.Left = workArea.Right - ToastWidth - RightMargin;
             toast.Top = workArea.Bottom - ((i + 1) * ToastHeight) - (i * VerticalSpacing) - BottomMargin;

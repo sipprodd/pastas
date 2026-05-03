@@ -15,15 +15,15 @@ public partial class ToastNotificationWindow : Window
 
     public void PlayShowAnimation()
     {
-        var storyboard = new Storyboard();
+        BeginAnimation(OpacityProperty, null);
 
-        var fade = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(180));
-        Storyboard.SetTarget(fade, this);
-        Storyboard.SetTargetProperty(fade, new PropertyPath(Window.OpacityProperty));
+        var fade = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(180))
+        {
+            FillBehavior = FillBehavior.Stop
+        };
 
-        storyboard.Completed += (_, _) => Opacity = 1;
+        fade.Completed += (_, _) => Opacity = 1;
 
-        storyboard.Children.Add(fade);
-        storyboard.Begin();
+        BeginAnimation(OpacityProperty, fade);
     }
 }
