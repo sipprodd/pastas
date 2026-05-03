@@ -85,7 +85,6 @@
             </Setter>
         </Style>
 
-
         <Style x:Key="SortComboBoxStyle" TargetType="ComboBox">
             <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}" />
             <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
@@ -174,6 +173,7 @@
                        Margin="0,2,0,0"
                        FontSize="13"
                        Foreground="{StaticResource MutedTextBrush}" />
+
             <Grid Margin="0,12,0,0"
                   HorizontalAlignment="Left"
                   Width="430">
@@ -181,12 +181,14 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
+
                 <TextBox Grid.Column="0"
                          Margin="0,0,8,0"
                          Height="36"
                          VerticalContentAlignment="Center"
                          Style="{StaticResource SearchTextBoxStyle}"
                          Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" />
+
                 <Button Grid.Column="1"
                         Margin="0"
                         Padding="12,6"
@@ -199,11 +201,31 @@
         </StackPanel>
 
         <WrapPanel Grid.Row="1" Margin="0,0,0,14" ItemHeight="32">
-            <Button Content="All" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.All}" />
-            <Button Content="Text" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Text}" />
-            <Button Content="Images" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Images}" />
-            <Button Content="Pinned" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Pinned}" />
-            <Button Margin="0,0,16,0" Content="Protected" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Protected}" />
+            <Button Content="All"
+                    Style="{StaticResource PrimaryButtonStyle}"
+                    Command="{Binding SetFilterCommand}"
+                    CommandParameter="{x:Static domain:ClipboardFilter.All}" />
+
+            <Button Content="Text"
+                    Style="{StaticResource PrimaryButtonStyle}"
+                    Command="{Binding SetFilterCommand}"
+                    CommandParameter="{x:Static domain:ClipboardFilter.Text}" />
+
+            <Button Content="Images"
+                    Style="{StaticResource PrimaryButtonStyle}"
+                    Command="{Binding SetFilterCommand}"
+                    CommandParameter="{x:Static domain:ClipboardFilter.Images}" />
+
+            <Button Content="Pinned"
+                    Style="{StaticResource PrimaryButtonStyle}"
+                    Command="{Binding SetFilterCommand}"
+                    CommandParameter="{x:Static domain:ClipboardFilter.Pinned}" />
+
+            <Button Margin="0,0,16,0"
+                    Content="Protected"
+                    Style="{StaticResource PrimaryButtonStyle}"
+                    Command="{Binding SetFilterCommand}"
+                    CommandParameter="{x:Static domain:ClipboardFilter.Protected}" />
 
             <ComboBox Width="170"
                       Height="32"
@@ -215,7 +237,10 @@
                 <ComboBoxItem Content="Oldest" Tag="{x:Static domain:SortMode.Oldest}" />
                 <ComboBoxItem Content="Most copied" Tag="{x:Static domain:SortMode.MostCopied}" />
             </ComboBox>
-            <Button Content="Refresh" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding RefreshCommand}" />
+
+            <Button Content="Refresh"
+                    Style="{StaticResource PrimaryButtonStyle}"
+                    Command="{Binding RefreshCommand}" />
         </WrapPanel>
 
         <Grid Grid.Row="2" Margin="0,0,0,10">
@@ -256,6 +281,7 @@
                                                 </Style.Triggers>
                                             </Style>
                                         </Border.Style>
+
                                         <Image Source="{Binding ThumbnailPath}"
                                                Stretch="UniformToFill"
                                                Margin="4"
@@ -267,12 +293,14 @@
                                                    Foreground="{StaticResource AccentBrush}"
                                                    FontWeight="SemiBold"
                                                    FontSize="12" />
+
                                         <TextBlock Text="{Binding PreviewText}"
                                                    Foreground="{StaticResource CreamTextBrush}"
                                                    Margin="0,6,0,6"
                                                    FontSize="14"
                                                    TextWrapping="Wrap"
                                                    MaxHeight="62" />
+
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="{Binding SourceLabel}"
                                                        Foreground="{StaticResource MutedTextBrush}"
@@ -316,8 +344,13 @@
                                                 VerticalAlignment="Top"
                                                 Visibility="Collapsed"
                                                 Panel.ZIndex="2">
-                                        <Button Content="Copy" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding DataContext.CopyItemCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
-                                        <Button Command="{Binding DataContext.TogglePinCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}">
+                                        <Button Content="Copy"
+                                                Style="{StaticResource PrimaryButtonStyle}"
+                                                Command="{Binding DataContext.CopyItemCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}" />
+
+                                        <Button Command="{Binding DataContext.TogglePinCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}">
                                             <Button.Style>
                                                 <Style TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}">
                                                     <Setter Property="Content" Value="Pin" />
@@ -330,18 +363,26 @@
                                                 </Style>
                                             </Button.Style>
                                         </Button>
-                                        <Button Margin="0" Content="Delete" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding DataContext.DeleteItemCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+
+                                        <Button Margin="0"
+                                                Content="Delete"
+                                                Style="{StaticResource PrimaryButtonStyle}"
+                                                Command="{Binding DataContext.DeleteItemCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}" />
                                     </StackPanel>
                                 </Grid>
                             </Border>
+
                             <DataTemplate.Triggers>
                                 <DataTrigger Binding="{Binding IsPinned}" Value="True">
                                     <Setter TargetName="ItemCard" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
                                 </DataTrigger>
+
                                 <Trigger SourceName="ItemCard" Property="IsMouseOver" Value="True">
                                     <Setter TargetName="ActionButtons" Property="Visibility" Value="Visible" />
                                     <Setter TargetName="ItemCard" Property="Background" Value="#FF2A2622" />
                                 </Trigger>
+
                                 <Trigger SourceName="ItemCard" Property="IsKeyboardFocusWithin" Value="True">
                                     <Setter TargetName="ActionButtons" Property="Visibility" Value="Visible" />
                                     <Setter TargetName="ItemCard" Property="Background" Value="#FF2A2622" />
