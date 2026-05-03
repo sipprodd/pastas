@@ -1,5 +1,6 @@
 using System.Windows.Threading;
 using Pastas.Application.Services;
+using Pastas.Presentation.Notifications;
 using Pastas.Presentation.ViewModels;
 
 namespace Pastas.Presentation.Services;
@@ -11,11 +12,13 @@ public sealed class MainViewModelNotificationService : INotificationService
     private readonly MainViewModel _mainViewModel;
     private readonly Dispatcher _dispatcher;
     private readonly DispatcherTimer _timer;
+    private readonly ToastNotificationManager _toastManager;
 
     public MainViewModelNotificationService(MainViewModel mainViewModel, Dispatcher dispatcher)
     {
         _mainViewModel = mainViewModel;
         _dispatcher = dispatcher;
+        _toastManager = new ToastNotificationManager(_dispatcher);
 
         _timer = new DispatcherTimer(DispatcherPriority.Background, _dispatcher)
         {
@@ -24,14 +27,14 @@ public sealed class MainViewModelNotificationService : INotificationService
         _timer.Tick += OnTimerTick;
     }
 
-    public void ShowInfo(string message)
-    {
-        ShowSafe(message);
-    }
+    public void ShowInfo(string message) => ShowSafe(message);
 
-    public void ShowWarning(string message)
+    public void ShowWarning(string message) => ShowSafe(message);
+
+    public void ShowClipboardCaptured(ClipboardCaptureNotification notification)
     {
-        ShowSafe(message);
+        ShowSafe(notification.Title);
+        _toastManager.Show(notification.Title, notification.Subtitle);
     }
 
     private void ShowSafe(string message)
@@ -46,7 +49,6 @@ public sealed class MainViewModelNotificationService : INotificationService
             }
             catch
             {
-                // Notification updates should never crash UI flow.
             }
         });
     }

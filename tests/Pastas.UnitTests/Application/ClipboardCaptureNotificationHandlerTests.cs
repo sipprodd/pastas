@@ -1,6 +1,7 @@
 using Pastas.Application.Services;
 using Pastas.Application.UseCases;
 using Pastas.Domain.Entities;
+using Pastas.Domain.Enums;
 using Pastas.Domain.Interfaces;
 using Pastas.Domain.ValueObjects;
 using Pastas.Shared.Result;
@@ -10,35 +11,43 @@ namespace Pastas.UnitTests.Application;
 public sealed class ClipboardCaptureNotificationHandlerTests
 {
     [Fact]
-    public async Task HandleClipboardChangedAsync_ShowsInfoNotification_AfterCapture()
+    public async Task HandleClipboardChangedAsync_ShowsClipboardNotification_AfterCapture()
     {
+        var repository = new FakeClipboardItemRepository
+        {
+            TotalCount = 2,
+            LatestItem = new ClipboardItem { Type = ClipboardItemType.Image }
+        };
+
         var coordinator = new ClipboardCaptureCoordinator(
             new FakeCaptureClipboardTextUseCase(),
             new FakeCaptureClipboardImageUseCase(),
-            new ClipboardCleanupService(new FakeClipboardItemRepository(), new FakeFileStorage(), new ClipboardCleanupOptions()),
+            new ClipboardCleanupService(repository, new FakeFileStorage(), new ClipboardCleanupOptions()),
             null,
             TimeSpan.Zero);
 
         var notificationService = new FakeNotificationService();
-        var handler = new ClipboardCaptureNotificationHandler(coordinator, notificationService);
+        var handler = new ClipboardCaptureNotificationHandler(coordinator, notificationService, repository);
 
         await handler.HandleClipboardChangedAsync();
 
-        Assert.Equal("Clipboard item saved.", notificationService.LastInfoMessage);
+        Assert.Equal("Image copied", notificationService.LastNotification?.Title);
+        Assert.Equal("Total items: 2", notificationService.LastNotification?.Subtitle);
     }
 
     [Fact]
     public async Task HandleClipboardChangedAsync_DoesNotThrow_WhenNotificationFails()
     {
+        var repository = new FakeClipboardItemRepository();
         var coordinator = new ClipboardCaptureCoordinator(
             new FakeCaptureClipboardTextUseCase(),
             new FakeCaptureClipboardImageUseCase(),
-            new ClipboardCleanupService(new FakeClipboardItemRepository(), new FakeFileStorage(), new ClipboardCleanupOptions()),
+            new ClipboardCleanupService(repository, new FakeFileStorage(), new ClipboardCleanupOptions()),
             null,
             TimeSpan.Zero);
 
         var notificationService = new ThrowingNotificationService();
-        var handler = new ClipboardCaptureNotificationHandler(coordinator, notificationService);
+        var handler = new ClipboardCaptureNotificationHandler(coordinator, notificationService, repository);
 
         var exception = await Record.ExceptionAsync(() => handler.HandleClipboardChangedAsync());
 
@@ -47,55 +56,42 @@ public sealed class ClipboardCaptureNotificationHandlerTests
 
     private sealed class FakeCaptureClipboardTextUseCase : ICaptureClipboardTextUseCase
     {
-        public Task<Result> ExecuteAsync(CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(Result.Success());
-        }
+        public Task<Result> ExecuteAsync(CancellationToken cancellationToken = default) => Task.FromResult(Result.Success());
     }
 
     private sealed class FakeCaptureClipboardImageUseCase : ICaptureClipboardImageUseCase
     {
-        public Task<Result> ExecuteAsync(CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(Result.Success());
-        }
+        public Task<Result> ExecuteAsync(CancellationToken cancellationToken = default) => Task.FromResult(Result.Success());
     }
 
     private sealed class FakeNotificationService : Pastas.Application.Services.INotificationService
     {
-        public string? LastInfoMessage { get; private set; }
-
-        public void ShowInfo(string message)
-        {
-            LastInfoMessage = message;
-        }
-
-        public void ShowWarning(string message)
-        {
-        }
+        public ClipboardCaptureNotification? LastNotification { get; private set; }
+        public void ShowInfo(string message) { }
+        public void ShowWarning(string message) { }
+        public void ShowClipboardCaptured(ClipboardCaptureNotification notification) => LastNotification = notification;
     }
 
     private sealed class ThrowingNotificationService : Pastas.Application.Services.INotificationService
     {
-        public void ShowInfo(string message)
-        {
-            throw new InvalidOperationException("notification failed");
-        }
-
-        public void ShowWarning(string message)
-        {
-        }
+        public void ShowInfo(string message) { }
+        public void ShowWarning(string message) { }
+        public void ShowClipboardCaptured(ClipboardCaptureNotification notification) => throw new InvalidOperationException("notification failed");
     }
 
     private sealed class FakeClipboardItemRepository : IClipboardItemRepository
     {
+        public int TotalCount { get; set; }
+        public ClipboardItem? LatestItem { get; set; }
+
         public Task AddAsync(ClipboardItem item, CancellationToken cancellationToken = default) => Task.CompletedTask;
         public Task UpdateAsync(ClipboardItem item, CancellationToken cancellationToken = default) => Task.CompletedTask;
         public Task DeleteAsync(Guid id, CancellationToken cancellationToken = default) => Task.CompletedTask;
         public Task<ClipboardItem?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) => Task.FromResult<ClipboardItem?>(null);
         public Task<ClipboardItem?> FindByHashAsync(string hash, CancellationToken cancellationToken = default) => Task.FromResult<ClipboardItem?>(null);
-        public Task<IReadOnlyList<ClipboardItem>> SearchAsync(ClipboardSearchQuery query, CancellationToken cancellationToken = default) => Task.FromResult((IReadOnlyList<ClipboardItem>)[]);
-        public Task<int> CountAsync(CancellationToken cancellationToken = default) => Task.FromResult(0);
+        public Task<IReadOnlyList<ClipboardItem>> SearchAsync(ClipboardSearchQuery query, CancellationToken cancellationToken = default)
+            => Task.FromResult((IReadOnlyList<ClipboardItem>)(LatestItem is null ? [] : [LatestItem]));
+        public Task<int> CountAsync(CancellationToken cancellationToken = default) => Task.FromResult(TotalCount);
     }
 
     private sealed class FakeFileStorage : IFileStorage
