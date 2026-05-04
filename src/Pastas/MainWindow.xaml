@@ -242,7 +242,7 @@
         </Style>
     </Window.Resources>
 
-    <Border CornerRadius="22" Background="{StaticResource ShellBrush}" BorderBrush="#FF3A342D" BorderThickness="1" Padding="16">
+    <Border CornerRadius="22" Background="{StaticResource ShellBrush}" BorderBrush="#FF3A342D" BorderThickness="1" Padding="16" MouseLeftButtonDown="WindowSurface_OnMouseLeftButtonDown">
         <Grid Width="700">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
