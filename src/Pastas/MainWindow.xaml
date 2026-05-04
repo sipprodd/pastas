@@ -26,11 +26,12 @@
         <SolidColorBrush x:Key="PinnedBorderBrush" Color="#FFE1BC7A" />
 
         <Style x:Key="ChipButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="36" />
             <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
-            <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}" />
-            <Setter Property="BorderBrush" Value="{StaticResource SubtleBorderBrush}" />
+            <Setter Property="Background" Value="#FF2D2823" />
+            <Setter Property="BorderBrush" Value="#FF4B433A" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="Padding" Value="14,0" />
             <Setter Property="Margin" Value="0,0,8,0" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
@@ -41,20 +42,20 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="10">
+                                CornerRadius="11">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="ChipBorder" Property="Background" Value="#FF302A25" />
-                                <Setter TargetName="ChipBorder" Property="BorderBrush" Value="#FF51483E" />
+                                <Setter TargetName="ChipBorder" Property="Background" Value="#FF373029" />
+                                <Setter TargetName="ChipBorder" Property="BorderBrush" Value="#FF63584A" />
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="ChipBorder" Property="Background" Value="#FF221E1A" />
-                                <Setter TargetName="ChipBorder" Property="BorderBrush" Value="#FF5A5147" />
+                                <Setter TargetName="ChipBorder" Property="BorderBrush" Value="#FF746655" />
                             </Trigger>
                             <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="ChipBorder" Property="BorderBrush" Value="#FF5A5147" />
+                                <Setter TargetName="ChipBorder" Property="BorderBrush" Value="#FF746655" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter TargetName="ChipBorder" Property="Opacity" Value="0.7" />
@@ -152,13 +153,13 @@
         </Style>
 
         <Style x:Key="SortMenuButtonStyle" TargetType="Button">
-            <Setter Property="Width" Value="154" />
-            <Setter Property="Height" Value="34" />
+            <Setter Property="Width" Value="166" />
+            <Setter Property="Height" Value="36" />
             <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
-            <Setter Property="Background" Value="#FF2B2621" />
-            <Setter Property="BorderBrush" Value="#FF4C433A" />
+            <Setter Property="Background" Value="#FF302A24" />
+            <Setter Property="BorderBrush" Value="#FF665A4D" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="Padding" Value="13,0" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
             <Setter Property="Template">
@@ -168,27 +169,31 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="10">
+                                CornerRadius="11">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <ContentPresenter Margin="0,0,8,0" VerticalAlignment="Center" HorizontalAlignment="Left" />
-                                <Path Grid.Column="1" Width="9" Height="6" VerticalAlignment="Center" Fill="{StaticResource MutedTextBrush}" Data="M 0 0 L 4.5 5 L 9 0 Z" />
+                                <ContentPresenter Margin="0,0,10,0" VerticalAlignment="Center" HorizontalAlignment="Left" />
+                                <Path Grid.Column="1" Width="10" Height="6" VerticalAlignment="Center" Fill="#FFE4D8C6" Opacity="0.85" Data="M 0 0 L 5 5 L 10 0 Z" />
                             </Grid>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="SortBorder" Property="Background" Value="#FF322C26" />
-                                <Setter TargetName="SortBorder" Property="BorderBrush" Value="#FF5A5045" />
+                                <Setter TargetName="SortBorder" Property="Background" Value="#FF38312A" />
+                                <Setter TargetName="SortBorder" Property="BorderBrush" Value="#FF766857" />
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="SortBorder" Property="Background" Value="#FF231F1B" />
-                                <Setter TargetName="SortBorder" Property="BorderBrush" Value="#FF685C4D" />
+                                <Setter TargetName="SortBorder" Property="BorderBrush" Value="#FF8A7A67" />
                             </Trigger>
                             <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="SortBorder" Property="BorderBrush" Value="#FF5A5045" />
+                                <Setter TargetName="SortBorder" Property="BorderBrush" Value="#FF8A7A67" />
+                            </Trigger>
+                            <Trigger Property="Tag" Value="Open">
+                                <Setter TargetName="SortBorder" Property="Background" Value="#FF3A332C" />
+                                <Setter TargetName="SortBorder" Property="BorderBrush" Value="#FF8A7A67" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -197,13 +202,13 @@
         </Style>
 
         <Style x:Key="SortMenuItemButtonStyle" TargetType="Button">
-            <Setter Property="Height" Value="30" />
+            <Setter Property="Height" Value="32" />
             <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
-            <Setter Property="Background" Value="#FF2B2621" />
+            <Setter Property="Background" Value="#FF2C2722" />
             <Setter Property="BorderBrush" Value="Transparent" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="10,0" />
-            <Setter Property="Margin" Value="0,0,0,4" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="Margin" Value="0,0,0,3" />
             <Setter Property="HorizontalContentAlignment" Value="Left" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
@@ -219,14 +224,15 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="SortItemBorder" Property="Background" Value="#FF352F29" />
+                                <Setter TargetName="SortItemBorder" Property="Background" Value="#FF3A332C" />
+                                <Setter TargetName="SortItemBorder" Property="BorderBrush" Value="#FF665A4C" />
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="SortItemBorder" Property="Background" Value="#FF221E1A" />
-                                <Setter TargetName="SortItemBorder" Property="BorderBrush" Value="#FF4E453C" />
+                                <Setter TargetName="SortItemBorder" Property="BorderBrush" Value="#FF7A6C5B" />
                             </Trigger>
                             <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="SortItemBorder" Property="BorderBrush" Value="#FF4E453C" />
+                                <Setter TargetName="SortItemBorder" Property="BorderBrush" Value="#FF7A6C5B" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -252,8 +258,8 @@
                     <TextBlock Text="clipboard" Margin="8,0,0,0" VerticalAlignment="Bottom" Foreground="{StaticResource MutedTextBrush}" />
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <Button Content="Settings" Command="{Binding OpenSettingsCommand}" Style="{StaticResource ChipButtonStyle}" />
-                    <Button Content="Close" Style="{StaticResource ChipButtonStyle}" Margin="0" Click="CloseButton_OnClick" />
+                    <Button Content="Settings" MinWidth="84" Command="{Binding OpenSettingsCommand}" Style="{StaticResource ChipButtonStyle}" />
+                    <Button Content="Close" MinWidth="72" Style="{StaticResource ChipButtonStyle}" Margin="0" Click="CloseButton_OnClick" />
                 </StackPanel>
             </Grid>
 
@@ -275,7 +281,7 @@
                 </Grid>
             </Grid>
 
-            <Grid Grid.Row="2" Visibility="{Binding IsMainContentVisible, Converter={StaticResource BoolToVisibility}}" Margin="0,0,0,8" MinHeight="34">
+            <Grid Grid.Row="2" Visibility="{Binding IsMainContentVisible, Converter={StaticResource BoolToVisibility}}" Margin="0,0,0,8" MinHeight="36">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
@@ -300,14 +306,16 @@
                        StaysOpen="False"
                        AllowsTransparency="True"
                        HorizontalOffset="0"
-                       VerticalOffset="4"
+                       VerticalOffset="2"
+                       Opened="SortMenuPopup_OnOpened"
+                       Closed="SortMenuPopup_OnClosed"
                        PopupAnimation="Fade">
-                    <Border Width="154"
-                            Padding="6"
-                            Background="#FF2B2621"
-                            BorderBrush="#FF4C433A"
+                    <Border Width="{Binding ActualWidth, ElementName=SortMenuButton}"
+                            Padding="6,6,6,5"
+                            Background="#FF2E2924"
+                            BorderBrush="#FF665A4D"
                             BorderThickness="1"
-                            CornerRadius="10"
+                            CornerRadius="11"
                             SnapsToDevicePixels="True">
                         <StackPanel>
                             <Button Content="Recent" Style="{StaticResource SortMenuItemButtonStyle}" Click="SortRecent_OnClick" />
@@ -454,5 +462,4 @@
         </Grid>
     </Border>
 </Window>
-
 
