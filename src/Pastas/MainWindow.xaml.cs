@@ -203,19 +203,19 @@ public partial class MainWindow : Window
         var node = source;
         while (node is not null)
         {
-            if (node is Button
-                or TextBox
-                or CheckBox
-                or RadioButton
-                or ComboBox
-                or ScrollBar
-                or ScrollViewer
-                or ListBox
-                or ListView
-                or MenuItem
+            if (node is System.Windows.Controls.Button
+                or System.Windows.Controls.TextBox
+                or System.Windows.Controls.CheckBox
+                or System.Windows.Controls.RadioButton
+                or System.Windows.Controls.ComboBox
+                or System.Windows.Controls.Primitives.ScrollBar
+                or System.Windows.Controls.ScrollViewer
+                or System.Windows.Controls.ListBox
+                or System.Windows.Controls.ListView
+                or System.Windows.Controls.MenuItem
                 or Hyperlink
-                or Image
-                or TextBlock)
+                or System.Windows.Controls.Image
+                or System.Windows.Controls.TextBlock)
             {
                 return true;
             }
@@ -568,6 +568,7 @@ public partial class MainWindow : Window
         }
     }
 }
+
 
 
 
