@@ -9,11 +9,11 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
         <SolidColorBrush x:Key="CardBackgroundBrush" Color="#FF2A241F" />
-        <SolidColorBrush x:Key="CardHoverBackgroundBrush" Color="#FF3D342B" />
-        <SolidColorBrush x:Key="CardSelectedBackgroundBrush" Color="#FF40362C" />
+        <SolidColorBrush x:Key="CardHoverBackgroundBrush" Color="#FF342D26" />
+        <SolidColorBrush x:Key="CardSelectedBackgroundBrush" Color="#FF392F26" />
         <SolidColorBrush x:Key="SubtleBorderBrush" Color="#FF4A4036" />
-        <SolidColorBrush x:Key="HoverBorderBrush" Color="#FF8A7A67" />
-        <SolidColorBrush x:Key="SelectedBorderBrush" Color="#FFF2E6D4" />
+        <SolidColorBrush x:Key="HoverBorderBrush" Color="#FF6A5A4C" />
+        <SolidColorBrush x:Key="SelectedBorderBrush" Color="#FFEFE3D0" />
         <SolidColorBrush x:Key="CreamTextBrush" Color="#FFF4EBDD" />
         <SolidColorBrush x:Key="MutedTextBrush" Color="#FFC6B9A6" />
         <SolidColorBrush x:Key="AccentBrush" Color="#FFD1A764" />
@@ -99,7 +99,6 @@
                     <DataTrigger Binding="{Binding IsSelected}" Value="True">
                         <Setter Property="Background" Value="{StaticResource CardSelectedBackgroundBrush}" />
                         <Setter Property="BorderBrush" Value="{StaticResource SelectedBorderBrush}" />
-                        <Setter Property="BorderThickness" Value="2" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding ElementName=CardSelectButton, Path=IsKeyboardFocusWithin}" Value="True">
                         <Setter Property="Background" Value="{StaticResource CardSelectedBackgroundBrush}" />
@@ -129,9 +128,24 @@
                             <Condition Binding="{Binding IsSelected}" Value="True" />
                             <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True" />
                         </MultiDataTrigger.Conditions>
-                        <Setter Property="Background" Value="#FF463B30" />
-                        <Setter Property="BorderBrush" Value="#FFF7EBD9" />
-                        <Setter Property="BorderThickness" Value="2" />
+                        <Setter Property="Background" Value="#FF3E3429" />
+                        <Setter Property="BorderBrush" Value="#FFE5C689" />
+                    </MultiDataTrigger>
+                    <MultiDataTrigger>
+                        <MultiDataTrigger.Conditions>
+                            <Condition Binding="{Binding IsPinned}" Value="True" />
+                            <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True" />
+                        </MultiDataTrigger.Conditions>
+                        <Setter Property="Background" Value="#FF372F27" />
+                        <Setter Property="BorderBrush" Value="#FFE7CA91" />
+                    </MultiDataTrigger>
+                    <MultiDataTrigger>
+                        <MultiDataTrigger.Conditions>
+                            <Condition Binding="{Binding IsSelected}" Value="True" />
+                            <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True" />
+                        </MultiDataTrigger.Conditions>
+                        <Setter Property="Background" Value="#FF3D332A" />
+                        <Setter Property="BorderBrush" Value="#FFF4E8D8" />
                     </MultiDataTrigger>
                 </Style.Triggers>
             </Style>
