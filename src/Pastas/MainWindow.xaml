@@ -270,9 +270,13 @@
                         <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
                         <Grid>
                             <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                            <Button Content="Back" Style="{StaticResource ChipButtonStyle}" Command="{Binding ClosePreviewCommand}" />
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button Content="Copy" Style="{StaticResource ChipButtonStyle}" Command="{Binding CopyItemCommand}" CommandParameter="{Binding SelectedItem}" />
+                                <Button Content="Pin" Style="{StaticResource ChipButtonStyle}" Command="{Binding TogglePinCommand}" CommandParameter="{Binding SelectedItem}" />
+                                <Button Content="Del" Style="{StaticResource ChipButtonStyle}" Command="{Binding DeleteItemCommand}" CommandParameter="{Binding SelectedItem}" Margin="0" />
+                            </StackPanel>
                             <TextBlock Grid.Column="1" Text="Preview" Foreground="{StaticResource CreamTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold" />
-                            <Button Grid.Column="2" Content="X" Style="{StaticResource ChipButtonStyle}" Command="{Binding ClosePreviewCommand}" Margin="0" />
+                            <Button Grid.Column="2" Content="Back" Style="{StaticResource ChipButtonStyle}" Command="{Binding ClosePreviewCommand}" Margin="0" />
                         </Grid>
                         <Border Grid.Row="1" Margin="0,10" Background="{StaticResource SurfaceElevatedBrush}" CornerRadius="10" Padding="12">
                             <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
@@ -312,13 +316,7 @@
                                 </StackPanel>
                             </ScrollViewer>
                         </Border>
-                        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-                            <Button Content="Copy" Style="{StaticResource ChipButtonStyle}" Command="{Binding CopyItemCommand}" CommandParameter="{Binding SelectedItem}" />
-                            <Button Command="{Binding TogglePinCommand}" CommandParameter="{Binding SelectedItem}">
-                                <Button.Style><Style TargetType="Button" BasedOn="{StaticResource ChipButtonStyle}"><Setter Property="Content" Value="Pin" /><Style.Triggers><DataTrigger Binding="{Binding SelectedItem.IsPinned}" Value="True"><Setter Property="Content" Value="Pin" /></DataTrigger></Style.Triggers></Style></Button.Style>
-                            </Button>
-                            <Button Content="Delete" Style="{StaticResource ChipButtonStyle}" Command="{Binding DeleteItemCommand}" CommandParameter="{Binding SelectedItem}" Margin="0" />
-                        </StackPanel>
+                        <Grid Grid.Row="2" Height="0" />
                     </Grid>
                 </Border>
 
