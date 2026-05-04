@@ -130,14 +130,6 @@
                             <Condition Binding="{Binding IsSelected}" Value="True" />
                             <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True" />
                         </MultiDataTrigger.Conditions>
-                        <Setter Property="Background" Value="#FF3E3429" />
-                        <Setter Property="BorderBrush" Value="#FFE5C689" />
-                    </MultiDataTrigger>
-                    <MultiDataTrigger>
-                        <MultiDataTrigger.Conditions>
-                            <Condition Binding="{Binding IsSelected}" Value="True" />
-                            <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True" />
-                        </MultiDataTrigger.Conditions>
                         <Setter Property="Background" Value="#FF514234" />
                         <Setter Property="BorderBrush" Value="#FFD7BD8A" />
                     </MultiDataTrigger>
@@ -236,13 +228,12 @@
                 </Button.InputBindings>
                 <StackPanel Margin="2,0,8,0" VerticalAlignment="Center">
                     <TextBlock Text="{Binding PreviewText}" Foreground="{StaticResource CreamTextBrush}" FontSize="13" Margin="0,0,0,4" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" MaxHeight="20" />
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{Binding SourceLabel}" FontSize="11" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding SourceLabel}"
+                                   FontSize="11"
+                                   TextTrimming="CharacterEllipsis"
+                                   TextWrapping="NoWrap"
+                                   MaxWidth="240">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
@@ -254,9 +245,9 @@
                                 </Style>
                             </TextBlock.Style>
                         </TextBlock>
-                        <TextBlock Grid.Column="1" Text=" · " Foreground="{StaticResource MutedTextBrush}" FontSize="11" Margin="6,0" />
-                        <TextBlock Grid.Column="2" Text="{Binding TimeLabel}" Foreground="{StaticResource MutedTextBrush}" FontSize="11" TextWrapping="NoWrap" />
-                    </Grid>
+                        <TextBlock Text=" · " Foreground="{StaticResource MutedTextBrush}" FontSize="11" />
+                        <TextBlock Text="{Binding TimeLabel}" Foreground="{StaticResource MutedTextBrush}" FontSize="11" TextWrapping="NoWrap" />
+                    </StackPanel>
                 </StackPanel>
             </Button>
 
