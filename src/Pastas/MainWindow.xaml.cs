@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Forms;
 using System.Windows.Input;
 using Pastas.Domain.Enums;
 using Pastas.Application.Services;
@@ -136,13 +137,67 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (e.Key == Key.Escape && _viewModel.IsPreviewOpen)
+        if (e.Key != Key.Escape)
+        {
+            return;
+        }
+
+        if (_viewModel.IsPreviewOpen)
         {
             _viewModel.ClosePreview();
             e.Handled = true;
+            return;
         }
+
+        if (_viewModel.IsSettingsOpen)
+        {
+            _viewModel.CloseSettings();
+            e.Handled = true;
+            return;
+        }
+
+        if (_viewModel.IsClearDataOpen)
+        {
+            _viewModel.CloseClearData();
+            e.Handled = true;
+            return;
+        }
+
+        Hide();
+        e.Handled = true;
     }
 
+
+    private void Header_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.LeftButton != MouseButtonState.Pressed)
+        {
+            return;
+        }
+
+        if (e.OriginalSource is DependencyObject source && FindAncestor<Button>(source) is not null)
+        {
+            return;
+        }
+
+        DragMove();
+    }
+
+    private static T? FindAncestor<T>(DependencyObject current) where T : DependencyObject
+    {
+        var node = current;
+        while (node is not null)
+        {
+            if (node is T match)
+            {
+                return match;
+            }
+
+            node = System.Windows.Media.VisualTreeHelper.GetParent(node);
+        }
+
+        return null;
+    }
     private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
     {
         if (!_isCompositionInitialized)
@@ -264,6 +319,7 @@ public partial class MainWindow : Window
 
             if (!IsVisible)
             {
+                PositionNearCursor();
                 Show();
             }
 
@@ -288,6 +344,7 @@ public partial class MainWindow : Window
         {
             if (!IsVisible)
             {
+                PositionNearCursor();
                 Show();
             }
 
@@ -303,6 +360,24 @@ public partial class MainWindow : Window
         {
             await _viewModel.RefreshAsync();
         }
+    }
+
+
+    private void PositionNearCursor()
+    {
+        var cursor = Control.MousePosition;
+        var screen = Screen.FromPoint(cursor);
+        var workArea = screen.WorkingArea;
+
+        const double offset = 16;
+        var proposedLeft = cursor.X + offset;
+        var proposedTop = cursor.Y + offset;
+
+        var maxLeft = workArea.Right - Width;
+        var maxTop = workArea.Bottom - Height;
+
+        Left = Math.Max(workArea.Left, Math.Min(proposedLeft, maxLeft));
+        Top = Math.Max(workArea.Top, Math.Min(proposedTop, maxTop));
     }
 
     private async Task ExitApplicationAsync()
