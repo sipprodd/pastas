@@ -70,12 +70,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (popup.IsOpen)
-        {
-            return;
-        }
-
-        popup.IsOpen = true;
+        popup.IsOpen = !popup.IsOpen;
     }
 
     private void SortRecent_OnClick(object sender, RoutedEventArgs e)
