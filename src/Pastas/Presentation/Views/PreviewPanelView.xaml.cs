@@ -6,7 +6,7 @@ using Pastas.Presentation.ViewModels;
 
 namespace Pastas.Presentation.Views;
 
-public partial class PreviewPanelView : UserControl
+public partial class PreviewPanelView : System.Windows.Controls.UserControl
 {
     private bool _isCopyFeedbackActive;
 
@@ -48,3 +48,4 @@ public partial class PreviewPanelView : UserControl
         }
     }
 }
+
