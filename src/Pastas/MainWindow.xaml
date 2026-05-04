@@ -180,7 +180,7 @@
                 </Grid.ColumnDefinitions>
                 <Grid Grid.Column="0">
                     <TextBox x:Name="SearchTextBox" Style="{StaticResource RoundedTextBoxStyle}" Padding="34,6,12,6" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" />
-                    <TextBlock Text="вЊ•" Margin="12,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource MutedTextBrush}" IsHitTestVisible="False" />
+                    <TextBlock Text="Search" Margin="12,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource MutedTextBrush}" IsHitTestVisible="False" />
                     <TextBlock Text="Search" Margin="34,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource MutedTextBrush}" IsHitTestVisible="False">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
@@ -239,7 +239,7 @@
                                                         <TextBlock Text="{Binding PreviewText}" Foreground="{StaticResource CreamTextBrush}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" MaxHeight="18" />
                                                         <StackPanel Orientation="Horizontal">
                                                             <TextBlock Text="{Binding SourceLabel}" Foreground="{StaticResource MutedTextBrush}" FontSize="11" />
-                                                            <TextBlock Text=" В· " Foreground="{StaticResource MutedTextBrush}" FontSize="11" />
+                                                            <TextBlock Text=" · " Foreground="{StaticResource MutedTextBrush}" FontSize="11" />
                                                             <TextBlock Text="{Binding TimeLabel}" Foreground="{StaticResource MutedTextBrush}" FontSize="11" />
                                                         </StackPanel>
                                                     </StackPanel>
@@ -344,6 +344,8 @@
         </Grid>
     </Border>
 </Window>
+
+
 
 
 
