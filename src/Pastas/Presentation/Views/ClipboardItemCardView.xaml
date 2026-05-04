@@ -193,7 +193,7 @@
                         Margin="8,0,0,0"
                         Visibility="{Binding ElementName=ItemCard, Path=IsMouseOver, Converter={StaticResource BoolToVisibility}}">
                 <Button Content="View" ToolTip="Preview" Style="{StaticResource CardActionIconButtonStyle}" Command="{Binding DataContext.OpenPreviewCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
-                <Button ToolTip="Pin or unpin" MinWidth="60" Style="{StaticResource CardActionIconButtonStyle}" Command="{Binding DataContext.TogglePinCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}">
+                <Button ToolTip="Pin or unpin" MinWidth="60" Command="{Binding DataContext.TogglePinCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}">
                     <Button.Style>
                         <Style TargetType="Button" BasedOn="{StaticResource CardActionIconButtonStyle}">
                             <Setter Property="Content" Value="Pin" />
