@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
+using Pastas.Domain.Enums;
 using Pastas.Application.Services;
 using Pastas.Application.State;
 using Pastas.Application.UseCases;
@@ -56,6 +57,37 @@ public partial class MainWindow : Window
     private void CloseButton_OnClick(object sender, RoutedEventArgs e)
     {
         Hide();
+    }
+
+    private void SortMenuButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        SortMenuPopup.IsOpen = !SortMenuPopup.IsOpen;
+    }
+
+    private void SortRecent_OnClick(object sender, RoutedEventArgs e)
+    {
+        SetSortMode(SortMode.Recent, "Recent");
+    }
+
+    private void SortOldest_OnClick(object sender, RoutedEventArgs e)
+    {
+        SetSortMode(SortMode.Oldest, "Oldest");
+    }
+
+    private void SortMostCopied_OnClick(object sender, RoutedEventArgs e)
+    {
+        SetSortMode(SortMode.MostCopied, "Most copied");
+    }
+
+    private void SetSortMode(SortMode sortMode, string label)
+    {
+        if (_viewModel?.SetSortModeCommand is { } sortCommand && sortCommand.CanExecute(sortMode))
+        {
+            sortCommand.Execute(sortMode);
+        }
+
+        SortMenuButton.Content = label;
+        SortMenuPopup.IsOpen = false;
     }
 
 
