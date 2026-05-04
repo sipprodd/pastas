@@ -28,13 +28,21 @@ public sealed class CopyTextItemToClipboardUseCase : ICopyTextItemToClipboardUse
             return Result.Failure(new Error("clipboard.item.not_found", "Clipboard item not found."));
         }
 
-        if (string.IsNullOrEmpty(item.ContentText))
+        if (!string.IsNullOrWhiteSpace(item.ContentText))
         {
-            return Result.Failure(new Error("clipboard.item.no_text", "Clipboard item has no text content."));
+            _captureState.MarkInternalClipboardWrite();
+            await _clipboardGateway.WriteTextAsync(item.ContentText, cancellationToken);
+
+            return Result.Success();
+        }
+
+        if (string.IsNullOrWhiteSpace(item.ImagePath))
+        {
+            return Result.Failure(new Error("clipboard.item.unsupported", "Clipboard item cannot be copied."));
         }
 
         _captureState.MarkInternalClipboardWrite();
-        await _clipboardGateway.WriteTextAsync(item.ContentText, cancellationToken);
+        await _clipboardGateway.WriteImageAsync(item.ImagePath, cancellationToken);
 
         return Result.Success();
     }

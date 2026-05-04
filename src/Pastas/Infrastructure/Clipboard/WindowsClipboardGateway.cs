@@ -81,8 +81,33 @@ public sealed class WindowsClipboardGateway : IClipboardGateway
         }
     }
 
-    public Task WriteImageAsync(string imagePath, CancellationToken cancellationToken = default)
+    public async Task WriteImageAsync(string imagePath, CancellationToken cancellationToken = default)
     {
-        throw new NotSupportedException("Image clipboard write is not supported in this stage.");
+        ArgumentException.ThrowIfNullOrWhiteSpace(imagePath);
+
+        var wrote = await _retryPolicy.ExecuteAsync(
+            () => StaClipboardRunner.Run(() =>
+            {
+                if (!File.Exists(imagePath))
+                {
+                    return false;
+                }
+
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.UriSource = new Uri(imagePath, UriKind.Absolute);
+                bitmap.EndInit();
+                bitmap.Freeze();
+
+                WpfClipboard.SetImage(bitmap);
+                return true;
+            }),
+            cancellationToken);
+
+        if (!wrote)
+        {
+            throw new InvalidOperationException("Unable to access clipboard for writing image.");
+        }
     }
 }
