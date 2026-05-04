@@ -64,24 +64,6 @@
             </Setter>
         </Style>
 
-        <Style x:Key="DarkComboBoxItemStyle" TargetType="ComboBoxItem">
-            <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
-            <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}" />
-            <Setter Property="Padding" Value="8,4" />
-            <Setter Property="HorizontalContentAlignment" Value="Left" />
-            <Style.Triggers>
-                <Trigger Property="IsHighlighted" Value="True">
-                    <Setter Property="Background" Value="{StaticResource CardHoverBrush}" />
-                    <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
-                </Trigger>
-                <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="{StaticResource AccentBrush}" />
-                    <Setter Property="Foreground" Value="#FF1A1612" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-
         <Style x:Key="CardSelectButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
@@ -139,7 +121,7 @@
             </Setter>
         </Style>
 
-        <Style x:Key="RoundedComboBoxStyle" TargetType="ComboBox">
+        <Style x:Key="SortButtonStyle" TargetType="Button">
             <Setter Property="Width" Value="154" />
             <Setter Property="MinWidth" Value="154" />
             <Setter Property="MaxWidth" Value="154" />
@@ -148,81 +130,39 @@
             <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}" />
             <Setter Property="BorderBrush" Value="{StaticResource SubtleBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="10,0,10,0" />
-            <Setter Property="ItemContainerStyle" Value="{StaticResource DarkComboBoxItemStyle}" />
-            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
-            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+            <Setter Property="Padding" Value="10,0,8,0" />
+            <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="ComboBox">
-                        <Grid x:Name="TemplateRoot" SnapsToDevicePixels="True">
-                            <Border x:Name="ComboBorder"
-                                    Background="{TemplateBinding Background}"
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    CornerRadius="10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="24" />
-                                    </Grid.ColumnDefinitions>
-                                    <ContentPresenter Grid.Column="0"
-                                                      Margin="10,0,0,0"
-                                                      VerticalAlignment="Center"
-                                                      HorizontalAlignment="Left"
-                                                      RecognizesAccessKey="True"
-                                                      Content="{TemplateBinding SelectionBoxItem}"
-                                                      ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
-                                                      ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}" />
-                                    <ToggleButton Grid.ColumnSpan="2"
-                                                  Focusable="False"
-                                                  Background="Transparent"
-                                                  BorderThickness="0"
-                                                  IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
-                                                  ClickMode="Press">
-                                        <Path HorizontalAlignment="Right"
-                                              Margin="0,0,8,0"
-                                              VerticalAlignment="Center"
-                                              Data="M 0 0 L 4 4 L 8 0 Z"
-                                              Fill="{StaticResource CreamTextBrush}" />
-                                    </ToggleButton>
-                                </Grid>
-                            </Border>
-                            <Popup x:Name="PART_Popup"
-                                   AllowsTransparency="True"
-                                   Focusable="False"
-                                   IsOpen="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}"
-                                   Placement="Bottom"
-                                   PlacementTarget="{Binding ElementName=TemplateRoot}"
-                                   PopupAnimation="Fade">
-                                <Grid Width="{Binding ActualWidth, ElementName=TemplateRoot}" MaxHeight="320" SnapsToDevicePixels="True">
-                                    <Border x:Name="DropDownBorder"
-                                            Margin="0,4,0,0"
-                                            Background="{StaticResource SurfaceElevatedBrush}"
-                                            BorderBrush="{StaticResource SubtleBorderBrush}"
-                                            BorderThickness="1"
-                                            CornerRadius="10" />
-                                    <ScrollViewer Margin="1,5,1,1" SnapsToDevicePixels="True">
-                                        <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained" />
-                                    </ScrollViewer>
-                                </Grid>
-                            </Popup>
-                        </Grid>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="SortButtonBorder"
+                                CornerRadius="10"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="18" />
+                                </Grid.ColumnDefinitions>
+                                <ContentPresenter Grid.Column="0"
+                                                  Margin="10,0,0,0"
+                                                  VerticalAlignment="Center"
+                                                  HorizontalAlignment="Left" />
+                                <Path Grid.Column="1"
+                                      VerticalAlignment="Center"
+                                      HorizontalAlignment="Center"
+                                      Data="M 0 0 L 4 4 L 8 0 Z"
+                                      Fill="{StaticResource CreamTextBrush}" />
+                            </Grid>
+                        </Border>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="HasItems" Value="False">
-                                <Setter TargetName="DropDownBorder" Property="MinHeight" Value="26" />
-                            </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="ComboBorder" Property="BorderBrush" Value="#FF5A5147" />
+                                <Setter TargetName="SortButtonBorder" Property="BorderBrush" Value="#FF5A5147" />
+                                <Setter TargetName="SortButtonBorder" Property="Background" Value="#FF2E2A25" />
                             </Trigger>
-                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                                <Setter TargetName="ComboBorder" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
-                            </Trigger>
-                            <Trigger Property="IsDropDownOpen" Value="True">
-                                <Setter TargetName="ComboBorder" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Opacity" Value="0.65" />
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="SortButtonBorder" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -282,17 +222,31 @@
                     <Button Content="Images" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Images}" />
                     <Button Content="Pinned" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Pinned}" />
                 </WrapPanel>
-                <ComboBox Grid.Column="1" Style="{StaticResource RoundedComboBoxStyle}" Margin="8,0,0,0" VerticalAlignment="Center" SelectedValuePath="Tag" SelectedValue="{Binding SelectedSortMode}">
-                    <ComboBox.Resources>
-                        <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#FF2A2622" />
-                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#FF2A2622" />
-                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFD1A764" />
-                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#FF1A1612" />
-                    </ComboBox.Resources>
-                    <ComboBoxItem Content="Recent" Tag="{x:Static domain:SortMode.Recent}" />
-                    <ComboBoxItem Content="Oldest" Tag="{x:Static domain:SortMode.Oldest}" />
-                    <ComboBoxItem Content="Most copied" Tag="{x:Static domain:SortMode.MostCopied}" />
-                </ComboBox>
+                <Grid Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center">
+                    <Button x:Name="SortMenuButton"
+                            Style="{StaticResource SortButtonStyle}"
+                            Content="Recent"
+                            Click="SortMenuButton_OnClick" />
+                    <Popup x:Name="SortMenuPopup"
+                           PlacementTarget="{Binding ElementName=SortMenuButton}"
+                           Placement="Bottom"
+                           StaysOpen="False"
+                           AllowsTransparency="True"
+                           PopupAnimation="Fade">
+                        <Border Width="154"
+                                Margin="0,4,0,0"
+                                CornerRadius="10"
+                                Background="{StaticResource SurfaceElevatedBrush}"
+                                BorderBrush="{StaticResource SubtleBorderBrush}"
+                                BorderThickness="1">
+                            <StackPanel Margin="4">
+                                <Button Content="Recent" Click="SortRecent_OnClick" Style="{StaticResource ChipButtonStyle}" Margin="0,0,0,4" HorizontalContentAlignment="Left" />
+                                <Button Content="Oldest" Click="SortOldest_OnClick" Style="{StaticResource ChipButtonStyle}" Margin="0,0,0,4" HorizontalContentAlignment="Left" />
+                                <Button Content="Most copied" Click="SortMostCopied_OnClick" Style="{StaticResource ChipButtonStyle}" Margin="0" HorizontalContentAlignment="Left" />
+                            </StackPanel>
+                        </Border>
+                    </Popup>
+                </Grid>
             </Grid>
 
             <Grid Grid.Row="3">
@@ -431,6 +385,3 @@
         </Grid>
     </Border>
 </Window>
-
-
-
