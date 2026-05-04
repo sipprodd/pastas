@@ -64,7 +64,7 @@ public partial class MainWindow : Window
 
     private void SortMenuButton_OnClick(object sender, RoutedEventArgs e)
     {
-        var popup = FindName("SortMenuPopup") as Popup;
+        var popup = FindName("SortMenuPopup") as System.Windows.Controls.Primitives.Popup;
         if (popup is null)
         {
             return;
@@ -95,12 +95,12 @@ public partial class MainWindow : Window
             sortCommand.Execute(sortMode);
         }
 
-        if (FindName("SortMenuButton") is Button sortMenuButton)
+        if (FindName("SortMenuButton") is System.Windows.Controls.Button sortMenuButton)
         {
             sortMenuButton.Content = label;
         }
 
-        if (FindName("SortMenuPopup") is Popup popup)
+        if (FindName("SortMenuPopup") is System.Windows.Controls.Primitives.Popup popup)
         {
             popup.IsOpen = false;
         }
