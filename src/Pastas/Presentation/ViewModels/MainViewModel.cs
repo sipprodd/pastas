@@ -363,6 +363,7 @@ public sealed class MainViewModel : ViewModelBase
     public void OpenSettings()
     {
         IsPreviewOpen = false;
+        IsClearDataOpen = false;
         IsSettingsOpen = true;
     }
 
