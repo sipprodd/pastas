@@ -227,7 +227,7 @@
                                                     <Border Width="28" Height="28" CornerRadius="8" Background="#FF1E1B17" BorderBrush="{StaticResource SubtleBorderBrush}" BorderThickness="1">
                                                         <TextBlock Text="{Binding ItemGlyph}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource AccentBrush}" FontSize="13" />
                                                     </Border>
-                                                    <TextBlock Text="рџ“Њ" FontSize="10" Margin="18,-2,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="{Binding IsPinned, Converter={StaticResource BoolToVisibility}}" />
+                                                    <TextBlock Text="P" FontSize="10" Margin="18,-2,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="{StaticResource AccentBrush}" Visibility="{Binding IsPinned, Converter={StaticResource BoolToVisibility}}" />
                                                 </Grid>
                                                 <Button x:Name="CardSelectButton" Grid.Column="1" Style="{StaticResource CardSelectButtonStyle}" HorizontalContentAlignment="Left" Command="{Binding DataContext.SelectItemCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}">
                                                     <Button.InputBindings>
@@ -245,7 +245,7 @@
                                                 </Button>
                                                 <StackPanel x:Name="Actions" Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Visibility="Collapsed">
                                                     <Button Content="View" ToolTip="Preview" Style="{StaticResource CardActionIconButtonStyle}" Command="{Binding DataContext.OpenPreviewCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
-                                                    <Button Content="📌" ToolTip="Pin or unpin" Style="{StaticResource CardActionIconButtonStyle}" Command="{Binding DataContext.TogglePinCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                                    <Button Content="Pin" ToolTip="Pin or unpin" Style="{StaticResource CardActionIconButtonStyle}" Command="{Binding DataContext.TogglePinCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
                                                     <Button Content="Del" ToolTip="Delete" Style="{StaticResource CardActionIconButtonStyle}" Command="{Binding DataContext.DeleteItemCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
                                                 </StackPanel>
                                             </Grid>
@@ -343,6 +343,7 @@
         </Grid>
     </Border>
 </Window>
+
 
 
 
