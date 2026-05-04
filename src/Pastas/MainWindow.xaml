@@ -155,7 +155,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ComboBox">
-                        <Grid SnapsToDevicePixels="True">
+                        <Grid x:Name="TemplateRoot" SnapsToDevicePixels="True">
                             <Border x:Name="ComboBorder"
                                     Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
@@ -174,20 +174,28 @@
                                                       Content="{TemplateBinding SelectionBoxItem}"
                                                       ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
                                                       ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}" />
-                                    <Path Grid.Column="1"
-                                          HorizontalAlignment="Center"
-                                          VerticalAlignment="Center"
-                                          Data="M 0 0 L 4 4 L 8 0 Z"
-                                          Fill="{StaticResource CreamTextBrush}" />
+                                    <ToggleButton Grid.ColumnSpan="2"
+                                                  Focusable="False"
+                                                  Background="Transparent"
+                                                  BorderThickness="0"
+                                                  IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                                  ClickMode="Press">
+                                        <Path HorizontalAlignment="Right"
+                                              Margin="0,0,8,0"
+                                              VerticalAlignment="Center"
+                                              Data="M 0 0 L 4 4 L 8 0 Z"
+                                              Fill="{StaticResource CreamTextBrush}" />
+                                    </ToggleButton>
                                 </Grid>
                             </Border>
                             <Popup x:Name="PART_Popup"
                                    AllowsTransparency="True"
                                    Focusable="False"
-                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   IsOpen="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}"
                                    Placement="Bottom"
+                                   PlacementTarget="{Binding ElementName=TemplateRoot}"
                                    PopupAnimation="Fade">
-                                <Grid Width="{TemplateBinding ActualWidth}" MinWidth="{TemplateBinding ActualWidth}" MaxHeight="320" SnapsToDevicePixels="True">
+                                <Grid Width="{Binding ActualWidth, ElementName=TemplateRoot}" MaxHeight="320" SnapsToDevicePixels="True">
                                     <Border x:Name="DropDownBorder"
                                             Margin="0,4,0,0"
                                             Background="{StaticResource SurfaceElevatedBrush}"
@@ -423,7 +431,6 @@
         </Grid>
     </Border>
 </Window>
-
 
 
 
