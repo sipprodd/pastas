@@ -109,6 +109,7 @@ public class ClipboardCleanupServiceTests
         public Task<ClipboardItem?> FindByHashAsync(string hash, CancellationToken cancellationToken = default) => Task.FromResult(Items.FirstOrDefault(x => x.Hash == hash));
         public Task<IReadOnlyList<ClipboardItem>> SearchAsync(ClipboardSearchQuery query, CancellationToken cancellationToken = default)
             => Task.FromResult((IReadOnlyList<ClipboardItem>)Items.OrderBy(x => x.LastCopiedAt).ToList());
+        public Task<IReadOnlyList<ClipboardItem>> DeleteByCategoriesAsync(bool includeText, bool includeImages, bool includePinned, CancellationToken cancellationToken = default) => Task.FromResult((IReadOnlyList<ClipboardItem>)[]);
         public Task<int> CountAsync(CancellationToken cancellationToken = default) => Task.FromResult(Items.Count);
     }
 

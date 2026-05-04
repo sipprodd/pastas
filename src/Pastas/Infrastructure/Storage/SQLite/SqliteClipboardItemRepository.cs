@@ -80,6 +80,56 @@ WHERE id = @id;";
         return await reader.ReadAsync(cancellationToken) ? ReadItem(reader) : null;
     }
 
+    public async Task<IReadOnlyList<ClipboardItem>> DeleteByCategoriesAsync(bool includeText, bool includeImages, bool includePinned, CancellationToken cancellationToken = default)
+    {
+        if (!includeText && !includeImages && !includePinned)
+        {
+            return Array.Empty<ClipboardItem>();
+        }
+
+        var whereClauses = new List<string>();
+        if (includePinned)
+        {
+            whereClauses.Add("is_pinned = 1");
+        }
+
+        if (includeText)
+        {
+            whereClauses.Add("(is_pinned = 0 AND type = 'Text')");
+        }
+
+        if (includeImages)
+        {
+            whereClauses.Add("(is_pinned = 0 AND type IN ('Image', 'Screenshot'))");
+        }
+
+        var where = string.Join(" OR ", whereClauses);
+        var deletedItems = new List<ClipboardItem>();
+
+        await using var connection = await _connectionFactory.OpenConnectionAsync(cancellationToken);
+
+        await using (var selectCommand = connection.CreateCommand())
+        {
+            selectCommand.CommandText = $"SELECT * FROM clipboard_items WHERE {where};";
+            await using var reader = await selectCommand.ExecuteReaderAsync(cancellationToken);
+            while (await reader.ReadAsync(cancellationToken))
+            {
+                deletedItems.Add(ReadItem(reader));
+            }
+        }
+
+        if (deletedItems.Count == 0)
+        {
+            return deletedItems;
+        }
+
+        await using var deleteCommand = connection.CreateCommand();
+        deleteCommand.CommandText = $"DELETE FROM clipboard_items WHERE {where};";
+        await deleteCommand.ExecuteNonQueryAsync(cancellationToken);
+
+        return deletedItems;
+    }
+
     public async Task<IReadOnlyList<ClipboardItem>> SearchAsync(ClipboardSearchQuery query, CancellationToken cancellationToken = default)
     {
         var whereClauses = new List<string>();

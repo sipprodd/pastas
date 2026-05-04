@@ -1,4 +1,5 @@
 using Pastas.Application.UseCases;
+using Pastas.Application.State;
 using Pastas.Domain.Entities;
 using Pastas.Domain.Enums;
 using Pastas.Domain.Interfaces;
@@ -182,7 +183,11 @@ public sealed class MainViewModelTests
         FakeClipboardItemRepository? repository = null,
         FakeCopyTextItemToClipboardUseCase? copyUseCase = null)
     {
-        return new MainViewModel(repository ?? new FakeClipboardItemRepository(), copyUseCase ?? new FakeCopyTextItemToClipboardUseCase());
+        return new MainViewModel(
+            repository ?? new FakeClipboardItemRepository(),
+            copyUseCase ?? new FakeCopyTextItemToClipboardUseCase(),
+            new FakeClipboardGateway(),
+            new ClipboardCaptureState());
     }
 
     private sealed class FakeCopyTextItemToClipboardUseCase : ICopyTextItemToClipboardUseCase
@@ -228,6 +233,8 @@ public sealed class MainViewModelTests
         }
 
         public Task<ClipboardItem?> FindByHashAsync(string hash, CancellationToken cancellationToken = default) => Task.FromResult<ClipboardItem?>(null);
+        public Task<IReadOnlyList<ClipboardItem>> DeleteByCategoriesAsync(bool includeText, bool includeImages, bool includePinned, CancellationToken cancellationToken = default)
+            => Task.FromResult<IReadOnlyList<ClipboardItem>>(Array.Empty<ClipboardItem>());
 
         public Task<IReadOnlyList<ClipboardItem>> SearchAsync(ClipboardSearchQuery query, CancellationToken cancellationToken = default)
         {
@@ -237,5 +244,13 @@ public sealed class MainViewModelTests
         }
 
         public Task<int> CountAsync(CancellationToken cancellationToken = default) => Task.FromResult(SearchResults.Count);
+    }
+
+    private sealed class FakeClipboardGateway : IClipboardGateway
+    {
+        public Task ClearAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public Task<ClipboardCaptureData?> ReadAsync(CancellationToken cancellationToken = default) => Task.FromResult<ClipboardCaptureData?>(null);
+        public Task WriteImageAsync(string imagePath, CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public Task WriteTextAsync(string text, CancellationToken cancellationToken = default) => Task.CompletedTask;
     }
 }

@@ -91,6 +91,8 @@ public sealed class ClipboardCaptureNotificationHandlerTests
         public Task<ClipboardItem?> FindByHashAsync(string hash, CancellationToken cancellationToken = default) => Task.FromResult<ClipboardItem?>(null);
         public Task<IReadOnlyList<ClipboardItem>> SearchAsync(ClipboardSearchQuery query, CancellationToken cancellationToken = default)
             => Task.FromResult((IReadOnlyList<ClipboardItem>)(LatestItem is null ? [] : [LatestItem]));
+        public Task<IReadOnlyList<ClipboardItem>> DeleteByCategoriesAsync(bool includeText, bool includeImages, bool includePinned, CancellationToken cancellationToken = default)
+            => Task.FromResult((IReadOnlyList<ClipboardItem>)[]);
         public Task<int> CountAsync(CancellationToken cancellationToken = default) => Task.FromResult(TotalCount);
     }
 
