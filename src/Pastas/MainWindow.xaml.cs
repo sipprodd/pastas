@@ -70,7 +70,12 @@ public partial class MainWindow : Window
             return;
         }
 
-        popup.IsOpen = !popup.IsOpen;
+        if (popup.IsOpen)
+        {
+            return;
+        }
+
+        popup.IsOpen = true;
     }
 
     private void SortRecent_OnClick(object sender, RoutedEventArgs e)
@@ -103,6 +108,22 @@ public partial class MainWindow : Window
         if (FindName("SortMenuPopup") is System.Windows.Controls.Primitives.Popup popup)
         {
             popup.IsOpen = false;
+        }
+    }
+
+    private void SortMenuPopup_OnOpened(object sender, EventArgs e)
+    {
+        if (FindName("SortMenuButton") is System.Windows.Controls.Button sortMenuButton)
+        {
+            sortMenuButton.Tag = "Open";
+        }
+    }
+
+    private void SortMenuPopup_OnClosed(object sender, EventArgs e)
+    {
+        if (FindName("SortMenuButton") is System.Windows.Controls.Button sortMenuButton)
+        {
+            sortMenuButton.Tag = null;
         }
     }
 
@@ -445,5 +466,4 @@ public partial class MainWindow : Window
         }
     }
 }
-
 
