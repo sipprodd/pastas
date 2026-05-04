@@ -374,7 +374,10 @@
             <Grid Grid.Row="3">
                 <Grid Visibility="{Binding IsMainContentVisible, Converter={StaticResource BoolToVisibility}}">
                     <Grid>
-                        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" CanContentScroll="True" VerticalScrollBarStyle="{StaticResource DarkScrollBarStyle}">
+                        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" CanContentScroll="True">
+    <ScrollViewer.Resources>
+        <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource DarkScrollBarStyle}" />
+    </ScrollViewer.Resources>
                             <ItemsControl ItemsSource="{Binding Items}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
@@ -462,3 +465,4 @@
         </Grid>
     </Border>
 </Window>
+
