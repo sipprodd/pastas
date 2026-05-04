@@ -169,16 +169,16 @@ public partial class MainWindow : Window
 
 
     private void Header_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-    {
-        TryDragWindowFromMouseDown(e);
-    }
+{
+    TryDragWindowFromMouseDown(e, allowTextBlockDrag: true);
+}
 
     private void WindowSurface_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-    {
-        TryDragWindowFromMouseDown(e);
-    }
+{
+    TryDragWindowFromMouseDown(e, allowTextBlockDrag: false);
+}
 
-    private void TryDragWindowFromMouseDown(MouseButtonEventArgs e)
+    private void TryDragWindowFromMouseDown(MouseButtonEventArgs e, bool allowTextBlockDrag)
     {
         if (e.LeftButton != MouseButtonState.Pressed)
         {
@@ -190,7 +190,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (IsInteractiveDragSource(source))
+        if (IsInteractiveDragSource(source, allowTextBlockDrag))
         {
             return;
         }
@@ -198,39 +198,59 @@ public partial class MainWindow : Window
         DragMove();
     }
 
-    private static bool IsInteractiveDragSource(DependencyObject source)
+    private static bool IsInteractiveDragSource(DependencyObject source, bool allowTextBlockDrag)
+{
+    var node = source;
+    while (node is not null)
     {
-        var node = source;
-        while (node is not null)
+        if (node is System.Windows.Controls.Button
+            or System.Windows.Controls.TextBox
+            or System.Windows.Controls.CheckBox
+            or System.Windows.Controls.RadioButton
+            or System.Windows.Controls.ComboBox
+            or System.Windows.Controls.Primitives.ScrollBar
+            or System.Windows.Controls.ScrollViewer
+            or System.Windows.Controls.ListBox
+            or System.Windows.Controls.ListView
+            or System.Windows.Controls.MenuItem
+            or Hyperlink
+            or System.Windows.Controls.Image)
         {
-            if (node is System.Windows.Controls.Button
-                or System.Windows.Controls.TextBox
-                or System.Windows.Controls.CheckBox
-                or System.Windows.Controls.RadioButton
-                or System.Windows.Controls.ComboBox
-                or System.Windows.Controls.Primitives.ScrollBar
-                or System.Windows.Controls.ScrollViewer
-                or System.Windows.Controls.ListBox
-                or System.Windows.Controls.ListView
-                or System.Windows.Controls.MenuItem
-                or Hyperlink
-                or System.Windows.Controls.Image
-                or System.Windows.Controls.TextBlock)
-            {
-                return true;
-            }
-
-            if (node is Popup)
-            {
-                return true;
-            }
-
-            node = System.Windows.Media.VisualTreeHelper.GetParent(node);
+            return true;
         }
 
-        return false;
+        if (!allowTextBlockDrag && node is System.Windows.Controls.TextBlock)
+        {
+            return true;
+        }
+
+        node = GetParentObject(node);
     }
-    private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
+
+    return false;
+}
+
+private static DependencyObject? GetParentObject(DependencyObject node)
+{
+    if (node is System.Windows.Media.Visual or System.Windows.Media.Media3D.Visual3D)
+    {
+        return System.Windows.Media.VisualTreeHelper.GetParent(node);
+    }
+
+    if (node is FrameworkElement frameworkElement)
+    {
+        return frameworkElement.Parent;
+    }
+
+    if (node is FrameworkContentElement frameworkContentElement)
+    {
+        return frameworkContentElement.Parent;
+    }
+
+    return null;
+}
+
+private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
     {
         if (!_isCompositionInitialized)
         {
@@ -568,6 +588,8 @@ public partial class MainWindow : Window
         }
     }
 }
+
+
 
 
 
