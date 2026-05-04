@@ -205,6 +205,8 @@ public class ClipboardPipelineTests
             WrittenImagePath = imagePath;
             return Task.CompletedTask;
         }
+
+        public Task ClearAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
     }
 
     private sealed class FakeClipboardItemRepository : IClipboardItemRepository
@@ -234,6 +236,9 @@ public class ClipboardPipelineTests
 
         public Task<IReadOnlyList<ClipboardItem>> SearchAsync(ClipboardSearchQuery query, CancellationToken cancellationToken = default)
             => Task.FromResult((IReadOnlyList<ClipboardItem>)Items);
+
+        public Task<IReadOnlyList<ClipboardItem>> DeleteByCategoriesAsync(bool includeText, bool includeImages, bool includePinned, CancellationToken cancellationToken = default)
+            => Task.FromResult((IReadOnlyList<ClipboardItem>)[]);
 
         public Task<int> CountAsync(CancellationToken cancellationToken = default)
             => Task.FromResult(Items.Count);

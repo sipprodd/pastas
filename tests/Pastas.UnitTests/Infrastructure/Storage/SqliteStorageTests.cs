@@ -147,6 +147,43 @@ public sealed class SqliteStorageTests : IDisposable
     }
 
     [Fact]
+    public async Task ClipboardRepository_DeleteByCategories_AllFalse_DeletesNothing()
+    {
+        var repository = new SqliteClipboardItemRepository(_connectionFactory);
+        await repository.AddAsync(BuildTextItem("hash-keep-1"));
+
+        var deleted = await repository.DeleteByCategoriesAsync(false, false, false);
+
+        Assert.Empty(deleted);
+        Assert.Equal(1, await repository.CountAsync());
+    }
+
+    [Fact]
+    public async Task ClipboardRepository_DeleteByCategories_RespectsPinnedAndTypeRules()
+    {
+        var repository = new SqliteClipboardItemRepository(_connectionFactory);
+        var text = BuildTextItem("hash-t");
+        var pinnedText = BuildTextItem("hash-pt", true);
+        var image = BuildImageItem("hash-i");
+        var pinnedImage = BuildImageItem("hash-pi", true);
+        await repository.AddAsync(text);
+        await repository.AddAsync(pinnedText);
+        await repository.AddAsync(image);
+        await repository.AddAsync(pinnedImage);
+
+        var deletedTextOnly = await repository.DeleteByCategoriesAsync(true, false, false);
+        Assert.Single(deletedTextOnly);
+        Assert.Equal(text.Id, deletedTextOnly[0].Id);
+
+        var deletedImagesOnly = await repository.DeleteByCategoriesAsync(false, true, false);
+        Assert.Single(deletedImagesOnly);
+        Assert.Equal(image.Id, deletedImagesOnly[0].Id);
+
+        var deletedPinned = await repository.DeleteByCategoriesAsync(false, false, true);
+        Assert.Equal(2, deletedPinned.Count);
+    }
+
+    [Fact]
     public async Task SettingsRepository_ReturnsDefaults_WhenEmpty()
     {
         var repository = new SqliteSettingsRepository(_connectionFactory);
@@ -199,7 +236,7 @@ public sealed class SqliteStorageTests : IDisposable
         }
     }
 
-    private static ClipboardItem BuildTextItem(string hash)
+    private static ClipboardItem BuildTextItem(string hash, bool isPinned = false)
         => new()
         {
             Id = Guid.NewGuid(),
@@ -207,18 +244,20 @@ public sealed class SqliteStorageTests : IDisposable
             PreviewText = "hello world",
             ContentText = "hello world content",
             Hash = hash,
+            IsPinned = isPinned,
             LastCopiedAt = DateTime.UtcNow,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
 
-    private static ClipboardItem BuildImageItem(string hash)
+    private static ClipboardItem BuildImageItem(string hash, bool isPinned = false)
         => new()
         {
             Id = Guid.NewGuid(),
             Type = ClipboardItemType.Image,
             ImagePath = "image.png",
             Hash = hash,
+            IsPinned = isPinned,
             LastCopiedAt = DateTime.UtcNow,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow

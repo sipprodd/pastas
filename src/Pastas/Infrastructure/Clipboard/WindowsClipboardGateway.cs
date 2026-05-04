@@ -110,4 +110,20 @@ public sealed class WindowsClipboardGateway : IClipboardGateway
             throw new InvalidOperationException("Unable to access clipboard for writing image.");
         }
     }
+
+    public async Task ClearAsync(CancellationToken cancellationToken = default)
+    {
+        var cleared = await _retryPolicy.ExecuteAsync(
+            () => StaClipboardRunner.Run(() =>
+            {
+                WpfClipboard.Clear();
+                return true;
+            }),
+            cancellationToken);
+
+        if (!cleared)
+        {
+            throw new InvalidOperationException("Unable to access clipboard for clearing.");
+        }
+    }
 }

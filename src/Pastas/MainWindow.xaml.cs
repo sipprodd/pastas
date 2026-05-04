@@ -430,7 +430,7 @@ public partial class MainWindow : Window
             diagnosticsLogger.Info("CreateComposition: after WindowsTrayService.");
 
             diagnosticsLogger.Info("CreateComposition: before MainViewModel.");
-            var viewModel = new MainViewModel(repository, copyUseCase);
+            var viewModel = new MainViewModel(repository, copyUseCase, clipboardGateway, captureState);
             diagnosticsLogger.Info("CreateComposition: after MainViewModel.");
 
             diagnosticsLogger.Info("CreateComposition: before MainViewModelNotificationService.");
@@ -457,8 +457,7 @@ public partial class MainWindow : Window
             var hotkeyService = new WindowsHotkeyService(window, diagnosticsLogger);
             var trayService = new WindowsTrayService(diagnosticsLogger);
 
-            return (new MainViewModel(repository, copyUseCase), diagnosticsLogger, null, null, hotkeyService, trayService);
+            return (new MainViewModel(repository, copyUseCase, clipboardGateway, captureState), diagnosticsLogger, null, null, hotkeyService, trayService);
         }
     }
 }
-

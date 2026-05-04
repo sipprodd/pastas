@@ -2,6 +2,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Windows.Input;
+using Pastas.Application.Services;
+using Pastas.Application.State;
 using Pastas.Application.UseCases;
 using Pastas.Domain.Entities;
 using Pastas.Domain.Enums;
@@ -15,6 +17,8 @@ public sealed class MainViewModel : ViewModelBase
 {
     private readonly IClipboardItemRepository _clipboardItemRepository;
     private readonly ICopyTextItemToClipboardUseCase _copyTextItemToClipboardUseCase;
+    private readonly IClipboardGateway _clipboardGateway;
+    private readonly ClipboardCaptureState _captureState;
     private string _searchQuery = string.Empty;
     private ClipboardFilter _selectedFilter = ClipboardFilter.All;
     private SortMode _selectedSortMode = SortMode.Recent;
@@ -22,16 +26,24 @@ public sealed class MainViewModel : ViewModelBase
     private bool _isPreviewOpen;
     private bool _isSettingsOpen;
     private ClipboardItemViewModel? _selectedItem;
+    private bool _isClearDataOpen;
+    private bool _clearTextSelected;
+    private bool _clearImagesSelected;
+    private bool _clearPinnedSelected;
     private string _emptyStateText = "No clipboard items yet.";
     private string _statusMessage = string.Empty;
     private CancellationTokenSource? _searchDebounceCts;
 
     public MainViewModel(
         IClipboardItemRepository clipboardItemRepository,
-        ICopyTextItemToClipboardUseCase copyTextItemToClipboardUseCase)
+        ICopyTextItemToClipboardUseCase copyTextItemToClipboardUseCase,
+        IClipboardGateway clipboardGateway,
+        ClipboardCaptureState captureState)
     {
         _clipboardItemRepository = clipboardItemRepository;
         _copyTextItemToClipboardUseCase = copyTextItemToClipboardUseCase;
+        _clipboardGateway = clipboardGateway;
+        _captureState = captureState;
 
         RefreshCommand = new AsyncRelayCommand(RefreshAsync);
         SearchCommand = new AsyncRelayCommand(RefreshAsync);
@@ -45,6 +57,9 @@ public sealed class MainViewModel : ViewModelBase
         ClosePreviewCommand = new RelayCommand(_ => ClosePreview());
         OpenSettingsCommand = new RelayCommand(_ => OpenSettings());
         CloseSettingsCommand = new RelayCommand(_ => CloseSettings());
+        OpenClearDataCommand = new RelayCommand(_ => OpenClearData());
+        CloseClearDataCommand = new RelayCommand(_ => CloseClearData());
+        ConfirmClearDataCommand = new AsyncRelayCommand(ConfirmClearDataAsync);
     }
 
     public ObservableCollection<ClipboardItemViewModel> Items { get; } = new();
@@ -120,6 +135,45 @@ public sealed class MainViewModel : ViewModelBase
     }
 
     public bool IsMainContentVisible => !IsPreviewOpen && !IsSettingsOpen;
+    public bool IsClearDataOpen
+    {
+        get => _isClearDataOpen;
+        private set => SetProperty(ref _isClearDataOpen, value);
+    }
+    public bool ClearTextSelected
+    {
+        get => _clearTextSelected;
+        set
+        {
+            if (SetProperty(ref _clearTextSelected, value))
+            {
+                OnPropertyChanged(nameof(CanConfirmClearData));
+            }
+        }
+    }
+    public bool ClearImagesSelected
+    {
+        get => _clearImagesSelected;
+        set
+        {
+            if (SetProperty(ref _clearImagesSelected, value))
+            {
+                OnPropertyChanged(nameof(CanConfirmClearData));
+            }
+        }
+    }
+    public bool ClearPinnedSelected
+    {
+        get => _clearPinnedSelected;
+        set
+        {
+            if (SetProperty(ref _clearPinnedSelected, value))
+            {
+                OnPropertyChanged(nameof(CanConfirmClearData));
+            }
+        }
+    }
+    public bool CanConfirmClearData => ClearTextSelected || ClearImagesSelected || ClearPinnedSelected;
 
     public string EmptyStateText
     {
@@ -147,6 +201,9 @@ public sealed class MainViewModel : ViewModelBase
     public ICommand ClosePreviewCommand { get; }
     public ICommand OpenSettingsCommand { get; }
     public ICommand CloseSettingsCommand { get; }
+    public ICommand OpenClearDataCommand { get; }
+    public ICommand CloseClearDataCommand { get; }
+    public ICommand ConfirmClearDataCommand { get; }
 
     public void SetStatusMessage(string message)
     {
@@ -312,6 +369,41 @@ public sealed class MainViewModel : ViewModelBase
     public void CloseSettings()
     {
         IsSettingsOpen = false;
+    }
+
+    public void OpenClearData() => IsClearDataOpen = true;
+    public void CloseClearData() => IsClearDataOpen = false;
+
+    private async Task ConfirmClearDataAsync(object? parameter)
+    {
+        if (!CanConfirmClearData)
+        {
+            return;
+        }
+
+        var deletedItems = await _clipboardItemRepository.DeleteByCategoriesAsync(ClearTextSelected, ClearImagesSelected, ClearPinnedSelected);
+        if (deletedItems.Count > 0)
+        {
+            var capture = await _clipboardGateway.ReadAsync();
+            if (capture is not null)
+            {
+                string? hash = capture.Type switch
+                {
+                    ClipboardItemType.Text when !string.IsNullOrEmpty(capture.Text) => ClipboardTextHasher.Compute(capture.Text),
+                    ClipboardItemType.Image when capture.ImageBytes is { Length: > 0 } => ClipboardImageHasher.Compute(capture.ImageBytes),
+                    _ => null
+                };
+
+                if (!string.IsNullOrWhiteSpace(hash) && deletedItems.Any(x => x.Hash.Equals(hash, StringComparison.Ordinal)))
+                {
+                    _captureState.MarkInternalClipboardWrite();
+                    await _clipboardGateway.ClearAsync();
+                }
+            }
+        }
+
+        await RefreshAsync();
+        IsClearDataOpen = false;
     }
 
     private void ApplyItems(IReadOnlyList<ClipboardItem> items)
