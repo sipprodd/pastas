@@ -584,7 +584,7 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
             diagnosticsLogger.Info("CreateComposition: after MainViewModelNotificationService.");
 
             diagnosticsLogger.Info("CreateComposition: before ClipboardCaptureNotificationHandler.");
-            var notificationHandler = new ClipboardCaptureNotificationHandler(coordinator, notificationService, repository);
+            var notificationHandler = new ClipboardCaptureNotificationHandler(coordinator, notificationService, repository, _captureState);
             diagnosticsLogger.Info("CreateComposition: after ClipboardCaptureNotificationHandler.");
 
             diagnosticsLogger.Info("Application composition succeeded.");
@@ -607,7 +607,6 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
         }
     }
 }
-
 
 
 

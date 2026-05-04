@@ -1,6 +1,7 @@
 using Pastas.Domain.Enums;
 using Pastas.Domain.Interfaces;
 using Pastas.Domain.ValueObjects;
+using Pastas.Application.State;
 
 namespace Pastas.Application.Services;
 
@@ -9,19 +10,27 @@ public sealed class ClipboardCaptureNotificationHandler
     private readonly ClipboardCaptureCoordinator _clipboardCaptureCoordinator;
     private readonly INotificationService _notificationService;
     private readonly IClipboardItemRepository _clipboardItemRepository;
+    private readonly ClipboardCaptureState _captureState;
 
     public ClipboardCaptureNotificationHandler(
         ClipboardCaptureCoordinator clipboardCaptureCoordinator,
         INotificationService notificationService,
-        IClipboardItemRepository clipboardItemRepository)
+        IClipboardItemRepository clipboardItemRepository,
+        ClipboardCaptureState captureState)
     {
         _clipboardCaptureCoordinator = clipboardCaptureCoordinator;
         _notificationService = notificationService;
         _clipboardItemRepository = clipboardItemRepository;
+        _captureState = captureState;
     }
 
     public async Task HandleClipboardChangedAsync(CancellationToken cancellationToken = default)
     {
+        if (_captureState.ConsumeInternalClipboardWriteFlag() || _captureState.ConsumeDoNotSaveNextFlag())
+        {
+            return;
+        }
+
         await _clipboardCaptureCoordinator.CaptureAsync(cancellationToken);
 
         try
