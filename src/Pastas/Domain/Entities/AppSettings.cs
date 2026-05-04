@@ -15,5 +15,5 @@ public sealed class AppSettings
     public int RevealProtectedSeconds { get; init; } = 10;
     public bool ClearProtectedClipboardAfterDelay { get; init; } = false;
     public int ClearProtectedClipboardDelaySeconds { get; init; } = 60;
-    public ThemeMode ThemeMode { get; init; } = ThemeMode.System;
+    public ThemeMode ThemeMode { get; init; } = ThemeMode.Chocolate;
 }
