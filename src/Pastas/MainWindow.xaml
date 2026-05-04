@@ -6,7 +6,7 @@
         xmlns:domain="clr-namespace:Pastas.Domain.Enums"
         mc:Ignorable="d"
         Title="Pastas"
-        Width="800"
+        Width="740"
         Height="590"
         WindowStyle="None"
         ResizeMode="NoResize"
@@ -150,12 +150,85 @@
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Padding" Value="10,3" />
             <Setter Property="ItemContainerStyle" Value="{StaticResource DarkComboBoxItemStyle}" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <Border x:Name="ComboBorder"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="30" />
+                                    </Grid.ColumnDefinitions>
+                                    <ToggleButton Grid.ColumnSpan="2"
+                                                  Background="Transparent"
+                                                  BorderThickness="0"
+                                                  Focusable="False"
+                                                  IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                                  ClickMode="Press" />
+                                    <ContentPresenter Grid.Column="0"
+                                                      Margin="10,0,0,0"
+                                                      VerticalAlignment="Center"
+                                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                      Content="{TemplateBinding SelectionBoxItem}"
+                                                      ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                      ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"
+                                                      IsHitTestVisible="False" />
+                                    <Path Grid.Column="1"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          Data="M 0 0 L 4 4 L 8 0 Z"
+                                          Fill="{StaticResource CreamTextBrush}"
+                                          IsHitTestVisible="False" />
+                                </Grid>
+                            </Border>
+                            <Popup x:Name="PART_Popup"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   Placement="Bottom"
+                                   PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                                   AllowsTransparency="True"
+                                   Focusable="False"
+                                   PopupAnimation="Slide">
+                                <Border Margin="0,4,0,0"
+                                        Width="{TemplateBinding ActualWidth}"
+                                        Background="{StaticResource SurfaceElevatedBrush}"
+                                        BorderBrush="{StaticResource SubtleBorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="10">
+                                    <ScrollViewer Margin="2"
+                                                  SnapsToDevicePixels="True"
+                                                  CanContentScroll="True">
+                                        <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained" />
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ComboBorder" Property="BorderBrush" Value="#FF5A5147" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter TargetName="ComboBorder" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.65" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Window.Resources>
 
     <Border CornerRadius="22" Background="{StaticResource ShellBrush}" BorderBrush="#FF3A342D" BorderThickness="1" Padding="16">
-        <Grid Width="760">
+        <Grid Width="700">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
@@ -175,10 +248,7 @@
             </Grid>
 
             <Grid Grid.Row="1" Visibility="{Binding IsMainContentVisible, Converter={StaticResource BoolToVisibility}}" Margin="0,0,0,8">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="420" />
-                </Grid.ColumnDefinitions>
-                <Grid Grid.Column="0">
+                <Grid>
                     <TextBox x:Name="SearchTextBox" Style="{StaticResource RoundedTextBoxStyle}" Padding="14,6,12,6" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" />
                     <TextBlock Text="Search" Margin="14,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource MutedTextBrush}" IsHitTestVisible="False">
                         <TextBlock.Style>
@@ -195,33 +265,33 @@
                 </Grid>
             </Grid>
 
-            <Grid Grid.Row="2">
+            <Grid Grid.Row="2" Visibility="{Binding IsMainContentVisible, Converter={StaticResource BoolToVisibility}}" Margin="0,0,0,8" MinHeight="34">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <WrapPanel Grid.Column="0" VerticalAlignment="Center">
+                    <Button Content="All" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.All}" />
+                    <Button Content="Text" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Text}" />
+                    <Button Content="Images" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Images}" />
+                    <Button Content="Pinned" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Pinned}" />
+                </WrapPanel>
+                <ComboBox Grid.Column="1" Style="{StaticResource RoundedComboBoxStyle}" Margin="8,0,0,0" VerticalAlignment="Center" SelectedValuePath="Tag" SelectedValue="{Binding SelectedSortMode}">
+                    <ComboBox.Resources>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#FF2A2622" />
+                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#FF2A2622" />
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFD1A764" />
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#FF1A1612" />
+                    </ComboBox.Resources>
+                    <ComboBoxItem Content="Recent" Tag="{x:Static domain:SortMode.Recent}" />
+                    <ComboBoxItem Content="Oldest" Tag="{x:Static domain:SortMode.Oldest}" />
+                    <ComboBoxItem Content="Most copied" Tag="{x:Static domain:SortMode.MostCopied}" />
+                </ComboBox>
+            </Grid>
+
+            <Grid Grid.Row="3">
                 <Grid Visibility="{Binding IsMainContentVisible, Converter={StaticResource BoolToVisibility}}">
-                    <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
-                    <Grid Margin="0,0,0,8" MinHeight="34">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <WrapPanel Grid.Column="0" VerticalAlignment="Center">
-                            <Button Content="All" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.All}" />
-                            <Button Content="Text" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Text}" />
-                            <Button Content="Images" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Images}" />
-                            <Button Content="Pinned" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Pinned}" />
-                        </WrapPanel>
-                        <ComboBox Grid.Column="1" Style="{StaticResource RoundedComboBoxStyle}" Margin="8,0,0,0" VerticalAlignment="Center" SelectedValuePath="Tag" SelectedValue="{Binding SelectedSortMode}">
-                            <ComboBox.Resources>
-                                <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#FF2A2622" />
-                                <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#FF2A2622" />
-                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFD1A764" />
-                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#FF1A1612" />
-                            </ComboBox.Resources>
-                            <ComboBoxItem Content="Recent" Tag="{x:Static domain:SortMode.Recent}" />
-                            <ComboBoxItem Content="Oldest" Tag="{x:Static domain:SortMode.Oldest}" />
-                            <ComboBoxItem Content="Most copied" Tag="{x:Static domain:SortMode.MostCopied}" />
-                        </ComboBox>
-                    </Grid>
-                    <Grid Grid.Row="1">
+                    <Grid>
                         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" CanContentScroll="True">
                             <ItemsControl ItemsSource="{Binding Items}">
                                 <ItemsControl.ItemTemplate>
@@ -336,21 +406,25 @@
                 </Border>
             </Grid>
 
-            <Border Grid.Row="3" Margin="0,10,0,0" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource SubtleBorderBrush}" BorderThickness="1" CornerRadius="10" Padding="10,6">
-                <TextBlock Foreground="{StaticResource MutedTextBrush}">
-                    <Run Text="Enter - copy" />
-                    <Run Text="    " />
-                    <Run Text="Space - preview" />
-                    <Run Text="    " />
-                    <Run Text="Esc - close" />
-                </TextBlock>
+            <Border Grid.Row="4" Margin="0,10,0,0" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource SubtleBorderBrush}" BorderThickness="1" CornerRadius="10" Padding="10,6">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Foreground="{StaticResource MutedTextBrush}" VerticalAlignment="Center">
+                        <Run Text="Enter - copy" />
+                        <Run Text="    " />
+                        <Run Text="Space - preview" />
+                        <Run Text="    " />
+                        <Run Text="Esc - close" />
+                    </TextBlock>
+                    <TextBlock Grid.Column="1" Foreground="{StaticResource MutedTextBrush}" VerticalAlignment="Center" Margin="12,0,0,0" Text="ИСИП-24-3 · Гоголев Айхал · Якутск · 2026" />
+                </Grid>
             </Border>
         </Grid>
     </Border>
 </Window>
-
-
-
 
 
 
