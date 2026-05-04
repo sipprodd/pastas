@@ -225,7 +225,7 @@
                                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                                                 <Grid>
                                                     <Border Width="28" Height="28" CornerRadius="8" Background="#FF1E1B17" BorderBrush="{StaticResource SubtleBorderBrush}" BorderThickness="1">
-                                                        <TextBlock Text="{Binding ItemGlyph}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource AccentBrush}" FontSize="13" />
+                                                        <TextBlock Text="I" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource AccentBrush}" FontSize="13" />
                                                     </Border>
                                                     <TextBlock Text="P" FontSize="10" Margin="18,-2,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="{StaticResource AccentBrush}" Visibility="{Binding IsPinned, Converter={StaticResource BoolToVisibility}}" />
                                                 </Grid>
@@ -238,7 +238,7 @@
                                                         <TextBlock Text="{Binding PreviewText}" Foreground="{StaticResource CreamTextBrush}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" MaxHeight="18" />
                                                         <StackPanel Orientation="Horizontal">
                                                             <TextBlock Text="{Binding SourceLabel}" Foreground="{StaticResource MutedTextBrush}" FontSize="11" />
-                                                            <TextBlock Text=" · " Foreground="{StaticResource MutedTextBrush}" FontSize="11" />
+                                                            <TextBlock Text=" | " Foreground="{StaticResource MutedTextBrush}" FontSize="11" />
                                                             <TextBlock Text="{Binding TimeLabel}" Foreground="{StaticResource MutedTextBrush}" FontSize="11" />
                                                         </StackPanel>
                                                     </StackPanel>
@@ -343,7 +343,6 @@
         </Grid>
     </Border>
 </Window>
-
 
 
 
