@@ -8,6 +8,36 @@
              d:DesignWidth="680">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+        <Style x:Key="PreviewDarkScrollBarThumbStyle" TargetType="Thumb">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Thumb">
+                        <Border x:Name="ThumbBorder" Background="#FF625648" CornerRadius="6" />
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="ThumbBorder" Property="Background" Value="#FF766857" /></Trigger>
+                            <Trigger Property="IsDragging" Value="True"><Setter TargetName="ThumbBorder" Property="Background" Value="#FF8A7A66" /></Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="PreviewDarkScrollBarStyle" TargetType="ScrollBar">
+            <Setter Property="Width" Value="11" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Border Background="#FF1C1916" CornerRadius="6" Padding="1">
+                            <Track x:Name="PART_Track" IsDirectionReversed="True">
+                                <Track.DecreaseRepeatButton><RepeatButton Command="ScrollBar.PageUpCommand" Opacity="0" IsTabStop="False" /></Track.DecreaseRepeatButton>
+                                <Track.Thumb><Thumb Style="{StaticResource PreviewDarkScrollBarThumbStyle}" MinHeight="28" /></Track.Thumb>
+                                <Track.IncreaseRepeatButton><RepeatButton Command="ScrollBar.PageDownCommand" Opacity="0" IsTabStop="False" /></Track.IncreaseRepeatButton>
+                            </Track>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
     <Border Visibility="{Binding IsPreviewOpen, Converter={StaticResource BoolToVisibility}}"
             Background="{DynamicResource SurfaceBrush}"
@@ -22,6 +52,7 @@
             </Grid>
             <Border Grid.Row="1" Margin="0,8,0,10" Background="{DynamicResource SurfaceElevatedBrush}" CornerRadius="12" Padding="16">
                 <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer.Resources><Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource PreviewDarkScrollBarStyle}" /></ScrollViewer.Resources>
                     <StackPanel>
                         <StackPanel>
                             <StackPanel.Style>
@@ -59,8 +90,8 @@
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,2,0,0">
-                    <Button Content="Copy" MinWidth="72" Style="{DynamicResource ChipButtonStyle}" Command="{Binding CopyItemCommand}" CommandParameter="{Binding SelectedItem}" Margin="0,0,8,0" />
-                    <Button MinWidth="68"
+                    <Button x:Name="CopyButton" Content="Copy" MinWidth="70" Style="{DynamicResource ChipButtonStyle}" Click="CopyButton_OnClick" Margin="0,0,8,0" />
+                    <Button MinWidth="66"
         Style="{DynamicResource ChipButtonStyle}"
         Command="{Binding TogglePinCommand}"
         CommandParameter="{Binding SelectedItem}"
@@ -79,9 +110,9 @@
         </TextBlock>
     </Button.Content>
 </Button>
-                    <Button Content="Del" MinWidth="60" Style="{DynamicResource ChipButtonStyle}" Command="{Binding DeleteItemCommand}" CommandParameter="{Binding SelectedItem}" />
+                    <Button Content="Del" MinWidth="58" Style="{DynamicResource ChipButtonStyle}" Command="{Binding DeleteItemCommand}" CommandParameter="{Binding SelectedItem}" />
                 </StackPanel>
-                <Button Grid.Column="1" Content="Back" MinWidth="72" Style="{DynamicResource ChipButtonStyle}" Command="{Binding ClosePreviewCommand}" Margin="0,2,0,0" />
+                <Button Grid.Column="1" Content="Back" MinWidth="70" Style="{DynamicResource ChipButtonStyle}" Command="{Binding ClosePreviewCommand}" Margin="0,2,0,0" />
             </Grid>
         </Grid>
     </Border>

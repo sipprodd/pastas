@@ -7,7 +7,7 @@
         xmlns:views="clr-namespace:Pastas.Presentation.Views"
         mc:Ignorable="d"
         Title="Pastas"
-        Width="740"
+        Width="700"
         Height="590"
         WindowStyle="None"
         ResizeMode="NoResize"
@@ -27,7 +27,7 @@
         <SolidColorBrush x:Key="PinnedBorderBrush" Color="#FFE1BC7A" />
 
         <Style x:Key="ChipButtonStyle" TargetType="Button">
-            <Setter Property="Height" Value="38" />
+            <Setter Property="Height" Value="34" />
             <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
             <Setter Property="Background" Value="#FF2D2823" />
             <Setter Property="BorderBrush" Value="#FF4B433A" />
@@ -68,7 +68,7 @@
         </Style>
 
         <Style x:Key="RoundedTextBoxStyle" TargetType="TextBox">
-            <Setter Property="Height" Value="35" />
+            <Setter Property="Height" Value="33" />
             <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
             <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
             <Setter Property="BorderBrush" Value="{StaticResource SubtleBorderBrush}" />
@@ -155,7 +155,7 @@
 
         <Style x:Key="SortMenuButtonStyle" TargetType="Button">
             <Setter Property="Width" Value="170" />
-            <Setter Property="Height" Value="38" />
+            <Setter Property="Height" Value="34" />
             <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
             <Setter Property="Background" Value="#FF302A24" />
             <Setter Property="BorderBrush" Value="#FF665A4D" />
@@ -247,7 +247,7 @@
         </Style>
 
         <Style x:Key="SortMenuItemButtonStyle" TargetType="Button">
-            <Setter Property="Height" Value="32" />
+            <Setter Property="Height" Value="30" />
             <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
             <Setter Property="Background" Value="#FF2C2722" />
             <Setter Property="BorderBrush" Value="Transparent" />
@@ -287,7 +287,7 @@
     </Window.Resources>
 
     <Border CornerRadius="22" Background="{StaticResource ShellBrush}" BorderBrush="#FF3A342D" BorderThickness="1" Padding="16" MouseLeftButtonDown="WindowSurface_OnMouseLeftButtonDown">
-        <Grid Width="700">
+        <Grid Width="660">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -316,9 +316,13 @@
                             <Style TargetType="TextBlock">
                                 <Setter Property="Visibility" Value="Collapsed" />
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding SearchQuery}" Value="">
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding SearchQuery}" Value="" />
+                                            <Condition Binding="{Binding ElementName=SearchTextBox, Path=IsKeyboardFocusWithin}" Value="False" />
+                                        </MultiDataTrigger.Conditions>
                                         <Setter Property="Visibility" Value="Visible" />
-                                    </DataTrigger>
+                                    </MultiDataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </TextBlock.Style>
@@ -343,6 +347,7 @@
                         Margin="8,0,0,0"
                         VerticalAlignment="Center"
                         Content="Recent"
+                        PreviewMouseLeftButtonDown="SortMenuButton_OnPreviewMouseLeftButtonDown"
                         Click="SortMenuButton_OnClick" />
                 <Popup x:Name="SortMenuPopup"
                        Grid.Column="1"
