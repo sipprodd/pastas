@@ -64,24 +64,6 @@
             </Setter>
         </Style>
 
-        <Style x:Key="DarkComboBoxItemStyle" TargetType="ComboBoxItem">
-            <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
-            <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}" />
-            <Setter Property="Padding" Value="8,4" />
-            <Setter Property="HorizontalContentAlignment" Value="Left" />
-            <Style.Triggers>
-                <Trigger Property="IsHighlighted" Value="True">
-                    <Setter Property="Background" Value="{StaticResource CardHoverBrush}" />
-                    <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
-                </Trigger>
-                <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="{StaticResource AccentBrush}" />
-                    <Setter Property="Foreground" Value="#FF1A1612" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-
         <Style x:Key="CardSelectButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
@@ -139,7 +121,7 @@
             </Setter>
         </Style>
 
-        <Style x:Key="RoundedComboBoxStyle" TargetType="ComboBox">
+        <Style x:Key="SortButtonStyle" TargetType="ToggleButton">
             <Setter Property="Width" Value="154" />
             <Setter Property="MinWidth" Value="154" />
             <Setter Property="MaxWidth" Value="154" />
@@ -209,17 +191,27 @@
                     <Button Content="Images" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Images}" />
                     <Button Content="Pinned" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Pinned}" />
                 </WrapPanel>
-                <ComboBox Grid.Column="1" Style="{StaticResource RoundedComboBoxStyle}" Margin="8,0,0,0" VerticalAlignment="Center" SelectedValuePath="Tag" SelectedValue="{Binding SelectedSortMode}">
-                    <ComboBox.Resources>
-                        <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#FF2A2622" />
-                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#FF2A2622" />
-                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFD1A764" />
-                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#FF1A1612" />
-                    </ComboBox.Resources>
-                    <ComboBoxItem Content="Recent" Tag="{x:Static domain:SortMode.Recent}" />
-                    <ComboBoxItem Content="Oldest" Tag="{x:Static domain:SortMode.Oldest}" />
-                    <ComboBoxItem Content="Most copied" Tag="{x:Static domain:SortMode.MostCopied}" />
-                </ComboBox>
+                <ToggleButton Grid.Column="1" Style="{StaticResource SortButtonStyle}" Margin="8,0,0,0" VerticalAlignment="Center" Content="Sort">
+                    <ToggleButton.ContextMenu>
+                        <ContextMenu Background="{StaticResource SurfaceElevatedBrush}"
+                                     BorderBrush="{StaticResource SubtleBorderBrush}"
+                                     BorderThickness="1"
+                                     IsOpen="{Binding PlacementTarget.IsChecked, RelativeSource={RelativeSource Self}, Mode=TwoWay}">
+                            <ContextMenu.Resources>
+                                <Style TargetType="MenuItem">
+                                    <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
+                                    <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}" />
+                                    <Setter Property="Padding" Value="10,6" />
+                                </Style>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFD1A764" />
+                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#FF1A1612" />
+                            </ContextMenu.Resources>
+                            <MenuItem Header="Recent" Command="{Binding SetSortModeCommand}" CommandParameter="{x:Static domain:SortMode.Recent}" />
+                            <MenuItem Header="Oldest" Command="{Binding SetSortModeCommand}" CommandParameter="{x:Static domain:SortMode.Oldest}" />
+                            <MenuItem Header="Most copied" Command="{Binding SetSortModeCommand}" CommandParameter="{x:Static domain:SortMode.MostCopied}" />
+                        </ContextMenu>
+                    </ToggleButton.ContextMenu>
+                </ToggleButton>
             </Grid>
 
             <Grid Grid.Row="3">
