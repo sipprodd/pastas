@@ -121,7 +121,7 @@
             </Setter>
         </Style>
 
-        <Style x:Key="SortButtonStyle" TargetType="Button">
+        <Style x:Key="SortButtonStyle" TargetType="ToggleButton">
             <Setter Property="Width" Value="154" />
             <Setter Property="MinWidth" Value="154" />
             <Setter Property="MaxWidth" Value="154" />
@@ -130,44 +130,13 @@
             <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}" />
             <Setter Property="BorderBrush" Value="{StaticResource SubtleBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="10,0,8,0" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="SortButtonBorder"
-                                CornerRadius="10"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="18" />
-                                </Grid.ColumnDefinitions>
-                                <ContentPresenter Grid.Column="0"
-                                                  Margin="10,0,0,0"
-                                                  VerticalAlignment="Center"
-                                                  HorizontalAlignment="Left" />
-                                <Path Grid.Column="1"
-                                      VerticalAlignment="Center"
-                                      HorizontalAlignment="Center"
-                                      Data="M 0 0 L 4 4 L 8 0 Z"
-                                      Fill="{StaticResource CreamTextBrush}" />
-                            </Grid>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="SortButtonBorder" Property="BorderBrush" Value="#FF5A5147" />
-                                <Setter TargetName="SortButtonBorder" Property="Background" Value="#FF2E2A25" />
-                            </Trigger>
-                            <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="SortButtonBorder" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+            <Setter Property="Padding" Value="10,0,10,0" />
+            <Setter Property="ItemContainerStyle" Value="{StaticResource DarkComboBoxItemStyle}" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="PopupAnimation" Value="Fade" />
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
         </Style>
     </Window.Resources>
 
@@ -222,31 +191,27 @@
                     <Button Content="Images" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Images}" />
                     <Button Content="Pinned" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Pinned}" />
                 </WrapPanel>
-                <Grid Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center">
-                    <Button x:Name="SortMenuButton"
-                            Style="{StaticResource SortButtonStyle}"
-                            Content="Recent"
-                            Click="SortMenuButton_OnClick" />
-                    <Popup x:Name="SortMenuPopup"
-                           PlacementTarget="{Binding ElementName=SortMenuButton}"
-                           Placement="Bottom"
-                           StaysOpen="False"
-                           AllowsTransparency="True"
-                           PopupAnimation="Fade">
-                        <Border Width="154"
-                                Margin="0,4,0,0"
-                                CornerRadius="10"
-                                Background="{StaticResource SurfaceElevatedBrush}"
-                                BorderBrush="{StaticResource SubtleBorderBrush}"
-                                BorderThickness="1">
-                            <StackPanel Margin="4">
-                                <Button Content="Recent" Click="SortRecent_OnClick" Style="{StaticResource ChipButtonStyle}" Margin="0,0,0,4" HorizontalContentAlignment="Left" />
-                                <Button Content="Oldest" Click="SortOldest_OnClick" Style="{StaticResource ChipButtonStyle}" Margin="0,0,0,4" HorizontalContentAlignment="Left" />
-                                <Button Content="Most copied" Click="SortMostCopied_OnClick" Style="{StaticResource ChipButtonStyle}" Margin="0" HorizontalContentAlignment="Left" />
-                            </StackPanel>
-                        </Border>
-                    </Popup>
-                </Grid>
+                <ToggleButton Grid.Column="1" Style="{StaticResource SortButtonStyle}" Margin="8,0,0,0" VerticalAlignment="Center" Content="Sort">
+                    <ToggleButton.ContextMenu>
+                        <ContextMenu Background="{StaticResource SurfaceElevatedBrush}"
+                                     BorderBrush="{StaticResource SubtleBorderBrush}"
+                                     BorderThickness="1"
+                                     IsOpen="{Binding PlacementTarget.IsChecked, RelativeSource={RelativeSource Self}, Mode=TwoWay}">
+                            <ContextMenu.Resources>
+                                <Style TargetType="MenuItem">
+                                    <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
+                                    <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}" />
+                                    <Setter Property="Padding" Value="10,6" />
+                                </Style>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFD1A764" />
+                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#FF1A1612" />
+                            </ContextMenu.Resources>
+                            <MenuItem Header="Recent" Command="{Binding SetSortModeCommand}" CommandParameter="{x:Static domain:SortMode.Recent}" />
+                            <MenuItem Header="Oldest" Command="{Binding SetSortModeCommand}" CommandParameter="{x:Static domain:SortMode.Oldest}" />
+                            <MenuItem Header="Most copied" Command="{Binding SetSortModeCommand}" CommandParameter="{x:Static domain:SortMode.MostCopied}" />
+                        </ContextMenu>
+                    </ToggleButton.ContextMenu>
+                </ToggleButton>
             </Grid>
 
             <Grid Grid.Row="3">
@@ -385,3 +350,5 @@
         </Grid>
     </Border>
 </Window>
+
+

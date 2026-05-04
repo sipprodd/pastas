@@ -1,8 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using Pastas.Domain.Enums;
 using Pastas.Application.Services;
 using Pastas.Application.State;
@@ -63,13 +61,7 @@ public partial class MainWindow : Window
 
     private void SortMenuButton_OnClick(object sender, RoutedEventArgs e)
     {
-        var popup = FindName("SortMenuPopup") as Popup;
-        if (popup is null)
-        {
-            return;
-        }
-
-        popup.IsOpen = !popup.IsOpen;
+        SortMenuPopup.IsOpen = !SortMenuPopup.IsOpen;
     }
 
     private void SortRecent_OnClick(object sender, RoutedEventArgs e)
@@ -94,15 +86,8 @@ public partial class MainWindow : Window
             sortCommand.Execute(sortMode);
         }
 
-        if (FindName("SortMenuButton") is Button sortMenuButton)
-        {
-            sortMenuButton.Content = label;
-        }
-
-        if (FindName("SortMenuPopup") is Popup popup)
-        {
-            popup.IsOpen = false;
-        }
+        SortMenuButton.Content = label;
+        SortMenuPopup.IsOpen = false;
     }
 
 
