@@ -32,6 +32,7 @@ public partial class MainWindow : Window
     private bool _isExiting;
     private bool _isCleanedUp;
     private bool _isCompositionInitialized;
+    private bool _suppressSortToggle;
 
     public MainWindow()
     {
@@ -63,8 +64,26 @@ public partial class MainWindow : Window
         Hide();
     }
 
+    private void SortMenuButton_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (FindName("SortMenuPopup") is not Popup popup || !popup.IsOpen)
+        {
+            return;
+        }
+
+        popup.IsOpen = false;
+        _suppressSortToggle = true;
+        e.Handled = true;
+    }
+
     private void SortMenuButton_OnClick(object sender, RoutedEventArgs e)
     {
+        if (_suppressSortToggle)
+        {
+            _suppressSortToggle = false;
+            return;
+        }
+
         var popup = FindName("SortMenuPopup") as System.Windows.Controls.Primitives.Popup;
         if (popup is null)
         {
