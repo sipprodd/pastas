@@ -1,10 +1,15 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
+using Pastas.Domain.Entities;
 using Pastas.Domain.Enums;
+using Pastas.Domain.Interfaces;
+using System.Globalization;
 using Pastas.Application.Services;
 using Pastas.Application.State;
 using Pastas.Application.UseCases;
@@ -28,6 +33,9 @@ public partial class MainWindow : Window
     private IClipboardChangeWatcher? _clipboardChangeWatcher;
     private IGlobalHotkeyService? _hotkeyService;
     private ITrayService? _trayService;
+    private ISettingsRepository? _settingsRepository;
+    private AppSettings _settings = new();
+    private string _pendingHotkey = "Alt+V";
 
     private bool _isExiting;
     private bool _isCleanedUp;
@@ -274,7 +282,7 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
         if (!_isCompositionInitialized)
         {
             _diagnosticsLogger.Info("MainWindow loaded: before CreateCompositionAsync(this).");
-            (_viewModel, _diagnosticsLogger, _clipboardCaptureNotificationHandler, _clipboardChangeWatcher, _hotkeyService, _trayService) = await CreateCompositionAsync(this);
+            (_viewModel, _diagnosticsLogger, _clipboardCaptureNotificationHandler, _clipboardChangeWatcher, _hotkeyService, _trayService, _settingsRepository) = await CreateCompositionAsync(this);
             _diagnosticsLogger.Info("MainWindow loaded: after CreateCompositionAsync(this).");
 
             _diagnosticsLogger.Info("MainWindow loaded: before DataContext assignment.");
@@ -309,15 +317,72 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
         _clipboardChangeWatcher?.Start();
         _trayService?.Start();
 
-        if (_hotkeyService is not null)
-        {
-            await _hotkeyService.RegisterAsync("Alt+V");
-        }
+        await LoadAndApplySettingsAsync();
 
         if (_viewModel is not null)
         {
             await _viewModel.RefreshAsync();
         }
+    }
+
+    private async Task LoadAndApplySettingsAsync()
+    {
+        try
+        {
+            if (_settingsRepository is not null)
+            {
+                _settings = await _settingsRepository.GetAsync();
+            }
+        }
+        catch
+        {
+            _settings = new AppSettings();
+        }
+
+        _pendingHotkey = _settings.Hotkey;
+        HotkeyTextBox.Text = _settings.Hotkey;
+        MaxItemsTextBox.Text = _settings.MaxItems.ToString(CultureInfo.InvariantCulture);
+        ThemeComboBox.SelectedIndex = _settings.ThemeMode switch { ThemeMode.White => 1, ThemeMode.Black => 2, _ => 0 };
+        ApplyTheme(_settings.ThemeMode);
+
+        if (_hotkeyService is not null)
+        {
+            await _hotkeyService.RegisterAsync(_settings.Hotkey);
+        }
+
+        if (_viewModel is not null)
+        {
+            await _viewModel.RefreshAsync();
+            UpdateStorageSummary();
+        }
+    }
+
+    private void ApplyTheme(ThemeMode mode)
+    {
+        var map = mode switch
+        {
+            ThemeMode.White => ("#FFFFFFFF", "#FFF8F8F8", "#FFFFFFFF", "#FFE2E2E2", "#FF1A1A1A", "#FF555555", "#FF6A4A2C"),
+            ThemeMode.Black => ("#FF000000", "#FF050505", "#FF0A0A0A", "#FF242424", "#FFF5F5F5", "#FFB5B5B5", "#FFE0B878"),
+            _ => ("#FF171613", "#FF23201C", "#FF2A2622", "#FF3F3932", "#FFF4EBDD", "#FFC6B9A6", "#FFD1A764")
+        };
+
+        ((System.Windows.Media.SolidColorBrush)Resources["ShellBrush"]).Color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(map.Item1);
+        ((System.Windows.Media.SolidColorBrush)Resources["SurfaceBrush"]).Color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(map.Item2);
+        ((System.Windows.Media.SolidColorBrush)Resources["SurfaceElevatedBrush"]).Color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(map.Item3);
+        ((System.Windows.Media.SolidColorBrush)Resources["SubtleBorderBrush"]).Color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(map.Item4);
+        ((System.Windows.Media.SolidColorBrush)Resources["CreamTextBrush"]).Color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(map.Item5);
+        ((System.Windows.Media.SolidColorBrush)Resources["MutedTextBrush"]).Color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(map.Item6);
+        ((System.Windows.Media.SolidColorBrush)Resources["AccentBrush"]).Color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(map.Item7);
+    }
+
+    private void UpdateStorageSummary()
+    {
+        if (_viewModel is null) return;
+        var total = _viewModel.Items.Count;
+        var pinned = _viewModel.Items.Count(x => x.IsPinned);
+        var images = _viewModel.Items.Count(x => x.Kind == ClipboardItemKind.Image);
+        var approx = _viewModel.Items.Sum(x => (x.ContentPreview?.Length ?? 0) * 2) / (1024d * 1024d);
+        StorageSummaryText.Text = $"Total items: {total}\nPinned: {pinned}\nImages: {images}\nApprox. usage: {approx:F2} MB";
     }
 
     private async void OnClipboardChangedAsync(object? sender, EventArgs e)
@@ -493,7 +558,7 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
         }
     }
 
-    private static async Task<(MainViewModel ViewModel, IDiagnosticsLogger DiagnosticsLogger, ClipboardCaptureNotificationHandler? NotificationHandler, IClipboardChangeWatcher? Watcher, IGlobalHotkeyService? HotkeyService, ITrayService? TrayService)> CreateCompositionAsync(Window window)
+    private static async Task<(MainViewModel ViewModel, IDiagnosticsLogger DiagnosticsLogger, ClipboardCaptureNotificationHandler? NotificationHandler, IClipboardChangeWatcher? Watcher, IGlobalHotkeyService? HotkeyService, ITrayService? TrayService, ISettingsRepository? SettingsRepository)> CreateCompositionAsync(Window window)
     {
         var diagnosticsLogger = new FileDiagnosticsLogger();
 
@@ -575,6 +640,8 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
             var trayService = new WindowsTrayService(diagnosticsLogger);
             diagnosticsLogger.Info("CreateComposition: after WindowsTrayService.");
 
+            var settingsRepository = new SqliteSettingsRepository(connectionFactory);
+
             diagnosticsLogger.Info("CreateComposition: before MainViewModel.");
             var viewModel = new MainViewModel(repository, copyUseCase, clipboardGateway, captureState);
             diagnosticsLogger.Info("CreateComposition: after MainViewModel.");
@@ -584,11 +651,11 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
             diagnosticsLogger.Info("CreateComposition: after MainViewModelNotificationService.");
 
             diagnosticsLogger.Info("CreateComposition: before ClipboardCaptureNotificationHandler.");
-            var notificationHandler = new ClipboardCaptureNotificationHandler(coordinator, notificationService, repository, _captureState);
+            var notificationHandler = new ClipboardCaptureNotificationHandler(coordinator, notificationService, repository, captureState);
             diagnosticsLogger.Info("CreateComposition: after ClipboardCaptureNotificationHandler.");
 
             diagnosticsLogger.Info("Application composition succeeded.");
-            return (viewModel, diagnosticsLogger, notificationHandler, watcher, hotkeyService, trayService);
+            return (viewModel, diagnosticsLogger, notificationHandler, watcher, hotkeyService, trayService, settingsRepository);
         }
         catch (Exception ex)
         {
@@ -603,12 +670,69 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
             var hotkeyService = new WindowsHotkeyService(window, diagnosticsLogger);
             var trayService = new WindowsTrayService(diagnosticsLogger);
 
-            return (new MainViewModel(repository, copyUseCase, clipboardGateway, captureState), diagnosticsLogger, null, null, hotkeyService, trayService);
+            return (new MainViewModel(repository, copyUseCase, clipboardGateway, captureState), diagnosticsLogger, null, null, hotkeyService, trayService, null);
         }
     }
+
+    private void CaptureHotkey_OnPreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        e.Handled = true;
+        if (e.Key is Key.LeftAlt or Key.RightAlt or Key.LeftCtrl or Key.RightCtrl or Key.LeftShift or Key.RightShift or Key.LWin or Key.RWin) return;
+        var mods = Keyboard.Modifiers;
+        if (mods == ModifierKeys.None) return;
+        var key = e.Key == Key.System ? e.SystemKey : e.Key;
+        if (key is < Key.A or > Key.Z) return;
+        var parts = new List<string>();
+        if (mods.HasFlag(ModifierKeys.Control)) parts.Add("Ctrl");
+        if (mods.HasFlag(ModifierKeys.Alt)) parts.Add("Alt");
+        if (mods.HasFlag(ModifierKeys.Shift)) parts.Add("Shift");
+        if (mods.HasFlag(ModifierKeys.Windows)) parts.Add("Win");
+        parts.Add(key.ToString());
+        _pendingHotkey = string.Join("+", parts);
+        HotkeyTextBox.Text = _pendingHotkey;
+    }
+
+    private async void SaveSettings_OnClick(object sender, RoutedEventArgs e)
+    {
+        var previous = _settings.Hotkey;
+        if (!int.TryParse(MaxItemsTextBox.Text, out var maxItems) || maxItems < 50) maxItems = 200;
+        var newTheme = ThemeComboBox.SelectedIndex switch { 1 => ThemeMode.White, 2 => ThemeMode.Black, _ => ThemeMode.Chocolate };
+        ApplyTheme(newTheme);
+
+        if (_hotkeyService is not null)
+        {
+            await _hotkeyService.UnregisterAsync();
+            await _hotkeyService.RegisterAsync(_pendingHotkey);
+            // parser-valid only, if fails fallback
+            if (!HotkeyGestureParser.TryParse(_pendingHotkey, out _, out _))
+            {
+                await _hotkeyService.RegisterAsync(previous);
+                HotkeyStatusText.Text = "Invalid hotkey. Previous hotkey kept.";
+                _pendingHotkey = previous;
+            }
+            else
+            {
+                HotkeyStatusText.Text = "Hotkey applied.";
+            }
+        }
+
+        _settings = new AppSettings
+        {
+            Hotkey = _pendingHotkey,
+            ThemeMode = newTheme,
+            MaxItems = maxItems,
+            MaxItemSizeBytes = _settings.MaxItemSizeBytes,
+            MaxCacheSizeBytes = _settings.MaxCacheSizeBytes,
+            NotificationsEnabled = _settings.NotificationsEnabled,
+            CopyStreakEnabled = _settings.CopyStreakEnabled,
+            ProtectedItemPolicy = _settings.ProtectedItemPolicy,
+            HideProtectedOnBlur = _settings.HideProtectedOnBlur,
+            RevealProtectedSeconds = _settings.RevealProtectedSeconds,
+            ClearProtectedClipboardAfterDelay = _settings.ClearProtectedClipboardAfterDelay,
+            ClearProtectedClipboardDelaySeconds = _settings.ClearProtectedClipboardDelaySeconds
+        };
+        if (_settingsRepository is not null) await _settingsRepository.SaveAsync(_settings);
+        UpdateStorageSummary();
+    }
 }
-
-
-
-
 
