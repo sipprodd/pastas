@@ -2,7 +2,6 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Forms;
 using System.Windows.Input;
 using Pastas.Domain.Enums;
 using Pastas.Application.Services;
@@ -175,7 +174,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (e.OriginalSource is DependencyObject source && FindAncestor<Button>(source) is not null)
+        if (e.OriginalSource is DependencyObject source && FindAncestor<System.Windows.Controls.Button>(source) is not null)
         {
             return;
         }
@@ -365,8 +364,8 @@ public partial class MainWindow : Window
 
     private void PositionNearCursor()
     {
-        var cursor = Control.MousePosition;
-        var screen = Screen.FromPoint(cursor);
+        var cursor = System.Windows.Forms.Control.MousePosition;
+        var screen = System.Windows.Forms.Screen.FromPoint(cursor);
         var workArea = screen.WorkingArea;
 
         const double offset = 16;
@@ -536,5 +535,6 @@ public partial class MainWindow : Window
         }
     }
 }
+
 
 
