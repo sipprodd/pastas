@@ -252,7 +252,7 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <Grid Grid.Row="0" Margin="0,0,0,10">
+            <Grid Grid.Row="0" Margin="0,0,0,10" MouseLeftButtonDown="Header_OnMouseLeftButtonDown">
                 <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="pastas" FontSize="24" FontWeight="SemiBold" Foreground="{StaticResource CreamTextBrush}" />
@@ -345,11 +345,37 @@
 
                 <views:PreviewPanelView />
 
-                <Border Visibility="{Binding IsSettingsOpen, Converter={StaticResource BoolToVisibility}}" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource SubtleBorderBrush}" BorderThickness="1" CornerRadius="14" Padding="14">
+                <Border Visibility="{Binding IsSettingsOpen, Converter={StaticResource BoolToVisibility}}" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource SubtleBorderBrush}" BorderThickness="1" CornerRadius="14" Padding="16">
                     <StackPanel>
                         <TextBlock Text="Settings" FontSize="22" Foreground="{StaticResource CreamTextBrush}" />
-                        <TextBlock Text="Settings panel placeholder for MVP shell." Foreground="{StaticResource MutedTextBrush}" Margin="0,10,0,14" />
-                        <Button Content="Clear data" Width="140" Style="{StaticResource ChipButtonStyle}" Command="{Binding OpenClearDataCommand}" Margin="0,0,0,10" />
+
+                        <Border Background="#FF2A2622" BorderBrush="#FF3F3932" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,12,0,10">
+                            <StackPanel>
+                                <TextBlock Text="General" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource CreamTextBrush}" />
+                                <TextBlock Text="Hotkey: Alt+V" Foreground="{StaticResource MutedTextBrush}" Margin="0,8,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="#FF2A2622" BorderBrush="#FF3F3932" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,0,0,10">
+                            <StackPanel>
+                                <TextBlock Text="Appearance" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource CreamTextBrush}" />
+                                <TextBlock Text="Theme (coming soon)" Foreground="{StaticResource MutedTextBrush}" Margin="0,8,0,8" />
+                                <StackPanel Orientation="Horizontal">
+                                    <RadioButton Content="White" IsEnabled="False" Foreground="{StaticResource MutedTextBrush}" Margin="0,0,14,0" />
+                                    <RadioButton Content="Chocolate" IsEnabled="False" Foreground="{StaticResource MutedTextBrush}" Margin="0,0,14,0" />
+                                    <RadioButton Content="Black OLED" IsEnabled="False" Foreground="{StaticResource MutedTextBrush}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="#FF2A2622" BorderBrush="#FF3F3932" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,0,0,12">
+                            <StackPanel>
+                                <TextBlock Text="Storage" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource CreamTextBrush}" />
+                                <TextBlock Text="Delete selected clipboard history categories." Foreground="{StaticResource MutedTextBrush}" Margin="0,8,0,10" />
+                                <Button Content="Clear data" Width="140" Style="{StaticResource ChipButtonStyle}" Command="{Binding OpenClearDataCommand}" Margin="0" />
+                            </StackPanel>
+                        </Border>
+
                         <Button Content="Close" Width="90" Style="{StaticResource ChipButtonStyle}" Command="{Binding CloseSettingsCommand}" Margin="0" />
                     </StackPanel>
                 </Border>

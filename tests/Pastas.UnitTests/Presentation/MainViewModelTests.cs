@@ -179,6 +179,33 @@ public sealed class MainViewModelTests
         Assert.Null(exception);
     }
 
+
+    [Fact]
+    public void OpenSettings_ClosesPreviewAndClearData()
+    {
+        var viewModel = CreateViewModel();
+
+        viewModel.OpenClearData();
+        viewModel.OpenPreview();
+        viewModel.OpenSettings();
+
+        Assert.True(viewModel.IsSettingsOpen);
+        Assert.False(viewModel.IsPreviewOpen);
+        Assert.False(viewModel.IsClearDataOpen);
+    }
+
+    [Fact]
+    public void CloseSettings_ReturnsToMainListVisibility()
+    {
+        var viewModel = CreateViewModel();
+
+        viewModel.OpenSettings();
+        viewModel.CloseSettings();
+
+        Assert.False(viewModel.IsSettingsOpen);
+        Assert.True(viewModel.IsMainContentVisible);
+    }
+
     private static MainViewModel CreateViewModel(
         FakeClipboardItemRepository? repository = null,
         FakeCopyTextItemToClipboardUseCase? copyUseCase = null)
