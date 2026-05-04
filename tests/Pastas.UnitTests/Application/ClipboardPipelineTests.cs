@@ -169,10 +169,28 @@ public class ClipboardPipelineTests
         Assert.True(state.ConsumeInternalClipboardWriteFlag());
     }
 
+    [Fact]
+    public async Task CopyTextItemToClipboardUseCase_WritesImagePathAndSetsInternalGuard()
+    {
+        var item = new ClipboardItem { ImagePath = "C:/tmp/example.png", Hash = "img-hash" };
+        var repo = new FakeClipboardItemRepository();
+        repo.Items.Add(item);
+        var gateway = new FakeClipboardGateway();
+        var state = new ClipboardCaptureState();
+        var useCase = new CopyTextItemToClipboardUseCase(repo, gateway, state);
+
+        var result = await useCase.ExecuteAsync(item.Id);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(item.ImagePath, gateway.WrittenImagePath);
+        Assert.True(state.ConsumeInternalClipboardWriteFlag());
+    }
+
     private sealed class FakeClipboardGateway : IClipboardGateway
     {
         public ClipboardCaptureData? ReadValue { get; set; }
         public string? WrittenText { get; private set; }
+        public string? WrittenImagePath { get; private set; }
 
         public Task<ClipboardCaptureData?> ReadAsync(CancellationToken cancellationToken = default) => Task.FromResult(ReadValue);
 
@@ -182,7 +200,11 @@ public class ClipboardPipelineTests
             return Task.CompletedTask;
         }
 
-        public Task WriteImageAsync(string imagePath, CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public Task WriteImageAsync(string imagePath, CancellationToken cancellationToken = default)
+        {
+            WrittenImagePath = imagePath;
+            return Task.CompletedTask;
+        }
     }
 
     private sealed class FakeClipboardItemRepository : IClipboardItemRepository
