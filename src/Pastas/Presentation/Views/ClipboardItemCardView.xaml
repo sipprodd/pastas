@@ -6,6 +6,72 @@
              mc:Ignorable="d"
              d:DesignHeight="74"
              d:DesignWidth="640">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+        <SolidColorBrush x:Key="SubtleBorderBrush" Color="#FF3F3932" />
+        <SolidColorBrush x:Key="CreamTextBrush" Color="#FFF4EBDD" />
+        <SolidColorBrush x:Key="MutedTextBrush" Color="#FFC6B9A6" />
+        <SolidColorBrush x:Key="AccentBrush" Color="#FFD1A764" />
+        <SolidColorBrush x:Key="PinnedBorderBrush" Color="#FFE1BC7A" />
+
+        <Style x:Key="CardSelectButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="Transparent" BorderThickness="0">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="CardActionIconButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="42" />
+            <Setter Property="Height" Value="26" />
+            <Setter Property="Margin" Value="4,0,0,0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
+            <Setter Property="Background" Value="#FF2C2823" />
+            <Setter Property="BorderBrush" Value="{StaticResource SubtleBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="IconButtonBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="IconButtonBorder" Property="Background" Value="#FF38322C" />
+                                <Setter TargetName="IconButtonBorder" Property="BorderBrush" Value="#FF5A5147" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="IconButtonBorder" Property="Background" Value="#FF231F1B" />
+                                <Setter TargetName="IconButtonBorder" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="IconButtonBorder" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
     <Border x:Name="ItemCard" Margin="0,0,0,8" Padding="10" CornerRadius="12" MinHeight="74" Background="#FF26221E" BorderBrush="{StaticResource SubtleBorderBrush}" BorderThickness="1">
         <Border.Style>
             <Style TargetType="Border">
