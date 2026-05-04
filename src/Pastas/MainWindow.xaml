@@ -33,6 +33,36 @@
             <Setter Property="Padding" Value="10,6" />
             <Setter Property="Margin" Value="0,0,8,0" />
             <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="ChipBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ChipBorder" Property="Background" Value="#FF302A25" />
+                                <Setter TargetName="ChipBorder" Property="BorderBrush" Value="#FF51483E" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ChipBorder" Property="Background" Value="#FF221E1A" />
+                                <Setter TargetName="ChipBorder" Property="BorderBrush" Value="#FF5A5147" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="ChipBorder" Property="BorderBrush" Value="#FF5A5147" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="ChipBorder" Property="Opacity" Value="0.7" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <Style x:Key="RoundedTextBoxStyle" TargetType="TextBox">
@@ -121,18 +151,87 @@
             </Setter>
         </Style>
 
-        <Style x:Key="SortButtonStyle" TargetType="ToggleButton">
+        <Style x:Key="SortMenuButtonStyle" TargetType="Button">
             <Setter Property="Width" Value="154" />
-            <Setter Property="MinWidth" Value="154" />
-            <Setter Property="MaxWidth" Value="154" />
             <Setter Property="Height" Value="34" />
             <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
-            <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}" />
-            <Setter Property="BorderBrush" Value="{StaticResource SubtleBorderBrush}" />
+            <Setter Property="Background" Value="#FF2B2621" />
+            <Setter Property="BorderBrush" Value="#FF4C433A" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="10,0,10,0" />
+            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="SortBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <ContentPresenter Margin="0,0,8,0" VerticalAlignment="Center" HorizontalAlignment="Left" />
+                                <Path Grid.Column="1" Width="9" Height="6" VerticalAlignment="Center" Fill="{StaticResource MutedTextBrush}" Data="M 0 0 L 4.5 5 L 9 0 Z" />
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="SortBorder" Property="Background" Value="#FF322C26" />
+                                <Setter TargetName="SortBorder" Property="BorderBrush" Value="#FF5A5045" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="SortBorder" Property="Background" Value="#FF231F1B" />
+                                <Setter TargetName="SortBorder" Property="BorderBrush" Value="#FF685C4D" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="SortBorder" Property="BorderBrush" Value="#FF5A5045" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SortMenuItemButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
+            <Setter Property="Background" Value="#FF2B2621" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="Margin" Value="0,0,0,4" />
             <Setter Property="HorizontalContentAlignment" Value="Left" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="SortItemBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Left" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="SortItemBorder" Property="Background" Value="#FF352F29" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="SortItemBorder" Property="Background" Value="#FF221E1A" />
+                                <Setter TargetName="SortItemBorder" Property="BorderBrush" Value="#FF4E453C" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="SortItemBorder" Property="BorderBrush" Value="#FF4E453C" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Window.Resources>
 
@@ -187,27 +286,36 @@
                     <Button Content="Images" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Images}" />
                     <Button Content="Pinned" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Pinned}" />
                 </WrapPanel>
-                <ToggleButton Grid.Column="1" Style="{StaticResource SortButtonStyle}" Margin="8,0,0,0" VerticalAlignment="Center" Content="Sort">
-                    <ToggleButton.ContextMenu>
-                        <ContextMenu Background="{StaticResource SurfaceElevatedBrush}"
-                                     BorderBrush="{StaticResource SubtleBorderBrush}"
-                                     BorderThickness="1"
-                                     IsOpen="{Binding PlacementTarget.IsChecked, RelativeSource={RelativeSource Self}, Mode=TwoWay}">
-                            <ContextMenu.Resources>
-                                <Style TargetType="MenuItem">
-                                    <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
-                                    <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}" />
-                                    <Setter Property="Padding" Value="10,6" />
-                                </Style>
-                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFD1A764" />
-                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#FF1A1612" />
-                            </ContextMenu.Resources>
-                            <MenuItem Header="Recent" Command="{Binding SetSortModeCommand}" CommandParameter="{x:Static domain:SortMode.Recent}" />
-                            <MenuItem Header="Oldest" Command="{Binding SetSortModeCommand}" CommandParameter="{x:Static domain:SortMode.Oldest}" />
-                            <MenuItem Header="Most copied" Command="{Binding SetSortModeCommand}" CommandParameter="{x:Static domain:SortMode.MostCopied}" />
-                        </ContextMenu>
-                    </ToggleButton.ContextMenu>
-                </ToggleButton>
+                <Button x:Name="SortMenuButton"
+                        Grid.Column="1"
+                        Style="{StaticResource SortMenuButtonStyle}"
+                        Margin="8,0,0,0"
+                        VerticalAlignment="Center"
+                        Content="Recent"
+                        Click="SortMenuButton_OnClick" />
+                <Popup x:Name="SortMenuPopup"
+                       Grid.Column="1"
+                       Placement="Bottom"
+                       PlacementTarget="{Binding ElementName=SortMenuButton}"
+                       StaysOpen="False"
+                       AllowsTransparency="True"
+                       HorizontalOffset="0"
+                       VerticalOffset="4"
+                       PopupAnimation="Fade">
+                    <Border Width="154"
+                            Padding="6"
+                            Background="#FF2B2621"
+                            BorderBrush="#FF4C433A"
+                            BorderThickness="1"
+                            CornerRadius="10"
+                            SnapsToDevicePixels="True">
+                        <StackPanel>
+                            <Button Content="Recent" Style="{StaticResource SortMenuItemButtonStyle}" Click="SortRecent_OnClick" />
+                            <Button Content="Oldest" Style="{StaticResource SortMenuItemButtonStyle}" Click="SortOldest_OnClick" />
+                            <Button Content="Most copied" Margin="0" Style="{StaticResource SortMenuItemButtonStyle}" Click="SortMostCopied_OnClick" />
+                        </StackPanel>
+                    </Border>
+                </Popup>
             </Grid>
 
             <Grid Grid.Row="3">
