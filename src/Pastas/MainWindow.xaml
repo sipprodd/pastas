@@ -202,6 +202,50 @@
             </Setter>
         </Style>
 
+
+        <Style x:Key="DarkScrollBarThumbStyle" TargetType="Thumb">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Thumb">
+                        <Border x:Name="ThumbBorder" Background="#FF625648" CornerRadius="6" />
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ThumbBorder" Property="Background" Value="#FF766857" />
+                            </Trigger>
+                            <Trigger Property="IsDragging" Value="True">
+                                <Setter TargetName="ThumbBorder" Property="Background" Value="#FF8A7A66" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="DarkScrollBarStyle" TargetType="ScrollBar">
+            <Setter Property="Width" Value="11" />
+            <Setter Property="Background" Value="#FF221E1A" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Border Background="#FF1C1916" CornerRadius="6" Padding="1">
+                            <Track x:Name="PART_Track" IsDirectionReversed="True">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.PageUpCommand" Opacity="0" IsTabStop="False" />
+                                </Track.DecreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb Style="{StaticResource DarkScrollBarThumbStyle}" MinHeight="28" />
+                                </Track.Thumb>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.PageDownCommand" Opacity="0" IsTabStop="False" />
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style x:Key="SortMenuItemButtonStyle" TargetType="Button">
             <Setter Property="Height" Value="32" />
             <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
@@ -330,7 +374,7 @@
             <Grid Grid.Row="3">
                 <Grid Visibility="{Binding IsMainContentVisible, Converter={StaticResource BoolToVisibility}}">
                     <Grid>
-                        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" CanContentScroll="True">
+                        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" CanContentScroll="True" VerticalScrollBarStyle="{StaticResource DarkScrollBarStyle}">
                             <ItemsControl ItemsSource="{Binding Items}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
@@ -347,7 +391,7 @@
 
                 <Border Visibility="{Binding IsSettingsOpen, Converter={StaticResource BoolToVisibility}}" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource SubtleBorderBrush}" BorderThickness="1" CornerRadius="14" Padding="16">
                     <StackPanel>
-                        <TextBlock Text="Settings" FontSize="22" Foreground="{StaticResource CreamTextBrush}" />
+                        <TextBlock Text="Settings" FontSize="22" Foreground="{StaticResource CreamTextBrush}" Margin="0,0,0,4" />
 
                         <Border Background="#FF2A2622" BorderBrush="#FF3F3932" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,12,0,10">
                             <StackPanel>
@@ -386,9 +430,9 @@
                             <StackPanel>
                                 <TextBlock Text="Clear data" FontSize="22" Foreground="{StaticResource CreamTextBrush}" />
                                 <TextBlock Text="Choose what to delete from Pastas history. This cannot be undone." TextWrapping="Wrap" Foreground="{StaticResource MutedTextBrush}" Margin="0,10,0,16" />
-                                <CheckBox Content="Text" Foreground="{StaticResource CreamTextBrush}" IsChecked="{Binding ClearTextSelected}" Margin="0,0,0,8"/>
-                                <CheckBox Content="Images" Foreground="{StaticResource CreamTextBrush}" IsChecked="{Binding ClearImagesSelected}" Margin="0,0,0,8"/>
-                                <CheckBox Content="Pinned objects" Foreground="{StaticResource CreamTextBrush}" IsChecked="{Binding ClearPinnedSelected}" Margin="0,0,0,18"/>
+                                <CheckBox Content="Text" Foreground="{StaticResource CreamTextBrush}" VerticalContentAlignment="Center" IsChecked="{Binding ClearTextSelected}" Margin="0,0,0,8"/>
+                                <CheckBox Content="Images" Foreground="{StaticResource CreamTextBrush}" VerticalContentAlignment="Center" IsChecked="{Binding ClearImagesSelected}" Margin="0,0,0,8"/>
+                                <CheckBox Content="Pinned objects" Foreground="{StaticResource CreamTextBrush}" VerticalContentAlignment="Center" IsChecked="{Binding ClearPinnedSelected}" Margin="0,0,0,18"/>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                     <Button Content="Cancel" Width="90" Style="{StaticResource ChipButtonStyle}" Command="{Binding CloseClearDataCommand}" />
                                     <Button Content="Delete selected" Width="130" Margin="0" Style="{StaticResource ChipButtonStyle}" Command="{Binding ConfirmClearDataCommand}" IsEnabled="{Binding CanConfirmClearData}" />

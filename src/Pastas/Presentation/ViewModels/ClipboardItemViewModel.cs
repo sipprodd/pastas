@@ -26,6 +26,8 @@ public sealed class ClipboardItemViewModel : ViewModelBase
     public string FullText { get; private init; } = string.Empty;
     public bool HasThumbnail { get; private init; }
     public bool HasImagePath { get; private init; }
+    public string? ThumbnailOrImagePath { get; private init; }
+    public bool HasThumbnailOrImagePath { get; private init; }
 
     public string PreviewBodyText => string.IsNullOrWhiteSpace(FullText) ? PreviewText : FullText;
 
@@ -44,6 +46,7 @@ public sealed class ClipboardItemViewModel : ViewModelBase
         var thumbnailPath = isImage && !string.IsNullOrWhiteSpace(item.ThumbnailPath)
             ? item.ThumbnailPath
             : null;
+        var thumbnailOrImagePath = thumbnailPath ?? (isImage && !string.IsNullOrWhiteSpace(item.ImagePath) ? item.ImagePath : null);
 
         return new ClipboardItemViewModel
         {
@@ -61,7 +64,9 @@ public sealed class ClipboardItemViewModel : ViewModelBase
             ImagePath = isImage ? item.ImagePath : null,
             FullText = item.ContentText ?? string.Empty,
             HasThumbnail = !string.IsNullOrWhiteSpace(thumbnailPath),
-            HasImagePath = isImage && !string.IsNullOrWhiteSpace(item.ImagePath)
+            HasImagePath = isImage && !string.IsNullOrWhiteSpace(item.ImagePath),
+            ThumbnailOrImagePath = thumbnailOrImagePath,
+            HasThumbnailOrImagePath = !string.IsNullOrWhiteSpace(thumbnailOrImagePath)
         };
     }
 
