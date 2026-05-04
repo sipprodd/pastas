@@ -1,5 +1,7 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using Pastas.Domain.Enums;
 using Pastas.Application.Services;
@@ -54,6 +56,7 @@ public partial class MainWindow : Window
         Deactivated += OnDeactivated;
         PreviewKeyDown += OnPreviewKeyDown;
     }
+
     private void CloseButton_OnClick(object sender, RoutedEventArgs e)
     {
         Hide();
@@ -61,7 +64,13 @@ public partial class MainWindow : Window
 
     private void SortMenuButton_OnClick(object sender, RoutedEventArgs e)
     {
-        SortMenuPopup.IsOpen = !SortMenuPopup.IsOpen;
+        var popup = FindName("SortMenuPopup") as Popup;
+        if (popup is null)
+        {
+            return;
+        }
+
+        popup.IsOpen = !popup.IsOpen;
     }
 
     private void SortRecent_OnClick(object sender, RoutedEventArgs e)
@@ -86,12 +95,18 @@ public partial class MainWindow : Window
             sortCommand.Execute(sortMode);
         }
 
-        SortMenuButton.Content = label;
-        SortMenuPopup.IsOpen = false;
+        if (FindName("SortMenuButton") is Button sortMenuButton)
+        {
+            sortMenuButton.Content = label;
+        }
+
+        if (FindName("SortMenuPopup") is Popup popup)
+        {
+            popup.IsOpen = false;
+        }
     }
 
-
-    private void OnPreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    private void OnPreviewKeyDown(object sender, KeyEventArgs e)
     {
         if (_viewModel is null)
         {
@@ -171,6 +186,7 @@ public partial class MainWindow : Window
         }
 
         await _clipboardCaptureNotificationHandler.HandleClipboardChangedAsync();
+
         if (_viewModel is not null)
         {
             await _viewModel.RefreshAsync();
@@ -282,7 +298,7 @@ public partial class MainWindow : Window
 
         _isExiting = true;
         await CleanupAsync();
-        await Dispatcher.InvokeAsync(() => System.Windows.Application.Current.Shutdown());
+        await Dispatcher.InvokeAsync(() => Application.Current.Shutdown());
     }
 
     private async Task CleanupAsync()
@@ -429,5 +445,3 @@ public partial class MainWindow : Window
         }
     }
 }
-
-
