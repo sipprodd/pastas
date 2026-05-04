@@ -53,6 +53,11 @@ public partial class MainWindow : Window
         Deactivated += OnDeactivated;
         PreviewKeyDown += OnPreviewKeyDown;
     }
+    private void CloseButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        Hide();
+    }
+
 
     private void OnPreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {
@@ -392,4 +397,5 @@ public partial class MainWindow : Window
         }
     }
 }
+
 

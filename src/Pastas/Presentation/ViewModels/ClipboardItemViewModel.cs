@@ -3,8 +3,10 @@ using Pastas.Domain.Enums;
 
 namespace Pastas.Presentation.ViewModels;
 
-public sealed class ClipboardItemViewModel
+public sealed class ClipboardItemViewModel : ViewModelBase
 {
+    private bool _isSelected;
+
     private ClipboardItemViewModel()
     {
     }
@@ -23,7 +25,17 @@ public sealed class ClipboardItemViewModel
     public string? ImagePath { get; private init; }
     public string FullText { get; private init; } = string.Empty;
     public bool HasThumbnail { get; private init; }
-    public bool IsSelected { get; set; }
+    public bool HasImagePath { get; private init; }
+
+    public string PreviewBodyText => string.IsNullOrWhiteSpace(FullText) ? PreviewText : FullText;
+
+    public bool IsSelected
+    {
+        get => _isSelected;
+        set => SetProperty(ref _isSelected, value);
+    }
+
+    public string ItemGlyph => IsProtected ? "🔒" : IsImage ? "🖼" : "T";
 
     public static ClipboardItemViewModel FromEntity(ClipboardItem item)
     {
@@ -48,7 +60,8 @@ public sealed class ClipboardItemViewModel
             ThumbnailPath = thumbnailPath,
             ImagePath = isImage ? item.ImagePath : null,
             FullText = item.ContentText ?? string.Empty,
-            HasThumbnail = !string.IsNullOrWhiteSpace(thumbnailPath)
+            HasThumbnail = !string.IsNullOrWhiteSpace(thumbnailPath),
+            HasImagePath = isImage && !string.IsNullOrWhiteSpace(item.ImagePath)
         };
     }
 
@@ -61,7 +74,7 @@ public sealed class ClipboardItemViewModel
 
         if (isImage)
         {
-            return "Image item";
+            return string.IsNullOrWhiteSpace(item.ImagePath) ? "Image unavailable" : "Image item";
         }
 
         var text = string.IsNullOrWhiteSpace(item.PreviewText) ? item.ContentText : item.PreviewText;
