@@ -140,13 +140,15 @@
         </Style>
 
         <Style x:Key="RoundedComboBoxStyle" TargetType="ComboBox">
-            <Setter Property="Width" Value="150" />
-            <Setter Property="Height" Value="35" />
+            <Setter Property="Width" Value="154" />
+            <Setter Property="MinWidth" Value="154" />
+            <Setter Property="MaxWidth" Value="154" />
+            <Setter Property="Height" Value="34" />
             <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
             <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}" />
             <Setter Property="BorderBrush" Value="{StaticResource SubtleBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="10,4" />
+            <Setter Property="Padding" Value="10,3" />
             <Setter Property="ItemContainerStyle" Value="{StaticResource DarkComboBoxItemStyle}" />
         </Style>
     </Window.Resources>
@@ -175,8 +177,6 @@
             <Grid Grid.Row="1" Visibility="{Binding IsMainContentVisible, Converter={StaticResource BoolToVisibility}}" Margin="0,0,0,8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="420" />
-                    <ColumnDefinition Width="12" />
-                    <ColumnDefinition Width="150" />
                 </Grid.ColumnDefinitions>
                 <Grid Grid.Column="0">
                     <TextBox x:Name="SearchTextBox" Style="{StaticResource RoundedTextBoxStyle}" Padding="14,6,12,6" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" />
@@ -193,28 +193,34 @@
                         </TextBlock.Style>
                     </TextBlock>
                 </Grid>
-                <ComboBox Grid.Column="2" Style="{StaticResource RoundedComboBoxStyle}" SelectedValuePath="Tag" SelectedValue="{Binding SelectedSortMode}">
-                    <ComboBox.Resources>
-                        <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#FF2A2622" />
-                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#FF2A2622" />
-                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFD1A764" />
-                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#FF1A1612" />
-                    </ComboBox.Resources>
-                    <ComboBoxItem Content="Recent" Tag="{x:Static domain:SortMode.Recent}" />
-                    <ComboBoxItem Content="Oldest" Tag="{x:Static domain:SortMode.Oldest}" />
-                    <ComboBoxItem Content="Most copied" Tag="{x:Static domain:SortMode.MostCopied}" />
-                </ComboBox>
             </Grid>
 
             <Grid Grid.Row="2">
                 <Grid Visibility="{Binding IsMainContentVisible, Converter={StaticResource BoolToVisibility}}">
                     <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
-                    <WrapPanel Margin="0,0,0,8">
-                        <Button Content="All" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.All}" />
-                        <Button Content="Text" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Text}" />
-                        <Button Content="Images" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Images}" />
-                        <Button Content="Pinned" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Pinned}" />
-                    </WrapPanel>
+                    <Grid Margin="0,0,0,8" MinHeight="34">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <WrapPanel Grid.Column="0" VerticalAlignment="Center">
+                            <Button Content="All" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.All}" />
+                            <Button Content="Text" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Text}" />
+                            <Button Content="Images" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Images}" />
+                            <Button Content="Pinned" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Pinned}" />
+                        </WrapPanel>
+                        <ComboBox Grid.Column="1" Style="{StaticResource RoundedComboBoxStyle}" Margin="8,0,0,0" VerticalAlignment="Center" SelectedValuePath="Tag" SelectedValue="{Binding SelectedSortMode}">
+                            <ComboBox.Resources>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#FF2A2622" />
+                                <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#FF2A2622" />
+                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFD1A764" />
+                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#FF1A1612" />
+                            </ComboBox.Resources>
+                            <ComboBoxItem Content="Recent" Tag="{x:Static domain:SortMode.Recent}" />
+                            <ComboBoxItem Content="Oldest" Tag="{x:Static domain:SortMode.Oldest}" />
+                            <ComboBoxItem Content="Most copied" Tag="{x:Static domain:SortMode.MostCopied}" />
+                        </ComboBox>
+                    </Grid>
                     <Grid Grid.Row="1">
                         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" CanContentScroll="True">
                             <ItemsControl ItemsSource="{Binding Items}">
@@ -342,8 +348,6 @@
         </Grid>
     </Border>
 </Window>
-
-
 
 
 
