@@ -101,11 +101,11 @@
         </Style>
 
         <Style x:Key="CardActionIconButtonStyle" TargetType="Button">
-            <Setter Property="Width" Value="26" />
+            <Setter Property="Width" Value="42" />
             <Setter Property="Height" Value="26" />
             <Setter Property="Margin" Value="4,0,0,0" />
             <Setter Property="Padding" Value="0" />
-            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontSize" Value="11" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
             <Setter Property="Background" Value="#FF2C2823" />
@@ -244,9 +244,9 @@
                                                     </StackPanel>
                                                 </Button>
                                                 <StackPanel x:Name="Actions" Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Visibility="Collapsed">
-                                                    <Button Content="рџ‘Ѓ" ToolTip="Preview" Style="{StaticResource CardActionIconButtonStyle}" Command="{Binding DataContext.OpenPreviewCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                                    <Button Content="View" ToolTip="Preview" Style="{StaticResource CardActionIconButtonStyle}" Command="{Binding DataContext.OpenPreviewCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
                                                     <Button Content="📌" ToolTip="Pin or unpin" Style="{StaticResource CardActionIconButtonStyle}" Command="{Binding DataContext.TogglePinCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
-                                                    <Button Content="рџ—‘" ToolTip="Delete" Style="{StaticResource CardActionIconButtonStyle}" Command="{Binding DataContext.DeleteItemCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                                    <Button Content="Del" ToolTip="Delete" Style="{StaticResource CardActionIconButtonStyle}" Command="{Binding DataContext.DeleteItemCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
                                                 </StackPanel>
                                             </Grid>
                                         </Border>
@@ -315,7 +315,7 @@
                         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
                             <Button Content="Copy" Style="{StaticResource ChipButtonStyle}" Command="{Binding CopyItemCommand}" CommandParameter="{Binding SelectedItem}" />
                             <Button Command="{Binding TogglePinCommand}" CommandParameter="{Binding SelectedItem}">
-                                <Button.Style><Style TargetType="Button" BasedOn="{StaticResource ChipButtonStyle}"><Setter Property="Content" Value="Pin" /><Style.Triggers><DataTrigger Binding="{Binding SelectedItem.IsPinned}" Value="True"><Setter Property="Content" Value="Unpin" /></DataTrigger></Style.Triggers></Style></Button.Style>
+                                <Button.Style><Style TargetType="Button" BasedOn="{StaticResource ChipButtonStyle}"><Setter Property="Content" Value="Pin" /><Style.Triggers><DataTrigger Binding="{Binding SelectedItem.IsPinned}" Value="True"><Setter Property="Content" Value="Pin" /></DataTrigger></Style.Triggers></Style></Button.Style>
                             </Button>
                             <Button Content="Delete" Style="{StaticResource ChipButtonStyle}" Command="{Binding DeleteItemCommand}" CommandParameter="{Binding SelectedItem}" Margin="0" />
                         </StackPanel>
@@ -343,6 +343,7 @@
         </Grid>
     </Border>
 </Window>
+
 
 
 
