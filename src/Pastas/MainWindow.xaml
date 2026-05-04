@@ -179,9 +179,8 @@
                     <ColumnDefinition Width="150" />
                 </Grid.ColumnDefinitions>
                 <Grid Grid.Column="0">
-                    <TextBox x:Name="SearchTextBox" Style="{StaticResource RoundedTextBoxStyle}" Padding="34,6,12,6" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" />
-                    <TextBlock Text="Search" Margin="12,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource MutedTextBrush}" IsHitTestVisible="False" />
-                    <TextBlock Text="Search" Margin="34,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource MutedTextBrush}" IsHitTestVisible="False">
+                    <TextBox x:Name="SearchTextBox" Style="{StaticResource RoundedTextBoxStyle}" Padding="14,6,12,6" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Text="Search" Margin="14,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource MutedTextBrush}" IsHitTestVisible="False">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Visibility" Value="Collapsed" />
@@ -344,6 +343,7 @@
         </Grid>
     </Border>
 </Window>
+
 
 
 
