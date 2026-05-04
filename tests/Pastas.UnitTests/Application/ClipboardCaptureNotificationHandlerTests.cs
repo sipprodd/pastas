@@ -1,4 +1,5 @@
 using Pastas.Application.Services;
+using Pastas.Application.State;
 using Pastas.Application.UseCases;
 using Pastas.Domain.Entities;
 using Pastas.Domain.Enums;
@@ -27,7 +28,7 @@ public sealed class ClipboardCaptureNotificationHandlerTests
             TimeSpan.Zero);
 
         var notificationService = new FakeNotificationService();
-        var handler = new ClipboardCaptureNotificationHandler(coordinator, notificationService, repository);
+        var handler = new ClipboardCaptureNotificationHandler(coordinator, notificationService, repository, new ClipboardCaptureState());
 
         await handler.HandleClipboardChangedAsync();
 
@@ -47,11 +48,32 @@ public sealed class ClipboardCaptureNotificationHandlerTests
             TimeSpan.Zero);
 
         var notificationService = new ThrowingNotificationService();
-        var handler = new ClipboardCaptureNotificationHandler(coordinator, notificationService, repository);
+        var handler = new ClipboardCaptureNotificationHandler(coordinator, notificationService, repository, new ClipboardCaptureState());
 
         var exception = await Record.ExceptionAsync(() => handler.HandleClipboardChangedAsync());
 
         Assert.Null(exception);
+    }
+
+    [Fact]
+    public async Task HandleClipboardChangedAsync_SkipsNotification_ForInternalClipboardWrite()
+    {
+        var repository = new FakeClipboardItemRepository();
+        var coordinator = new ClipboardCaptureCoordinator(
+            new FakeCaptureClipboardTextUseCase(),
+            new FakeCaptureClipboardImageUseCase(),
+            new ClipboardCleanupService(repository, new FakeFileStorage(), new ClipboardCleanupOptions()),
+            null,
+            TimeSpan.Zero);
+
+        var notificationService = new FakeNotificationService();
+        var state = new ClipboardCaptureState();
+        state.MarkInternalClipboardWrite();
+        var handler = new ClipboardCaptureNotificationHandler(coordinator, notificationService, repository, state);
+
+        await handler.HandleClipboardChangedAsync();
+
+        Assert.Null(notificationService.LastNotification);
     }
 
     private sealed class FakeCaptureClipboardTextUseCase : ICaptureClipboardTextUseCase
