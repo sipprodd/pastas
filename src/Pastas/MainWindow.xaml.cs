@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Documents;
 using System.Windows.Input;
 using Pastas.Domain.Enums;
 using Pastas.Application.Services;
@@ -169,12 +170,27 @@ public partial class MainWindow : Window
 
     private void Header_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
+        TryDragWindowFromMouseDown(e);
+    }
+
+    private void WindowSurface_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        TryDragWindowFromMouseDown(e);
+    }
+
+    private void TryDragWindowFromMouseDown(MouseButtonEventArgs e)
+    {
         if (e.LeftButton != MouseButtonState.Pressed)
         {
             return;
         }
 
-        if (e.OriginalSource is DependencyObject source && FindAncestor<System.Windows.Controls.Button>(source) is not null)
+        if (e.OriginalSource is not DependencyObject source)
+        {
+            return;
+        }
+
+        if (IsInteractiveDragSource(source))
         {
             return;
         }
@@ -182,20 +198,37 @@ public partial class MainWindow : Window
         DragMove();
     }
 
-    private static T? FindAncestor<T>(DependencyObject current) where T : DependencyObject
+    private static bool IsInteractiveDragSource(DependencyObject source)
     {
-        var node = current;
+        var node = source;
         while (node is not null)
         {
-            if (node is T match)
+            if (node is Button
+                or TextBox
+                or CheckBox
+                or RadioButton
+                or ComboBox
+                or ScrollBar
+                or ScrollViewer
+                or ListBox
+                or ListView
+                or MenuItem
+                or Hyperlink
+                or Image
+                or TextBlock)
             {
-                return match;
+                return true;
+            }
+
+            if (node is Popup)
+            {
+                return true;
             }
 
             node = System.Windows.Media.VisualTreeHelper.GetParent(node);
         }
 
-        return null;
+        return false;
     }
     private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
     {
