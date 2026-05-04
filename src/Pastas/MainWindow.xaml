@@ -131,12 +131,8 @@
             <Setter Property="BorderBrush" Value="{StaticResource SubtleBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Padding" Value="10,0,10,0" />
-            <Setter Property="ItemContainerStyle" Value="{StaticResource DarkComboBoxItemStyle}" />
             <Setter Property="HorizontalContentAlignment" Value="Left" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="PopupAnimation" Value="Fade" />
-            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
-            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
         </Style>
     </Window.Resources>
 

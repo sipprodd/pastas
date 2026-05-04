@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -106,7 +106,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private void OnPreviewKeyDown(object sender, KeyEventArgs e)
+    private void OnPreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {
         if (_viewModel is null)
         {
@@ -298,7 +298,7 @@ public partial class MainWindow : Window
 
         _isExiting = true;
         await CleanupAsync();
-        await Dispatcher.InvokeAsync(() => Application.Current.Shutdown());
+        await Dispatcher.InvokeAsync(() => System.Windows.Application.Current.Shutdown());
     }
 
     private async Task CleanupAsync()
@@ -445,3 +445,5 @@ public partial class MainWindow : Window
         }
     }
 }
+
+
