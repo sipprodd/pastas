@@ -250,7 +250,8 @@
         </Style>
 
         <Style x:Key="DarkScrollBarStyle" TargetType="ScrollBar">
-            <Setter Property="Width" Value="11" />
+            <Setter Property="Width" Value="12" />
+            <Setter Property="Height" Value="12" />
             <Setter Property="Background" Value="{DynamicResource ScrollbarTrackBrush}" />
             <Setter Property="Template">
                 <Setter.Value>
@@ -267,7 +268,18 @@
                                     <RepeatButton Command="ScrollBar.PageDownCommand" Style="{StaticResource DarkScrollBarRepeatButtonStyle}" IsTabStop="False" />
                                 </Track.IncreaseRepeatButton>
                             </Track>
-                        </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Orientation" Value="Horizontal">
+                                <Setter Property="Width" Value="Auto" />
+                                <Setter Property="Height" Value="12" />
+                                <Setter TargetName="PART_Track" Property="IsDirectionReversed" Value="False" />
+                            </Trigger>
+                            <Trigger Property="Orientation" Value="Vertical">
+                                <Setter Property="Width" Value="12" />
+                                <Setter Property="Height" Value="Auto" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -328,13 +340,18 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
                             <ScrollContentPresenter Grid.Column="0"
+                                                    Grid.Row="0"
                                                     Margin="{TemplateBinding Padding}"
                                                     CanContentScroll="{TemplateBinding CanContentScroll}" />
                             <ScrollBar Grid.Column="1"
+                                       Grid.Row="0"
                                        Margin="6,0,0,0"
                                        Orientation="Vertical"
-                                       Width="11"
                                        Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
                                        Value="{TemplateBinding VerticalOffset}"
                                        Minimum="0"
