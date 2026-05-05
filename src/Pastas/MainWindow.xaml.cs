@@ -27,6 +27,42 @@ namespace Pastas;
 
 public partial class MainWindow : Window
 {
+    private static readonly IReadOnlyDictionary<ThemeMode, IReadOnlyDictionary<string, string>> ThemePalettes = new Dictionary<ThemeMode, IReadOnlyDictionary<string, string>>
+    {
+        [ThemeMode.Chocolate] = new Dictionary<string, string>
+        {
+            ["ShellBrush"] = "#FF171613", ["SurfaceBrush"] = "#FF23201C", ["SurfaceElevatedBrush"] = "#FF2A2622",
+            ["CardBackgroundBrush"] = "#FF2A241F", ["CardHoverBackgroundBrush"] = "#FF342D26", ["CardSelectedBackgroundBrush"] = "#FF47392B",
+            ["SubtleBorderBrush"] = "#FF3F3932", ["HoverBorderBrush"] = "#FF6A5A4C", ["SelectedBorderBrush"] = "#FFCDAF7A",
+            ["SelectedAccentMarkerBrush"] = "#FFE8C47A", ["CreamTextBrush"] = "#FFF4EBDD", ["MutedTextBrush"] = "#FFC6B9A6",
+            ["AccentBrush"] = "#FFD1A764", ["PinnedBorderBrush"] = "#FFE1BC7A", ["InputBackgroundBrush"] = "#FF2A2622",
+            ["ButtonBackgroundBrush"] = "#FF2D2823", ["ButtonHoverBrush"] = "#FF373029", ["ButtonPressedBrush"] = "#FF221E1A",
+            ["SortPopupBackgroundBrush"] = "#FF2E2924", ["ScrollbarTrackBrush"] = "#FF1C1916", ["ScrollbarThumbBrush"] = "#FF625648",
+            ["ScrollbarThumbHoverBrush"] = "#FF766857", ["OverlayBrush"] = "#AA151310"
+        },
+        [ThemeMode.White] = new Dictionary<string, string>
+        {
+            ["ShellBrush"] = "#FFF5F3EF", ["SurfaceBrush"] = "#FFFFFFFF", ["SurfaceElevatedBrush"] = "#FFF8F7F4",
+            ["CardBackgroundBrush"] = "#FFFFFFFF", ["CardHoverBackgroundBrush"] = "#FFF4F1EC", ["CardSelectedBackgroundBrush"] = "#FFEDE6DC",
+            ["SubtleBorderBrush"] = "#FFD8D2C9", ["HoverBorderBrush"] = "#FFC8BDAE", ["SelectedBorderBrush"] = "#FFAE8E64",
+            ["SelectedAccentMarkerBrush"] = "#FFD1A764", ["CreamTextBrush"] = "#FF1E1A15", ["MutedTextBrush"] = "#FF655E57",
+            ["AccentBrush"] = "#FF8C6538", ["PinnedBorderBrush"] = "#FFB08957", ["InputBackgroundBrush"] = "#FFFFFFFF",
+            ["ButtonBackgroundBrush"] = "#FFF7F3ED", ["ButtonHoverBrush"] = "#FFEFE8DE", ["ButtonPressedBrush"] = "#FFE4D9CB",
+            ["SortPopupBackgroundBrush"] = "#FFFFFFFF", ["ScrollbarTrackBrush"] = "#FFEAE5DD", ["ScrollbarThumbBrush"] = "#FFC5B8A7",
+            ["ScrollbarThumbHoverBrush"] = "#FFAD9C87", ["OverlayBrush"] = "#99E7E1D7"
+        },
+        [ThemeMode.Black] = new Dictionary<string, string>
+        {
+            ["ShellBrush"] = "#FF000000", ["SurfaceBrush"] = "#FF050505", ["SurfaceElevatedBrush"] = "#FF0A0A0A",
+            ["CardBackgroundBrush"] = "#FF101010", ["CardHoverBackgroundBrush"] = "#FF191919", ["CardSelectedBackgroundBrush"] = "#FF25201A",
+            ["SubtleBorderBrush"] = "#FF2B2B2B", ["HoverBorderBrush"] = "#FF3B3B3B", ["SelectedBorderBrush"] = "#FFB18D58",
+            ["SelectedAccentMarkerBrush"] = "#FFE0B878", ["CreamTextBrush"] = "#FFF3F3F3", ["MutedTextBrush"] = "#FF9C9C9C",
+            ["AccentBrush"] = "#FFE0B878", ["PinnedBorderBrush"] = "#FFCFA568", ["InputBackgroundBrush"] = "#FF0F0F0F",
+            ["ButtonBackgroundBrush"] = "#FF111111", ["ButtonHoverBrush"] = "#FF1C1C1C", ["ButtonPressedBrush"] = "#FF080808",
+            ["SortPopupBackgroundBrush"] = "#FF111111", ["ScrollbarTrackBrush"] = "#FF090909", ["ScrollbarThumbBrush"] = "#FF3B3B3B",
+            ["ScrollbarThumbHoverBrush"] = "#FF585858", ["OverlayBrush"] = "#AA000000"
+        }
+    };
     private MainViewModel? _viewModel;
     private IDiagnosticsLogger _diagnosticsLogger;
     private ClipboardCaptureNotificationHandler? _clipboardCaptureNotificationHandler;
@@ -365,42 +401,9 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
 
     private void ApplyTheme(ThemeMode mode)
     {
-        var palette = mode switch
-        {
-            ThemeMode.White => new Dictionary<string, string>
-            {
-                ["ShellBrush"] = "#FFF5F3EF", ["SurfaceBrush"] = "#FFFFFFFF", ["SurfaceElevatedBrush"] = "#FFF8F7F4",
-                ["CardBackgroundBrush"] = "#FFFFFFFF", ["CardHoverBackgroundBrush"] = "#FFF4F1EC", ["CardSelectedBackgroundBrush"] = "#FFEDE6DC",
-                ["SubtleBorderBrush"] = "#FFD8D2C9", ["HoverBorderBrush"] = "#FFC8BDAE", ["SelectedBorderBrush"] = "#FFAE8E64",
-                ["SelectedAccentMarkerBrush"] = "#FFD1A764", ["CreamTextBrush"] = "#FF1E1A15", ["MutedTextBrush"] = "#FF655E57",
-                ["AccentBrush"] = "#FF8C6538", ["PinnedBorderBrush"] = "#FFB08957", ["InputBackgroundBrush"] = "#FFFFFFFF",
-                ["ButtonBackgroundBrush"] = "#FFF7F3ED", ["ButtonHoverBrush"] = "#FFEFE8DE", ["ButtonPressedBrush"] = "#FFE4D9CB",
-                ["SortPopupBackgroundBrush"] = "#FFFFFFFF", ["ScrollbarTrackBrush"] = "#FFEAE5DD", ["ScrollbarThumbBrush"] = "#FFC5B8A7",
-                ["ScrollbarThumbHoverBrush"] = "#FFAD9C87", ["OverlayBrush"] = "#99E7E1D7"
-            },
-            ThemeMode.Black => new Dictionary<string, string>
-            {
-                ["ShellBrush"] = "#FF000000", ["SurfaceBrush"] = "#FF050505", ["SurfaceElevatedBrush"] = "#FF0A0A0A",
-                ["CardBackgroundBrush"] = "#FF101010", ["CardHoverBackgroundBrush"] = "#FF191919", ["CardSelectedBackgroundBrush"] = "#FF25201A",
-                ["SubtleBorderBrush"] = "#FF2B2B2B", ["HoverBorderBrush"] = "#FF3B3B3B", ["SelectedBorderBrush"] = "#FFB18D58",
-                ["SelectedAccentMarkerBrush"] = "#FFE0B878", ["CreamTextBrush"] = "#FFF3F3F3", ["MutedTextBrush"] = "#FF9C9C9C",
-                ["AccentBrush"] = "#FFE0B878", ["PinnedBorderBrush"] = "#FFCFA568", ["InputBackgroundBrush"] = "#FF0F0F0F",
-                ["ButtonBackgroundBrush"] = "#FF111111", ["ButtonHoverBrush"] = "#FF1C1C1C", ["ButtonPressedBrush"] = "#FF080808",
-                ["SortPopupBackgroundBrush"] = "#FF111111", ["ScrollbarTrackBrush"] = "#FF090909", ["ScrollbarThumbBrush"] = "#FF3B3B3B",
-                ["ScrollbarThumbHoverBrush"] = "#FF585858", ["OverlayBrush"] = "#AA000000"
-            },
-            _ => new Dictionary<string, string>
-            {
-                ["ShellBrush"] = "#FF171613", ["SurfaceBrush"] = "#FF23201C", ["SurfaceElevatedBrush"] = "#FF2A2622",
-                ["CardBackgroundBrush"] = "#FF2A241F", ["CardHoverBackgroundBrush"] = "#FF342D26", ["CardSelectedBackgroundBrush"] = "#FF47392B",
-                ["SubtleBorderBrush"] = "#FF3F3932", ["HoverBorderBrush"] = "#FF6A5A4C", ["SelectedBorderBrush"] = "#FFCDAF7A",
-                ["SelectedAccentMarkerBrush"] = "#FFE8C47A", ["CreamTextBrush"] = "#FFF4EBDD", ["MutedTextBrush"] = "#FFC6B9A6",
-                ["AccentBrush"] = "#FFD1A764", ["PinnedBorderBrush"] = "#FFE1BC7A", ["InputBackgroundBrush"] = "#FF2A2622",
-                ["ButtonBackgroundBrush"] = "#FF2D2823", ["ButtonHoverBrush"] = "#FF373029", ["ButtonPressedBrush"] = "#FF221E1A",
-                ["SortPopupBackgroundBrush"] = "#FF2E2924", ["ScrollbarTrackBrush"] = "#FF1C1916", ["ScrollbarThumbBrush"] = "#FF625648",
-                ["ScrollbarThumbHoverBrush"] = "#FF766857", ["OverlayBrush"] = "#AA151310"
-            }
-        };
+        var palette = ThemePalettes.TryGetValue(mode, out var selectedPalette)
+            ? selectedPalette
+            : ThemePalettes[ThemeMode.Chocolate];
 
         foreach (var (key, colorHex) in palette)
         {
@@ -750,8 +753,8 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
             "Black" => ThemeMode.Black,
             _ => ThemeMode.Chocolate
         };
-
-        UpdateThemeChipSelection(_pendingThemeMode);
+        ApplyTheme(_pendingThemeMode);
+        HotkeyStatusText.Text = "Theme preview. Click Save to keep changes.";
     }
 
     private void UpdateThemeChipSelection(ThemeMode mode)
@@ -819,5 +822,15 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
         if (_settingsRepository is not null) await _settingsRepository.SaveAsync(_settings);
         UpdateStorageSummary();
     }
-}
 
+    private void BackSettings_OnClick(object sender, RoutedEventArgs e)
+    {
+        _pendingThemeMode = _settings.ThemeMode;
+        _pendingHotkey = _settings.Hotkey;
+        ApplyTheme(_settings.ThemeMode);
+        HotkeyTextBox.Text = _settings.Hotkey;
+        MaxItemsTextBox.Text = _settings.MaxItems.ToString(CultureInfo.InvariantCulture);
+        HotkeyStatusText.Text = string.Empty;
+        _viewModel?.CloseSettingsCommand.Execute(null);
+    }
+}
