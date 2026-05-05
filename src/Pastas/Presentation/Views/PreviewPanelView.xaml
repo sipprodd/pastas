@@ -24,9 +24,6 @@
                 <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto"
                               CanContentScroll="False">
-                    <ScrollViewer.Resources>
-                        <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource PastasScrollBarStyle}" />
-                    </ScrollViewer.Resources>
                     <StackPanel>
                         <StackPanel>
                             <StackPanel.Style>
@@ -91,3 +88,4 @@
         </Grid>
     </Border>
 </UserControl>
+
