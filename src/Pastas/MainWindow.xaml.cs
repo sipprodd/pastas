@@ -44,23 +44,23 @@ public partial class MainWindow : Window
         {
             ["ShellBrush"] = "#FFF5F3EF", ["SurfaceBrush"] = "#FFFFFFFF", ["SurfaceElevatedBrush"] = "#FFF8F7F4",
             ["CardBackgroundBrush"] = "#FFFFFFFF", ["CardHoverBackgroundBrush"] = "#FFF2F5FA", ["CardSelectedBackgroundBrush"] = "#FFE8EEF7",
-            ["SubtleBorderBrush"] = "#FFD8DDE6", ["HoverBorderBrush"] = "#FFA9B8CC", ["SelectedBorderBrush"] = "#FF2F3B4F",
-            ["SelectedAccentMarkerBrush"] = "#FF2F3B4F", ["CreamTextBrush"] = "#FF1A202C", ["MutedTextBrush"] = "#FF5D6778",
-            ["AccentBrush"] = "#FF2F3B4F", ["PinnedBorderBrush"] = "#FF6E809A", ["InputBackgroundBrush"] = "#FFFFFFFF",
+            ["SubtleBorderBrush"] = "#FFD8DDE6", ["HoverBorderBrush"] = "#FFA9B8CC", ["SelectedBorderBrush"] = "#FF111111",
+            ["SelectedAccentMarkerBrush"] = "#FF111111", ["CreamTextBrush"] = "#FF1A202C", ["MutedTextBrush"] = "#FF5D6778",
+            ["AccentBrush"] = "#FF111111", ["PinnedBorderBrush"] = "#FF111111", ["InputBackgroundBrush"] = "#FFFFFFFF",
             ["ButtonBackgroundBrush"] = "#FFF7F3ED", ["ButtonHoverBrush"] = "#FFEFE8DE", ["ButtonPressedBrush"] = "#FFE4D9CB",
-            ["SortPopupBackgroundBrush"] = "#FFFFFFFF", ["ScrollbarTrackBrush"] = "#FFE6EBF2", ["ScrollbarThumbBrush"] = "#FF8A98AD",
-            ["ScrollbarThumbHoverBrush"] = "#FF6D7E96", ["OverlayBrush"] = "#99E7EAF0"
+            ["SortPopupBackgroundBrush"] = "#FFFFFFFF", ["ScrollbarTrackBrush"] = "#FFE6EBF2", ["ScrollbarThumbBrush"] = "#FF5F6368",
+            ["ScrollbarThumbHoverBrush"] = "#FF111111", ["OverlayBrush"] = "#99E7EAF0"
         },
         [ThemeMode.Black] = new Dictionary<string, string>
         {
             ["ShellBrush"] = "#FF000000", ["SurfaceBrush"] = "#FF050505", ["SurfaceElevatedBrush"] = "#FF0A0A0A",
             ["CardBackgroundBrush"] = "#FF101214", ["CardHoverBackgroundBrush"] = "#FF171D22", ["CardSelectedBackgroundBrush"] = "#FF102636",
-            ["SubtleBorderBrush"] = "#FF232A31", ["HoverBorderBrush"] = "#FF35505F", ["SelectedBorderBrush"] = "#FF79C8F2",
-            ["SelectedAccentMarkerBrush"] = "#FF79C8F2", ["CreamTextBrush"] = "#FFF3F7FA", ["MutedTextBrush"] = "#FF9AA8B5",
-            ["AccentBrush"] = "#FF79C8F2", ["PinnedBorderBrush"] = "#FF5AA5CD", ["InputBackgroundBrush"] = "#FF0D1013",
+            ["SubtleBorderBrush"] = "#FF232A31", ["HoverBorderBrush"] = "#FF35505F", ["SelectedBorderBrush"] = "#FFFFFFFF",
+            ["SelectedAccentMarkerBrush"] = "#FFFFFFFF", ["CreamTextBrush"] = "#FFF3F7FA", ["MutedTextBrush"] = "#FF9AA8B5",
+            ["AccentBrush"] = "#FFFFFFFF", ["PinnedBorderBrush"] = "#FFECEFF1", ["InputBackgroundBrush"] = "#FF0D1013",
             ["ButtonBackgroundBrush"] = "#FF111111", ["ButtonHoverBrush"] = "#FF1C1C1C", ["ButtonPressedBrush"] = "#FF080808",
-            ["SortPopupBackgroundBrush"] = "#FF111111", ["ScrollbarTrackBrush"] = "#FF080D12", ["ScrollbarThumbBrush"] = "#FF2E5E76",
-            ["ScrollbarThumbHoverBrush"] = "#FF3F7FA0", ["OverlayBrush"] = "#AA000000"
+            ["SortPopupBackgroundBrush"] = "#FF111111", ["ScrollbarTrackBrush"] = "#FF080D12", ["ScrollbarThumbBrush"] = "#FFB0BEC5",
+            ["ScrollbarThumbHoverBrush"] = "#FFFFFFFF", ["OverlayBrush"] = "#AA000000"
         }
     };
     private MainViewModel? _viewModel;
@@ -418,8 +418,8 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
         if (_viewModel is null) return;
         var total = _viewModel.Items.Count;
         var pinned = _viewModel.Items.Count(x => x.IsPinned);
-        var images = _viewModel.Items.Count(x => x.Kind == ClipboardItemKind.Image);
-        var approx = _viewModel.Items.Sum(x => (x.ContentPreview?.Length ?? 0) * 2) / (1024d * 1024d);
+        var images = _viewModel.Items.Count(x => x.IsImage);
+        var approx = _viewModel.Items.Sum(x => ((x.PreviewText?.Length ?? 0) + (x.PreviewBodyText?.Length ?? 0)) * 2) / (1024d * 1024d);
         StorageSummaryText.Text = $"Total items: {total}\nPinned: {pinned}\nImages: {images}\nApprox. usage: {approx:F2} MB";
     }
 
@@ -726,7 +726,7 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
         }
     }
 
-    private void CaptureHotkey_OnPreviewKeyDown(object sender, KeyEventArgs e)
+    private void CaptureHotkey_OnPreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {
         e.Handled = true;
         if (e.Key is Key.LeftAlt or Key.RightAlt or Key.LeftCtrl or Key.RightCtrl or Key.LeftShift or Key.RightShift or Key.LWin or Key.RWin) return;
@@ -746,7 +746,7 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
 
     private void ThemeChip_OnClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not Button { Tag: string tag }) return;
+        if (sender is not System.Windows.Controls.Button { Tag: string tag }) return;
         _pendingThemeMode = tag switch
         {
             "White" => ThemeMode.White,
@@ -764,7 +764,7 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
         StyleThemeChip(ThemeBlackButton, mode == ThemeMode.Black);
     }
 
-    private void StyleThemeChip(Button button, bool isSelected)
+    private void StyleThemeChip(System.Windows.Controls.Button button, bool isSelected)
     {
         if (button is null) return;
         button.Background = (System.Windows.Media.Brush)FindResource(isSelected ? "CardSelectedBackgroundBrush" : "ButtonBackgroundBrush");

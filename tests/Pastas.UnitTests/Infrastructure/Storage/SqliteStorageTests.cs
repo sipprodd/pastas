@@ -202,7 +202,7 @@ public sealed class SqliteStorageTests : IDisposable
         {
             Hotkey = "Ctrl+Shift+V",
             MaxItems = 999,
-            ThemeMode = ThemeMode.Dark,
+            ThemeMode = ThemeMode.Black,
             NotificationsEnabled = false
         };
 
@@ -211,7 +211,7 @@ public sealed class SqliteStorageTests : IDisposable
 
         Assert.Equal("Ctrl+Shift+V", loaded.Hotkey);
         Assert.Equal(999, loaded.MaxItems);
-        Assert.Equal(ThemeMode.Dark, loaded.ThemeMode);
+        Assert.Equal(ThemeMode.Black, loaded.ThemeMode);
         Assert.False(loaded.NotificationsEnabled);
     }
 
