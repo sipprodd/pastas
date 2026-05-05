@@ -1,5 +1,4 @@
 using System.Drawing;
-using System.Windows.Forms;
 using Pastas.Application.Services;
 
 namespace Pastas.Infrastructure.Tray;
@@ -11,6 +10,7 @@ public sealed class WindowsTrayService : ITrayService
     private bool _isStarted;
 
     public event EventHandler? ShowRequested;
+    public event EventHandler? SettingsRequested;
     public event EventHandler? ExitRequested;
 
     public WindowsTrayService(IDiagnosticsLogger? diagnosticsLogger = null)
@@ -27,19 +27,22 @@ public sealed class WindowsTrayService : ITrayService
 
         try
         {
-            var menu = new ContextMenuStrip();
-            menu.Items.Add("Open Pastas", null, (_, _) => ShowRequested?.Invoke(this, EventArgs.Empty));
+            var menu = new System.Windows.Forms.ContextMenuStrip();
+            menu.Items.Add("Open", null, (_, _) => ShowRequested?.Invoke(this, EventArgs.Empty));
+            menu.Items.Add("Settings", null, (_, _) => SettingsRequested?.Invoke(this, EventArgs.Empty));
             menu.Items.Add("Exit", null, (_, _) => ExitRequested?.Invoke(this, EventArgs.Empty));
 
-            _notifyIcon = new NotifyIcon
+            var icon = Icon.ExtractAssociatedIcon(Environment.ProcessPath ?? string.Empty) ?? SystemIcons.Application;
+
+            _notifyIcon = new System.Windows.Forms.NotifyIcon
             {
                 Text = "Pastas",
-                Icon = SystemIcons.Application,
+                Icon = icon,
                 ContextMenuStrip = menu,
                 Visible = true
             };
 
-            _notifyIcon.DoubleClick += OnNotifyIconDoubleClick;
+            _notifyIcon.MouseClick += OnNotifyIconMouseClick;
             _isStarted = true;
             _diagnosticsLogger?.Info("Tray started.");
         }
@@ -58,7 +61,7 @@ public sealed class WindowsTrayService : ITrayService
             return;
         }
 
-        _notifyIcon.DoubleClick -= OnNotifyIconDoubleClick;
+        _notifyIcon.MouseClick -= OnNotifyIconMouseClick;
         _notifyIcon.Visible = false;
 
         if (_notifyIcon.ContextMenuStrip is not null)
@@ -84,8 +87,11 @@ public sealed class WindowsTrayService : ITrayService
         GC.SuppressFinalize(this);
     }
 
-    private void OnNotifyIconDoubleClick(object? sender, EventArgs e)
+    private void OnNotifyIconMouseClick(object? sender, System.Windows.Forms.MouseEventArgs e)
     {
-        ShowRequested?.Invoke(this, EventArgs.Empty);
+        if (e.Button == System.Windows.Forms.MouseButtons.Left)
+        {
+            ShowRequested?.Invoke(this, EventArgs.Empty);
+        }
     }
 }

@@ -26,39 +26,46 @@ public sealed class WindowsHotkeyService : IHotkeyService, IGlobalHotkeyService
 
     public Task RegisterAsync(string hotkey, CancellationToken cancellationToken = default)
     {
-        if (_isRegistered)
-        {
-            return Task.CompletedTask;
-        }
+        return TryRegisterAsync(hotkey, cancellationToken);
+    }
 
+    public Task<bool> TryRegisterAsync(string hotkey, CancellationToken cancellationToken = default)
+    {
         if (!HotkeyGestureParser.TryParse(hotkey, out var modifiers, out var virtualKey))
         {
             _diagnosticsLogger?.Warning("Hotkey register skipped: parse failed.");
-            return Task.CompletedTask;
+            return Task.FromResult(false);
         }
 
         var handle = new WindowInteropHelper(_window).Handle;
         if (handle == IntPtr.Zero)
         {
             _diagnosticsLogger?.Warning("Hotkey register skipped: window handle unavailable.");
-            return Task.CompletedTask;
+            return Task.FromResult(false);
+        }
+
+        if (_isRegistered)
+        {
+            UnregisterHotKey(handle, HotkeyId);
+            _source?.RemoveHook(WndProc);
+            _source = null;
+            _isRegistered = false;
         }
 
         _source = HwndSource.FromHwnd(handle);
         _source?.AddHook(WndProc);
-
         var registered = RegisterHotKey(handle, HotkeyId, modifiers, virtualKey);
         if (!registered)
         {
             _source?.RemoveHook(WndProc);
             _source = null;
             _diagnosticsLogger?.Warning("Hotkey register failed: RegisterHotKey returned false.");
-            return Task.CompletedTask;
+            return Task.FromResult(false);
         }
 
         _isRegistered = true;
         _diagnosticsLogger?.Info("Hotkey registered.");
-        return Task.CompletedTask;
+        return Task.FromResult(true);
     }
 
     public Task UnregisterAsync(CancellationToken cancellationToken = default)
