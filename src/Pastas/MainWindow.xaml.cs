@@ -308,6 +308,10 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
             {
                 _trayService.ShowRequested += OnTrayShowRequestedAsync;
                 _trayService.ExitRequested += OnTrayExitRequestedAsync;
+                if (_trayService is WindowsTrayService windowsTrayService)
+                {
+                    windowsTrayService.SettingsRequested += OnTraySettingsRequestedAsync;
+                }
             }
             _diagnosticsLogger.Info("MainWindow loaded: after tray event subscription.");
 
@@ -366,13 +370,13 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
             _ => ("#FF171613", "#FF23201C", "#FF2A2622", "#FF3F3932", "#FFF4EBDD", "#FFC6B9A6", "#FFD1A764")
         };
 
-        ((System.Windows.Media.SolidColorBrush)Resources["ShellBrush"]).Color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(map.Item1);
-        ((System.Windows.Media.SolidColorBrush)Resources["SurfaceBrush"]).Color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(map.Item2);
-        ((System.Windows.Media.SolidColorBrush)Resources["SurfaceElevatedBrush"]).Color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(map.Item3);
-        ((System.Windows.Media.SolidColorBrush)Resources["SubtleBorderBrush"]).Color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(map.Item4);
-        ((System.Windows.Media.SolidColorBrush)Resources["CreamTextBrush"]).Color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(map.Item5);
-        ((System.Windows.Media.SolidColorBrush)Resources["MutedTextBrush"]).Color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(map.Item6);
-        ((System.Windows.Media.SolidColorBrush)Resources["AccentBrush"]).Color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(map.Item7);
+        Resources["ShellBrush"] = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(map.Item1));
+        Resources["SurfaceBrush"] = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(map.Item2));
+        Resources["SurfaceElevatedBrush"] = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(map.Item3));
+        Resources["SubtleBorderBrush"] = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(map.Item4));
+        Resources["CreamTextBrush"] = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(map.Item5));
+        Resources["MutedTextBrush"] = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(map.Item6));
+        Resources["AccentBrush"] = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(map.Item7));
     }
 
     private void UpdateStorageSummary()
@@ -407,7 +411,12 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
 
     private async void OnTrayShowRequestedAsync(object? sender, EventArgs e)
     {
-        await ShowWindowAsync();
+        await ToggleWindowVisibilityAsync();
+    }
+
+    private async void OnTraySettingsRequestedAsync(object? sender, EventArgs e)
+    {
+        await ShowWindowAsync(openSettings: true);
     }
 
     private async void OnTrayExitRequestedAsync(object? sender, EventArgs e)
@@ -474,7 +483,7 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
         }
     }
 
-    private async Task ShowWindowAsync()
+    private async Task ShowWindowAsync(bool openSettings = false)
     {
         await Dispatcher.InvokeAsync(() =>
         {
@@ -490,6 +499,11 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
             }
 
             Activate();
+
+            if (openSettings)
+            {
+                _viewModel?.OpenSettings();
+            }
         });
 
         if (_viewModel is not null)
@@ -553,6 +567,10 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
         {
             _trayService.ShowRequested -= OnTrayShowRequestedAsync;
             _trayService.ExitRequested -= OnTrayExitRequestedAsync;
+            if (_trayService is WindowsTrayService windowsTrayService)
+            {
+                windowsTrayService.SettingsRequested -= OnTraySettingsRequestedAsync;
+            }
             _trayService.Stop();
             _trayService.Dispose();
         }
@@ -695,26 +713,34 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
     private async void SaveSettings_OnClick(object sender, RoutedEventArgs e)
     {
         var previous = _settings.Hotkey;
-        if (!int.TryParse(MaxItemsTextBox.Text, out var maxItems) || maxItems < 50) maxItems = 200;
-        var newTheme = ThemeComboBox.SelectedIndex switch { 1 => ThemeMode.White, 2 => ThemeMode.Black, _ => ThemeMode.Chocolate };
-        ApplyTheme(newTheme);
-
-        if (_hotkeyService is not null)
+        if (!int.TryParse(MaxItemsTextBox.Text, out var maxItems) || maxItems <= 0)
         {
-            await _hotkeyService.UnregisterAsync();
-            await _hotkeyService.RegisterAsync(_pendingHotkey);
-            // parser-valid only, if fails fallback
-            if (!HotkeyGestureParser.TryParse(_pendingHotkey, out _, out _))
+            HotkeyStatusText.Text = "Max items must be a positive number.";
+            return;
+        }
+        var newTheme = ThemeComboBox.SelectedIndex switch { 1 => ThemeMode.White, 2 => ThemeMode.Black, _ => ThemeMode.Chocolate };
+
+        if (!HotkeyGestureParser.TryParse(_pendingHotkey, out _, out _))
+        {
+            HotkeyStatusText.Text = "Invalid hotkey. Previous hotkey kept.";
+            _pendingHotkey = previous;
+            return;
+        }
+
+        if (_hotkeyService is WindowsHotkeyService windowsHotkeyService)
+        {
+            var applied = await windowsHotkeyService.TryRegisterAsync(_pendingHotkey);
+            if (!applied)
             {
-                await _hotkeyService.RegisterAsync(previous);
-                HotkeyStatusText.Text = "Invalid hotkey. Previous hotkey kept.";
+                await windowsHotkeyService.TryRegisterAsync(previous);
                 _pendingHotkey = previous;
-            }
-            else
-            {
-                HotkeyStatusText.Text = "Hotkey applied.";
+                HotkeyStatusText.Text = "Could not register hotkey.";
+                return;
             }
         }
+
+        ApplyTheme(newTheme);
+        HotkeyStatusText.Text = "Settings saved.";
 
         _settings = new AppSettings
         {

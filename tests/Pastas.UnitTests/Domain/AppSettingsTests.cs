@@ -21,6 +21,6 @@ public class AppSettingsTests
         Assert.Equal(10, settings.RevealProtectedSeconds);
         Assert.False(settings.ClearProtectedClipboardAfterDelay);
         Assert.Equal(60, settings.ClearProtectedClipboardDelaySeconds);
-        Assert.Equal(ThemeMode.System, settings.ThemeMode);
+        Assert.Equal(ThemeMode.Chocolate, settings.ThemeMode);
     }
 }
