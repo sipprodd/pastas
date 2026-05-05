@@ -8,22 +8,11 @@
              d:DesignWidth="640">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
-        <SolidColorBrush x:Key="CardBackgroundBrush" Color="#FF2A241F" />
-        <SolidColorBrush x:Key="CardHoverBackgroundBrush" Color="#FF342D26" />
-        <SolidColorBrush x:Key="CardSelectedBackgroundBrush" Color="#FF47392B" />
-        <SolidColorBrush x:Key="SubtleBorderBrush" Color="#FF4A4036" />
-        <SolidColorBrush x:Key="HoverBorderBrush" Color="#FF6A5A4C" />
-        <SolidColorBrush x:Key="SelectedBorderBrush" Color="#FFCDAF7A" />
-        <SolidColorBrush x:Key="SelectedAccentMarkerBrush" Color="#FFE8C47A" />
-        <SolidColorBrush x:Key="CreamTextBrush" Color="#FFF4EBDD" />
-        <SolidColorBrush x:Key="MutedTextBrush" Color="#FFC6B9A6" />
-        <SolidColorBrush x:Key="AccentBrush" Color="#FFD1A764" />
-        <SolidColorBrush x:Key="PinnedBorderBrush" Color="#FFE7C982" />
 
         <Style x:Key="CardSelectButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource CreamTextBrush}" />
             <Setter Property="HorizontalContentAlignment" Value="Left" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="Padding" Value="0" />
@@ -47,7 +36,7 @@
             <Setter Property="FontSize" Value="11" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource CreamTextBrush}" />
             <Setter Property="Background" Value="#FF2F2822" />
             <Setter Property="BorderBrush" Value="#FF55493E" />
             <Setter Property="BorderThickness" Value="1" />
@@ -69,10 +58,10 @@
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="IconButtonBorder" Property="Background" Value="#FF251F1A" />
-                                <Setter TargetName="IconButtonBorder" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                                <Setter TargetName="IconButtonBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
                             </Trigger>
                             <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="IconButtonBorder" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                                <Setter TargetName="IconButtonBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
                                 <Setter TargetName="IconButtonBorder" Property="Background" Value="#FF352D25" />
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -82,29 +71,29 @@
         </Style>
     </UserControl.Resources>
 
-    <Border x:Name="ItemCard" Margin="0,0,0,8" Padding="12,10" CornerRadius="14" MinHeight="78" Background="{StaticResource CardBackgroundBrush}" BorderBrush="{StaticResource SubtleBorderBrush}" BorderThickness="1">
+    <Border x:Name="ItemCard" Margin="0,0,0,8" Padding="12,10" CornerRadius="14" MinHeight="78" Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource SubtleBorderBrush}" BorderThickness="1">
         <Border.Style>
             <Style TargetType="Border">
-                <Setter Property="BorderBrush" Value="{StaticResource SubtleBorderBrush}" />
-                <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource SubtleBorderBrush}" />
+                <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
                 <Setter Property="BorderThickness" Value="1" />
                 <Style.Triggers>
                     <Trigger Property="IsMouseOver" Value="True">
-                        <Setter Property="Background" Value="{StaticResource CardHoverBackgroundBrush}" />
-                        <Setter Property="BorderBrush" Value="{StaticResource HoverBorderBrush}" />
+                        <Setter Property="Background" Value="{DynamicResource CardHoverBackgroundBrush}" />
+                        <Setter Property="BorderBrush" Value="{DynamicResource HoverBorderBrush}" />
                     </Trigger>
                     <DataTrigger Binding="{Binding IsPinned}" Value="True">
-                        <Setter Property="BorderBrush" Value="{StaticResource PinnedBorderBrush}" />
+                        <Setter Property="BorderBrush" Value="{DynamicResource PinnedBorderBrush}" />
                         <Setter Property="BorderThickness" Value="1" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                        <Setter Property="Background" Value="{StaticResource CardSelectedBackgroundBrush}" />
-                        <Setter Property="BorderBrush" Value="{StaticResource SelectedBorderBrush}" />
+                        <Setter Property="Background" Value="{DynamicResource CardSelectedBackgroundBrush}" />
+                        <Setter Property="BorderBrush" Value="{DynamicResource SelectedBorderBrush}" />
                         <Setter Property="BorderThickness" Value="1" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding ElementName=CardSelectButton, Path=IsKeyboardFocusWithin}" Value="True">
-                        <Setter Property="Background" Value="{StaticResource CardSelectedBackgroundBrush}" />
-                        <Setter Property="BorderBrush" Value="{StaticResource SelectedBorderBrush}" />
+                        <Setter Property="Background" Value="{DynamicResource CardSelectedBackgroundBrush}" />
+                        <Setter Property="BorderBrush" Value="{DynamicResource SelectedBorderBrush}" />
                         <Setter Property="BorderThickness" Value="1" />
                     </DataTrigger>
                     <MultiDataTrigger>
@@ -150,8 +139,8 @@
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
                         CornerRadius="3"
-                        Background="{StaticResource SelectedAccentMarkerBrush}"
-                        Visibility="{Binding IsSelected, Converter={StaticResource BoolToVisibility}}"
+                        Background="{DynamicResource SelectedAccentMarkerBrush}"
+                        Visibility="{Binding IsSelected, Converter={DynamicResource BoolToVisibility}}"
                         Margin="-7,0,0,0" />
             </Grid>
 
@@ -159,8 +148,8 @@
                 <Border Width="40"
                         Height="40"
                         CornerRadius="10"
-                        Background="#FF1F1A15"
-                        BorderBrush="#FF4E4339"
+                        Background="{DynamicResource InputBackgroundBrush}"
+                        BorderBrush="{DynamicResource SubtleBorderBrush}"
                         BorderThickness="1"
                         ClipToBounds="True">
                     <Grid>
@@ -178,7 +167,7 @@
                         </Image>
                         <TextBlock HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
-                                   Foreground="{StaticResource AccentBrush}"
+                                   Foreground="{DynamicResource AccentBrush}"
                                    FontSize="14"
                                    FontWeight="SemiBold">
                             <TextBlock.Style>
@@ -203,22 +192,22 @@
                         HorizontalAlignment="Right"
                         VerticalAlignment="Top"
                         Margin="0,-2,-2,0"
-                        Background="#FF1F1A15"
-                        BorderBrush="#FF5E513F"
+                        Background="{DynamicResource InputBackgroundBrush}"
+                        BorderBrush="{DynamicResource PinnedBorderBrush}"
                         BorderThickness="1"
-                        Visibility="{Binding IsPinned, Converter={StaticResource BoolToVisibility}}">
+                        Visibility="{Binding IsPinned, Converter={DynamicResource BoolToVisibility}}">
                     <TextBlock Text="P"
                                FontSize="8"
                                FontWeight="Bold"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center"
-                               Foreground="{StaticResource AccentBrush}" />
+                               Foreground="{DynamicResource AccentBrush}" />
                 </Border>
             </Grid>
 
             <Button x:Name="CardSelectButton"
                     Grid.Column="1"
-                    Style="{StaticResource CardSelectButtonStyle}"
+                    Style="{DynamicResource CardSelectButtonStyle}"
                     HorizontalContentAlignment="Left"
                     Command="{Binding DataContext.SelectItemCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                     CommandParameter="{Binding}">
@@ -227,7 +216,7 @@
                     <MouseBinding Gesture="LeftDoubleClick" Command="{Binding DataContext.CopyItemCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
                 </Button.InputBindings>
                 <StackPanel Margin="2,0,8,0" VerticalAlignment="Center">
-                    <TextBlock Text="{Binding PreviewText}" Foreground="{StaticResource CreamTextBrush}" FontSize="13" Margin="0,0,0,4" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" MaxHeight="20" />
+                    <TextBlock Text="{Binding PreviewText}" Foreground="{DynamicResource CreamTextBrush}" FontSize="13" Margin="0,0,0,4" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" MaxHeight="20" />
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{Binding SourceLabel}"
                                    FontSize="11"
@@ -236,17 +225,17 @@
                                    MaxWidth="240">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
-                                    <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}" />
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding SourceLabel}" Value="Unknown source">
-                                            <Setter Property="Foreground" Value="#FF958979" />
+                                            <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </TextBlock.Style>
                         </TextBlock>
-                        <TextBlock Text=" · " Foreground="{StaticResource MutedTextBrush}" FontSize="11" />
-                        <TextBlock Text="{Binding TimeLabel}" Foreground="{StaticResource MutedTextBrush}" FontSize="11" TextWrapping="NoWrap" />
+                        <TextBlock Text=" · " Foreground="{DynamicResource MutedTextBrush}" FontSize="11" />
+                        <TextBlock Text="{Binding TimeLabel}" Foreground="{DynamicResource MutedTextBrush}" FontSize="11" TextWrapping="NoWrap" />
                     </StackPanel>
                 </StackPanel>
             </Button>
@@ -256,11 +245,11 @@
                         Orientation="Horizontal"
                         VerticalAlignment="Center"
                         Margin="8,0,0,0"
-                        Visibility="{Binding ElementName=ItemCard, Path=IsMouseOver, Converter={StaticResource BoolToVisibility}}">
-                <Button Content="View" ToolTip="Preview" Style="{StaticResource CardActionIconButtonStyle}" Command="{Binding DataContext.OpenPreviewCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                        Visibility="{Binding ElementName=ItemCard, Path=IsMouseOver, Converter={DynamicResource BoolToVisibility}}">
+                <Button Content="View" ToolTip="Preview" Style="{DynamicResource CardActionIconButtonStyle}" Command="{Binding DataContext.OpenPreviewCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
                 <Button ToolTip="Pin or unpin" MinWidth="60" Command="{Binding DataContext.TogglePinCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}">
                     <Button.Style>
-                        <Style TargetType="Button" BasedOn="{StaticResource CardActionIconButtonStyle}">
+                        <Style TargetType="Button" BasedOn="{DynamicResource CardActionIconButtonStyle}">
                             <Setter Property="Content" Value="Pin" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsPinned}" Value="True">
@@ -270,7 +259,7 @@
                         </Style>
                     </Button.Style>
                 </Button>
-                <Button Content="Del" ToolTip="Delete" Style="{StaticResource CardActionIconButtonStyle}" Command="{Binding DataContext.DeleteItemCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                <Button Content="Del" ToolTip="Delete" Style="{DynamicResource CardActionIconButtonStyle}" Command="{Binding DataContext.DeleteItemCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
             </StackPanel>
         </Grid>
     </Border>

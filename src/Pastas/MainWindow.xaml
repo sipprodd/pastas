@@ -25,10 +25,25 @@
         <SolidColorBrush x:Key="MutedTextBrush" Color="#FFC6B9A6" />
         <SolidColorBrush x:Key="AccentBrush" Color="#FFD1A764" />
         <SolidColorBrush x:Key="PinnedBorderBrush" Color="#FFE1BC7A" />
+        <SolidColorBrush x:Key="CardBackgroundBrush" Color="#FF2A241F" />
+        <SolidColorBrush x:Key="CardHoverBackgroundBrush" Color="#FF342D26" />
+        <SolidColorBrush x:Key="CardSelectedBackgroundBrush" Color="#FF47392B" />
+        <SolidColorBrush x:Key="HoverBorderBrush" Color="#FF6A5A4C" />
+        <SolidColorBrush x:Key="SelectedBorderBrush" Color="#FFCDAF7A" />
+        <SolidColorBrush x:Key="SelectedAccentMarkerBrush" Color="#FFE8C47A" />
+        <SolidColorBrush x:Key="InputBackgroundBrush" Color="#FF2A2622" />
+        <SolidColorBrush x:Key="ButtonBackgroundBrush" Color="#FF2D2823" />
+        <SolidColorBrush x:Key="ButtonHoverBrush" Color="#FF373029" />
+        <SolidColorBrush x:Key="ButtonPressedBrush" Color="#FF221E1A" />
+        <SolidColorBrush x:Key="SortPopupBackgroundBrush" Color="#FF2E2924" />
+        <SolidColorBrush x:Key="ScrollbarTrackBrush" Color="#FF1C1916" />
+        <SolidColorBrush x:Key="ScrollbarThumbBrush" Color="#FF625648" />
+        <SolidColorBrush x:Key="ScrollbarThumbHoverBrush" Color="#FF766857" />
+        <SolidColorBrush x:Key="OverlayBrush" Color="#AA151310" />
 
         <Style x:Key="ChipButtonStyle" TargetType="Button">
             <Setter Property="Height" Value="34" />
-            <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource CreamTextBrush}" />
             <Setter Property="Background" Value="#FF2D2823" />
             <Setter Property="BorderBrush" Value="#FF4B433A" />
             <Setter Property="BorderThickness" Value="1" />
@@ -69,13 +84,13 @@
 
         <Style x:Key="RoundedTextBoxStyle" TargetType="TextBox">
             <Setter Property="Height" Value="33" />
-            <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
-            <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
-            <Setter Property="BorderBrush" Value="{StaticResource SubtleBorderBrush}" />
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource CreamTextBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SubtleBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Padding" Value="12,6" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="CaretBrush" Value="{StaticResource CreamTextBrush}" />
+            <Setter Property="CaretBrush" Value="{DynamicResource CreamTextBrush}" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
@@ -88,7 +103,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="SearchBorder" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                                <Setter TargetName="SearchBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -99,7 +114,7 @@
         <Style x:Key="CardSelectButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource CreamTextBrush}" />
             <Setter Property="HorizontalContentAlignment" Value="Left" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="Padding" Value="0" />
@@ -121,9 +136,9 @@
             <Setter Property="Padding" Value="0" />
             <Setter Property="FontSize" Value="11" />
             <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource CreamTextBrush}" />
             <Setter Property="Background" Value="#FF2C2823" />
-            <Setter Property="BorderBrush" Value="{StaticResource SubtleBorderBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SubtleBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Template">
                 <Setter.Value>
@@ -142,10 +157,10 @@
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="IconButtonBorder" Property="Background" Value="#FF231F1B" />
-                                <Setter TargetName="IconButtonBorder" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                                <Setter TargetName="IconButtonBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
                             </Trigger>
                             <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="IconButtonBorder" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                                <Setter TargetName="IconButtonBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -156,7 +171,7 @@
         <Style x:Key="SortMenuButtonStyle" TargetType="Button">
             <Setter Property="Width" Value="170" />
             <Setter Property="Height" Value="34" />
-            <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource CreamTextBrush}" />
             <Setter Property="Background" Value="#FF302A24" />
             <Setter Property="BorderBrush" Value="#FF665A4D" />
             <Setter Property="BorderThickness" Value="1" />
@@ -234,7 +249,7 @@
                                     <RepeatButton Command="ScrollBar.PageUpCommand" Opacity="0" IsTabStop="False" />
                                 </Track.DecreaseRepeatButton>
                                 <Track.Thumb>
-                                    <Thumb Style="{StaticResource DarkScrollBarThumbStyle}" MinHeight="28" />
+                                    <Thumb Style="{DynamicResource DarkScrollBarThumbStyle}" MinHeight="28" />
                                 </Track.Thumb>
                                 <Track.IncreaseRepeatButton>
                                     <RepeatButton Command="ScrollBar.PageDownCommand" Opacity="0" IsTabStop="False" />
@@ -248,7 +263,7 @@
 
         <Style x:Key="SortMenuItemButtonStyle" TargetType="Button">
             <Setter Property="Height" Value="30" />
-            <Setter Property="Foreground" Value="{StaticResource CreamTextBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource CreamTextBrush}" />
             <Setter Property="Background" Value="#FF2C2722" />
             <Setter Property="BorderBrush" Value="Transparent" />
             <Setter Property="BorderThickness" Value="1" />
@@ -283,10 +298,14 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+                <Style x:Key="ThemeChipButtonStyle" TargetType="Button" BasedOn="{DynamicResource ChipButtonStyle}">
+            <Setter Property="Margin" Value="0,0,8,0" />
+            <Setter Property="Padding" Value="14,0" />
         </Style>
+
     </Window.Resources>
 
-    <Border CornerRadius="22" Background="{StaticResource ShellBrush}" BorderBrush="#FF3A342D" BorderThickness="1" Padding="16" MouseLeftButtonDown="WindowSurface_OnMouseLeftButtonDown">
+    <Border CornerRadius="22" Background="{DynamicResource ShellBrush}" BorderBrush="{DynamicResource SubtleBorderBrush}" BorderThickness="1" Padding="16" MouseLeftButtonDown="WindowSurface_OnMouseLeftButtonDown">
         <Grid Width="660">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -299,19 +318,19 @@
             <Grid Grid.Row="0" Margin="0,0,0,10" MouseLeftButtonDown="Header_OnMouseLeftButtonDown">
                 <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="pastas" FontSize="24" FontWeight="SemiBold" Foreground="{StaticResource CreamTextBrush}" />
-                    <TextBlock Text="clipboard" Margin="8,0,0,0" VerticalAlignment="Bottom" Foreground="{StaticResource MutedTextBrush}" />
+                    <TextBlock Text="pastas" FontSize="24" FontWeight="SemiBold" Foreground="{DynamicResource CreamTextBrush}" />
+                    <TextBlock Text="clipboard" Margin="8,0,0,0" VerticalAlignment="Bottom" Foreground="{DynamicResource MutedTextBrush}" />
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <Button Content="Settings" MinWidth="96" Command="{Binding OpenSettingsCommand}" Style="{StaticResource ChipButtonStyle}" />
-                    <Button Content="Close" MinWidth="82" Style="{StaticResource ChipButtonStyle}" Margin="0" Click="CloseButton_OnClick" />
+                    <Button Content="Settings" MinWidth="96" Command="{Binding OpenSettingsCommand}" Style="{DynamicResource ChipButtonStyle}" />
+                    <Button Content="Close" MinWidth="82" Style="{DynamicResource ChipButtonStyle}" Margin="0" Click="CloseButton_OnClick" />
                 </StackPanel>
             </Grid>
 
-            <Grid Grid.Row="1" Visibility="{Binding IsMainContentVisible, Converter={StaticResource BoolToVisibility}}" Margin="0,0,0,8">
+            <Grid Grid.Row="1" Visibility="{Binding IsMainContentVisible, Converter={DynamicResource BoolToVisibility}}" Margin="0,0,0,8">
                 <Grid>
-                    <TextBox x:Name="SearchTextBox" Style="{StaticResource RoundedTextBoxStyle}" Padding="14,6,12,6" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" />
-                    <TextBlock Text="Search" Margin="14,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource MutedTextBrush}" IsHitTestVisible="False">
+                    <TextBox x:Name="SearchTextBox" Style="{DynamicResource RoundedTextBoxStyle}" Padding="14,6,12,6" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Text="Search" Margin="14,0,0,0" VerticalAlignment="Center" Foreground="{DynamicResource MutedTextBrush}" IsHitTestVisible="False">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Visibility" Value="Collapsed" />
@@ -330,20 +349,20 @@
                 </Grid>
             </Grid>
 
-            <Grid Grid.Row="2" Visibility="{Binding IsMainContentVisible, Converter={StaticResource BoolToVisibility}}" Margin="0,0,0,8" MinHeight="36">
+            <Grid Grid.Row="2" Visibility="{Binding IsMainContentVisible, Converter={DynamicResource BoolToVisibility}}" Margin="0,0,0,8" MinHeight="36">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <WrapPanel Grid.Column="0" VerticalAlignment="Center">
-                    <Button Content="All" MinWidth="62" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.All}" />
-                    <Button Content="Text" MinWidth="66" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Text}" />
-                    <Button Content="Images" MinWidth="78" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Images}" />
-                    <Button Content="Pinned" MinWidth="78" Style="{StaticResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Pinned}" />
+                    <Button Content="All" MinWidth="62" Style="{DynamicResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.All}" />
+                    <Button Content="Text" MinWidth="66" Style="{DynamicResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Text}" />
+                    <Button Content="Images" MinWidth="78" Style="{DynamicResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Images}" />
+                    <Button Content="Pinned" MinWidth="78" Style="{DynamicResource ChipButtonStyle}" Command="{Binding SetFilterCommand}" CommandParameter="{x:Static domain:ClipboardFilter.Pinned}" />
                 </WrapPanel>
                 <Button x:Name="SortMenuButton"
                         Grid.Column="1"
-                        Style="{StaticResource SortMenuButtonStyle}"
+                        Style="{DynamicResource SortMenuButtonStyle}"
                         Margin="8,0,0,0"
                         VerticalAlignment="Center"
                         Content="Recent"
@@ -362,26 +381,26 @@
                        PopupAnimation="Fade">
                     <Border Width="{Binding ActualWidth, ElementName=SortMenuButton}"
                             Padding="6,6,6,5"
-                            Background="#FF2E2924"
+                            Background="{DynamicResource SortPopupBackgroundBrush}"
                             BorderBrush="#FF665A4D"
                             BorderThickness="1"
                             CornerRadius="11"
                             SnapsToDevicePixels="True">
                         <StackPanel>
-                            <Button Content="Recent" Style="{StaticResource SortMenuItemButtonStyle}" Click="SortRecent_OnClick" />
-                            <Button Content="Oldest" Style="{StaticResource SortMenuItemButtonStyle}" Click="SortOldest_OnClick" />
-                            <Button Content="Most copied" Margin="0" Style="{StaticResource SortMenuItemButtonStyle}" Click="SortMostCopied_OnClick" />
+                            <Button Content="Recent" Style="{DynamicResource SortMenuItemButtonStyle}" Click="SortRecent_OnClick" />
+                            <Button Content="Oldest" Style="{DynamicResource SortMenuItemButtonStyle}" Click="SortOldest_OnClick" />
+                            <Button Content="Most copied" Margin="0" Style="{DynamicResource SortMenuItemButtonStyle}" Click="SortMostCopied_OnClick" />
                         </StackPanel>
                     </Border>
                 </Popup>
             </Grid>
 
             <Grid Grid.Row="3">
-                <Grid Visibility="{Binding IsMainContentVisible, Converter={StaticResource BoolToVisibility}}">
+                <Grid Visibility="{Binding IsMainContentVisible, Converter={DynamicResource BoolToVisibility}}">
                     <Grid>
                         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" CanContentScroll="True">
     <ScrollViewer.Resources>
-        <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource DarkScrollBarStyle}" />
+        <Style TargetType="{x:Type ScrollBar}" BasedOn="{DynamicResource DarkScrollBarStyle}" />
     </ScrollViewer.Resources>
                             <ItemsControl ItemsSource="{Binding Items}">
                                 <ItemsControl.ItemTemplate>
@@ -391,13 +410,13 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                         </ScrollViewer>
-                        <TextBlock Text="{Binding EmptyStateText}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource MutedTextBrush}" IsHitTestVisible="False" />
+                        <TextBlock Text="{Binding EmptyStateText}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource MutedTextBrush}" IsHitTestVisible="False" />
                     </Grid>
                 </Grid>
 
                 <views:PreviewPanelView />
 
-                <Border Visibility="{Binding IsSettingsOpen, Converter={StaticResource BoolToVisibility}}" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource SubtleBorderBrush}" BorderThickness="1" CornerRadius="14" Padding="16">
+                <Border Visibility="{Binding IsSettingsOpen, Converter={DynamicResource BoolToVisibility}}" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource SubtleBorderBrush}" BorderThickness="1" CornerRadius="14" Padding="16">
                     <StackPanel>
                         <Grid Margin="0,0,0,4">
                             <TextBlock Text="Settings" FontSize="22" Foreground="{DynamicResource CreamTextBrush}" VerticalAlignment="Center" />
@@ -408,7 +427,7 @@
                             <StackPanel>
                                 <TextBlock Text="Hotkey" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource CreamTextBrush}" />
                                 <TextBlock Text="Press a key combination with modifier(s)." Foreground="{DynamicResource MutedTextBrush}" Margin="0,8,0,8" />
-                                <TextBox x:Name="HotkeyTextBox" Style="{StaticResource RoundedTextBoxStyle}" PreviewKeyDown="CaptureHotkey_OnPreviewKeyDown" />
+                                <TextBox x:Name="HotkeyTextBox" Style="{DynamicResource RoundedTextBoxStyle}" PreviewKeyDown="CaptureHotkey_OnPreviewKeyDown" />
                                 <TextBlock x:Name="HotkeyStatusText" Foreground="{DynamicResource MutedTextBrush}" Margin="0,8,0,0" />
                             </StackPanel>
                         </Border>
@@ -416,11 +435,11 @@
                         <Border Background="{DynamicResource SurfaceElevatedBrush}" BorderBrush="{DynamicResource SubtleBorderBrush}" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,0,0,10">
                             <StackPanel>
                                 <TextBlock Text="Theme" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource CreamTextBrush}" />
-                                <ComboBox x:Name="ThemeComboBox" Margin="0,8,0,0" SelectedIndex="0">
-                                    <ComboBoxItem Content="Chocolate" />
-                                    <ComboBoxItem Content="White" />
-                                    <ComboBoxItem Content="Black" />
-                                </ComboBox>
+                                <WrapPanel Margin="0,8,0,0">
+                                    <Button x:Name="ThemeChocolateButton" Content="Chocolate" Tag="Chocolate" MinWidth="106" Style="{DynamicResource ThemeChipButtonStyle}" Click="ThemeChip_OnClick" />
+                                    <Button x:Name="ThemeWhiteButton" Content="White" Tag="White" MinWidth="86" Style="{DynamicResource ThemeChipButtonStyle}" Click="ThemeChip_OnClick" />
+                                    <Button x:Name="ThemeBlackButton" Content="Black" Tag="Black" MinWidth="86" Style="{DynamicResource ThemeChipButtonStyle}" Click="ThemeChip_OnClick" />
+                                </WrapPanel>
                             </StackPanel>
                         </Border>
 
@@ -430,30 +449,30 @@
                                 <TextBlock x:Name="StorageSummaryText" Foreground="{DynamicResource MutedTextBrush}" Margin="0,8,0,10" />
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                     <TextBlock Text="Max items" Foreground="{DynamicResource CreamTextBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                    <TextBox x:Name="MaxItemsTextBox" Width="100" Style="{StaticResource RoundedTextBoxStyle}" />
-                                    <Button Content="Clear data" Width="140" Style="{StaticResource ChipButtonStyle}" Command="{Binding OpenClearDataCommand}" Margin="12,0,0,0" />
+                                    <TextBox x:Name="MaxItemsTextBox" Width="100" Style="{DynamicResource RoundedTextBoxStyle}" />
+                                    <Button Content="Clear data" Width="140" Style="{DynamicResource ChipButtonStyle}" Command="{Binding OpenClearDataCommand}" Margin="12,0,0,0" />
                                 </StackPanel>
                             </StackPanel>
                         </Border>
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                            <Button Content="Save" Width="90" Style="{StaticResource ChipButtonStyle}" Click="SaveSettings_OnClick" />
+                            <Button Content="Save" Width="90" Style="{DynamicResource ChipButtonStyle}" Click="SaveSettings_OnClick" />
                         </StackPanel>
                     </StackPanel>
                 </Border>
 
-                <Border Visibility="{Binding IsClearDataOpen, Converter={StaticResource BoolToVisibility}}" Background="#AA151310">
+                <Border Visibility="{Binding IsClearDataOpen, Converter={DynamicResource BoolToVisibility}}" Background="{DynamicResource OverlayBrush}">
                     <Grid>
-                        <Border Width="410" Background="{StaticResource SurfaceElevatedBrush}" BorderBrush="{StaticResource SubtleBorderBrush}" BorderThickness="1" CornerRadius="14" Padding="18" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Border Width="410" Background="{DynamicResource SurfaceElevatedBrush}" BorderBrush="{DynamicResource SubtleBorderBrush}" BorderThickness="1" CornerRadius="14" Padding="18" HorizontalAlignment="Center" VerticalAlignment="Center">
                             <StackPanel>
-                                <TextBlock Text="Clear data" FontSize="22" Foreground="{StaticResource CreamTextBrush}" />
-                                <TextBlock Text="Choose what to delete from Pastas history. This cannot be undone." TextWrapping="Wrap" Foreground="{StaticResource MutedTextBrush}" Margin="0,10,0,16" />
-                                <CheckBox Content="Text" Foreground="{StaticResource CreamTextBrush}" VerticalContentAlignment="Center" IsChecked="{Binding ClearTextSelected}" Margin="0,0,0,8"/>
-                                <CheckBox Content="Images" Foreground="{StaticResource CreamTextBrush}" VerticalContentAlignment="Center" IsChecked="{Binding ClearImagesSelected}" Margin="0,0,0,8"/>
-                                <CheckBox Content="Pinned objects" Foreground="{StaticResource CreamTextBrush}" VerticalContentAlignment="Center" IsChecked="{Binding ClearPinnedSelected}" Margin="0,0,0,18"/>
+                                <TextBlock Text="Clear data" FontSize="22" Foreground="{DynamicResource CreamTextBrush}" />
+                                <TextBlock Text="Choose what to delete from Pastas history. This cannot be undone." TextWrapping="Wrap" Foreground="{DynamicResource MutedTextBrush}" Margin="0,10,0,16" />
+                                <CheckBox Content="Text" Foreground="{DynamicResource CreamTextBrush}" VerticalContentAlignment="Center" IsChecked="{Binding ClearTextSelected}" Margin="0,0,0,8"/>
+                                <CheckBox Content="Images" Foreground="{DynamicResource CreamTextBrush}" VerticalContentAlignment="Center" IsChecked="{Binding ClearImagesSelected}" Margin="0,0,0,8"/>
+                                <CheckBox Content="Pinned objects" Foreground="{DynamicResource CreamTextBrush}" VerticalContentAlignment="Center" IsChecked="{Binding ClearPinnedSelected}" Margin="0,0,0,18"/>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                    <Button Content="Cancel" Width="90" Style="{StaticResource ChipButtonStyle}" Command="{Binding CloseClearDataCommand}" />
-                                    <Button Content="Delete selected" Width="130" Margin="0" Style="{StaticResource ChipButtonStyle}" Command="{Binding ConfirmClearDataCommand}" IsEnabled="{Binding CanConfirmClearData}" />
+                                    <Button Content="Cancel" Width="90" Style="{DynamicResource ChipButtonStyle}" Command="{Binding CloseClearDataCommand}" />
+                                    <Button Content="Delete selected" Width="130" Margin="0" Style="{DynamicResource ChipButtonStyle}" Command="{Binding ConfirmClearDataCommand}" IsEnabled="{Binding CanConfirmClearData}" />
                                 </StackPanel>
                             </StackPanel>
                         </Border>
@@ -461,20 +480,20 @@
                 </Border>
             </Grid>
 
-            <Border Grid.Row="4" Margin="0,10,0,0" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource SubtleBorderBrush}" BorderThickness="1" CornerRadius="10" Padding="10,6">
+            <Border Grid.Row="4" Margin="0,10,0,0" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource SubtleBorderBrush}" BorderThickness="1" CornerRadius="10" Padding="10,6">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Foreground="{StaticResource MutedTextBrush}" VerticalAlignment="Center">
+                    <TextBlock Grid.Column="0" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center">
                         <Run Text="Enter - copy" />
                         <Run Text="    " />
                         <Run Text="Space - preview" />
                         <Run Text="    " />
                         <Run Text="Esc - close" />
                     </TextBlock>
-                    <TextBlock Grid.Column="1" Foreground="{StaticResource MutedTextBrush}" VerticalAlignment="Center" Margin="12,0,0,0" Text="ИСИП-24-3 · Гоголев Айхал · Якутск · 2026" />
+                    <TextBlock Grid.Column="1" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" Margin="12,0,0,0" Text="ИСИП-24-3 · Гоголев Айхал · Якутск · 2026" />
                 </Grid>
             </Border>
         </Grid>

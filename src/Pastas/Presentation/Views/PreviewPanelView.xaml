@@ -30,7 +30,7 @@
                         <Border Background="#FF1C1916" CornerRadius="6" Padding="1">
                             <Track x:Name="PART_Track" IsDirectionReversed="True">
                                 <Track.DecreaseRepeatButton><RepeatButton Command="ScrollBar.PageUpCommand" Opacity="0" IsTabStop="False" /></Track.DecreaseRepeatButton>
-                                <Track.Thumb><Thumb Style="{StaticResource PreviewDarkScrollBarThumbStyle}" MinHeight="28" /></Track.Thumb>
+                                <Track.Thumb><Thumb Style="{DynamicResource PreviewDarkScrollBarThumbStyle}" MinHeight="28" /></Track.Thumb>
                                 <Track.IncreaseRepeatButton><RepeatButton Command="ScrollBar.PageDownCommand" Opacity="0" IsTabStop="False" /></Track.IncreaseRepeatButton>
                             </Track>
                         </Border>
@@ -39,7 +39,7 @@
             </Setter>
         </Style>
     </UserControl.Resources>
-    <Border Visibility="{Binding IsPreviewOpen, Converter={StaticResource BoolToVisibility}}"
+    <Border Visibility="{Binding IsPreviewOpen, Converter={DynamicResource BoolToVisibility}}"
             Background="{DynamicResource SurfaceBrush}"
             BorderBrush="{DynamicResource SubtleBorderBrush}"
             BorderThickness="1"
@@ -52,7 +52,7 @@
             </Grid>
             <Border Grid.Row="1" Margin="0,8,0,10" Background="{DynamicResource SurfaceElevatedBrush}" CornerRadius="12" Padding="16">
                 <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                    <ScrollViewer.Resources><Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource PreviewDarkScrollBarStyle}" /></ScrollViewer.Resources>
+                    <ScrollViewer.Resources><Style TargetType="{x:Type ScrollBar}" BasedOn="{DynamicResource PreviewDarkScrollBarStyle}" /></ScrollViewer.Resources>
                     <StackPanel>
                         <StackPanel>
                             <StackPanel.Style>
