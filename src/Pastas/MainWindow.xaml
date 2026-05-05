@@ -217,18 +217,32 @@
         </Style>
 
 
+        <Style x:Key="DarkScrollBarRepeatButtonStyle" TargetType="RepeatButton">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RepeatButton">
+                        <Border Background="Transparent" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style x:Key="DarkScrollBarThumbStyle" TargetType="Thumb">
             <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="MinHeight" Value="32" />
+            <Setter Property="MinWidth" Value="32" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Thumb">
-                        <Border x:Name="ThumbBorder" Background="{DynamicResource ScrollbarThumbBrush}" CornerRadius="6" />
+                        <Border x:Name="ThumbBorder" Background="{DynamicResource ScrollbarThumbBrush}" CornerRadius="5" />
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="ThumbBorder" Property="Background" Value="{DynamicResource ScrollbarThumbHoverBrush}" />
                             </Trigger>
                             <Trigger Property="IsDragging" Value="True">
-                                <Setter TargetName="ThumbBorder" Property="Background" Value="{DynamicResource ScrollbarThumbHoverBrush}" />
+                                <Setter TargetName="ThumbBorder" Property="Background" Value="{DynamicResource AccentBrush}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -237,24 +251,39 @@
         </Style>
 
         <Style x:Key="DarkScrollBarStyle" TargetType="ScrollBar">
-            <Setter Property="Width" Value="11" />
+            <Setter Property="Width" Value="12" />
+            <Setter Property="Height" Value="12" />
             <Setter Property="Background" Value="{DynamicResource ScrollbarTrackBrush}" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ScrollBar">
-                        <Border Background="{DynamicResource ScrollbarTrackBrush}" CornerRadius="6" Padding="1">
-                            <Track x:Name="PART_Track" IsDirectionReversed="True">
+                        <Grid Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                            <Border CornerRadius="6" Margin="1" Background="{DynamicResource ScrollbarTrackBrush}" />
+                            <Track x:Name="PART_Track"
+                                   IsDirectionReversed="True"
+                                   Focusable="False">
                                 <Track.DecreaseRepeatButton>
-                                    <RepeatButton Command="ScrollBar.PageUpCommand" Opacity="0" IsTabStop="False" />
+                                    <RepeatButton Style="{StaticResource DarkScrollBarRepeatButtonStyle}" Command="ScrollBar.PageUpCommand" IsTabStop="False" />
                                 </Track.DecreaseRepeatButton>
                                 <Track.Thumb>
-                                    <Thumb Style="{DynamicResource DarkScrollBarThumbStyle}" MinHeight="28" />
+                                    <Thumb Style="{StaticResource DarkScrollBarThumbStyle}" />
                                 </Track.Thumb>
                                 <Track.IncreaseRepeatButton>
-                                    <RepeatButton Command="ScrollBar.PageDownCommand" Opacity="0" IsTabStop="False" />
+                                    <RepeatButton Style="{StaticResource DarkScrollBarRepeatButtonStyle}" Command="ScrollBar.PageDownCommand" IsTabStop="False" />
                                 </Track.IncreaseRepeatButton>
                             </Track>
-                        </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Orientation" Value="Horizontal">
+                                <Setter Property="Width" Value="Auto" />
+                                <Setter Property="Height" Value="12" />
+                                <Setter TargetName="PART_Track" Property="IsDirectionReversed" Value="False" />
+                            </Trigger>
+                            <Trigger Property="Orientation" Value="Vertical">
+                                <Setter Property="Width" Value="12" />
+                                <Setter Property="Height" Value="Auto" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -315,13 +344,18 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
                             <ScrollContentPresenter Grid.Column="0"
+                                                    Grid.Row="0"
                                                     Margin="{TemplateBinding Padding}"
                                                     CanContentScroll="{TemplateBinding CanContentScroll}" />
                             <ScrollBar Grid.Column="1"
+                                       Grid.Row="0"
                                        Margin="6,0,0,0"
                                        Orientation="Vertical"
-                                       Width="11"
                                        Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
                                        Value="{TemplateBinding VerticalOffset}"
                                        Minimum="0"
@@ -329,7 +363,19 @@
                                        ViewportSize="{TemplateBinding ViewportHeight}"
                                        SmallChange="1"
                                        LargeChange="12"
-                                       Style="{DynamicResource DarkScrollBarStyle}" />
+                                       Style="{StaticResource DarkScrollBarStyle}" />
+                            <ScrollBar Grid.Column="0"
+                                       Grid.Row="1"
+                                       Margin="0,6,0,0"
+                                       Orientation="Horizontal"
+                                       Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"
+                                       Value="{TemplateBinding HorizontalOffset}"
+                                       Minimum="0"
+                                       Maximum="{TemplateBinding ScrollableWidth}"
+                                       ViewportSize="{TemplateBinding ViewportWidth}"
+                                       SmallChange="1"
+                                       LargeChange="12"
+                                       Style="{StaticResource DarkScrollBarStyle}" />
                         </Grid>
                     </ControlTemplate>
                 </Setter.Value>
@@ -360,7 +406,7 @@
                 </StackPanel>
             </Grid>
 
-            <Grid Grid.Row="1" Visibility="{Binding IsMainContentVisible, Converter={DynamicResource BoolToVisibility}}" Margin="0,0,0,8">
+            <Grid Grid.Row="1" Visibility="{Binding IsMainContentVisible, Converter={StaticResource BoolToVisibility}}" Margin="0,0,0,8">
                 <Grid>
                     <TextBox x:Name="SearchTextBox" Style="{DynamicResource RoundedTextBoxStyle}" Padding="14,6,12,6" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" />
                     <TextBlock Text="Search" Margin="14,0,0,0" VerticalAlignment="Center" Foreground="{DynamicResource MutedTextBrush}" IsHitTestVisible="False">
@@ -382,7 +428,7 @@
                 </Grid>
             </Grid>
 
-            <Grid Grid.Row="2" Visibility="{Binding IsMainContentVisible, Converter={DynamicResource BoolToVisibility}}" Margin="0,0,0,8" MinHeight="36">
+            <Grid Grid.Row="2" Visibility="{Binding IsMainContentVisible, Converter={StaticResource BoolToVisibility}}" Margin="0,0,0,8" MinHeight="36">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
@@ -429,7 +475,7 @@
             </Grid>
 
             <Grid Grid.Row="3">
-                <Grid Visibility="{Binding IsMainContentVisible, Converter={DynamicResource BoolToVisibility}}">
+                <Grid Visibility="{Binding IsMainContentVisible, Converter={StaticResource BoolToVisibility}}">
                     <Grid>
                         <ScrollViewer Style="{DynamicResource ThemedScrollViewerStyle}" CanContentScroll="True">
                             <ItemsControl ItemsSource="{Binding Items}">
@@ -446,7 +492,7 @@
 
                 <views:PreviewPanelView />
 
-                <Border Visibility="{Binding IsSettingsOpen, Converter={DynamicResource BoolToVisibility}}" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource SubtleBorderBrush}" BorderThickness="1" CornerRadius="14" Padding="16">
+                <Border Visibility="{Binding IsSettingsOpen, Converter={StaticResource BoolToVisibility}}" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource SubtleBorderBrush}" BorderThickness="1" CornerRadius="14" Padding="16">
                     <Grid>
                         <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
                         <Grid Grid.Row="0" Margin="0,0,0,10">
@@ -465,7 +511,7 @@
                     </Grid>
                 </Border>
 
-                <Border Visibility="{Binding IsClearDataOpen, Converter={DynamicResource BoolToVisibility}}" Background="{DynamicResource OverlayBrush}">
+                <Border Visibility="{Binding IsClearDataOpen, Converter={StaticResource BoolToVisibility}}" Background="{DynamicResource OverlayBrush}">
                     <Grid>
                         <Border Width="410" Background="{DynamicResource SurfaceElevatedBrush}" BorderBrush="{DynamicResource SubtleBorderBrush}" BorderThickness="1" CornerRadius="14" Padding="18" HorizontalAlignment="Center" VerticalAlignment="Center">
                             <StackPanel>

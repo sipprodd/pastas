@@ -9,7 +9,7 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
     </UserControl.Resources>
-    <Border Visibility="{Binding IsPreviewOpen, Converter={DynamicResource BoolToVisibility}}"
+    <Border Visibility="{Binding IsPreviewOpen, Converter={StaticResource BoolToVisibility}}"
             Background="{DynamicResource SurfaceBrush}"
             BorderBrush="{DynamicResource SubtleBorderBrush}"
             BorderThickness="1"

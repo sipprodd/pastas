@@ -140,7 +140,7 @@
                         VerticalAlignment="Center"
                         CornerRadius="3"
                         Background="{DynamicResource SelectedAccentMarkerBrush}"
-                        Visibility="{Binding IsSelected, Converter={DynamicResource BoolToVisibility}}"
+                        Visibility="{Binding IsSelected, Converter={StaticResource BoolToVisibility}}"
                         Margin="-7,0,0,0" />
             </Grid>
 
@@ -200,7 +200,7 @@
                         Background="{DynamicResource InputBackgroundBrush}"
                         BorderBrush="{DynamicResource PinnedBorderBrush}"
                         BorderThickness="1"
-                        Visibility="{Binding IsPinned, Converter={DynamicResource BoolToVisibility}}">
+                        Visibility="{Binding IsPinned, Converter={StaticResource BoolToVisibility}}">
                     <TextBlock Text="P"
                                FontSize="8"
                                FontWeight="Bold"
@@ -250,11 +250,11 @@
                         Orientation="Horizontal"
                         VerticalAlignment="Center"
                         Margin="8,0,0,0"
-                        Visibility="{Binding ElementName=ItemCard, Path=IsMouseOver, Converter={DynamicResource BoolToVisibility}}">
+                        Visibility="{Binding ElementName=ItemCard, Path=IsMouseOver, Converter={StaticResource BoolToVisibility}}">
                 <Button Content="View" ToolTip="Preview" Style="{DynamicResource CardActionIconButtonStyle}" Command="{Binding DataContext.OpenPreviewCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
                 <Button ToolTip="Pin or unpin" MinWidth="60" Command="{Binding DataContext.TogglePinCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}">
                     <Button.Style>
-                        <Style TargetType="Button" BasedOn="{DynamicResource CardActionIconButtonStyle}">
+                        <Style TargetType="Button" BasedOn="{StaticResource CardActionIconButtonStyle}">
                             <Setter Property="Content" Value="Pin" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsPinned}" Value="True">
