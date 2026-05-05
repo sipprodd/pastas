@@ -231,12 +231,11 @@
 
         <Style x:Key="DarkScrollBarThumbStyle" TargetType="Thumb">
             <Setter Property="OverridesDefaultStyle" Value="True" />
-            <Setter Property="MinHeight" Value="32" />
-            <Setter Property="MinWidth" Value="32" />
+            <Setter Property="MinHeight" Value="34" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Thumb">
-                        <Border x:Name="ThumbBorder" Background="{DynamicResource ScrollbarThumbBrush}" CornerRadius="5" />
+                        <Border x:Name="ThumbBorder" Margin="1" Background="{DynamicResource ScrollbarThumbBrush}" CornerRadius="5" />
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="ThumbBorder" Property="Background" Value="{DynamicResource ScrollbarThumbHoverBrush}" />
@@ -257,19 +256,16 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ScrollBar">
-                        <Grid Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
-                            <Border CornerRadius="6" Margin="1" Background="{DynamicResource ScrollbarTrackBrush}" />
-                            <Track x:Name="PART_Track"
-                                   IsDirectionReversed="True"
-                                   Focusable="False">
+                        <Border Background="{DynamicResource ScrollbarTrackBrush}" CornerRadius="6" Padding="1">
+                            <Track x:Name="PART_Track">
                                 <Track.DecreaseRepeatButton>
-                                    <RepeatButton Style="{StaticResource DarkScrollBarRepeatButtonStyle}" Command="ScrollBar.PageUpCommand" IsTabStop="False" />
+                                    <RepeatButton Command="ScrollBar.PageUpCommand" Style="{StaticResource DarkScrollBarRepeatButtonStyle}" IsTabStop="False" />
                                 </Track.DecreaseRepeatButton>
                                 <Track.Thumb>
                                     <Thumb Style="{StaticResource DarkScrollBarThumbStyle}" />
                                 </Track.Thumb>
                                 <Track.IncreaseRepeatButton>
-                                    <RepeatButton Style="{StaticResource DarkScrollBarRepeatButtonStyle}" Command="ScrollBar.PageDownCommand" IsTabStop="False" />
+                                    <RepeatButton Command="ScrollBar.PageDownCommand" Style="{StaticResource DarkScrollBarRepeatButtonStyle}" IsTabStop="False" />
                                 </Track.IncreaseRepeatButton>
                             </Track>
                         </Grid>
@@ -361,18 +357,6 @@
                                        Minimum="0"
                                        Maximum="{TemplateBinding ScrollableHeight}"
                                        ViewportSize="{TemplateBinding ViewportHeight}"
-                                       SmallChange="1"
-                                       LargeChange="12"
-                                       Style="{StaticResource DarkScrollBarStyle}" />
-                            <ScrollBar Grid.Column="0"
-                                       Grid.Row="1"
-                                       Margin="0,6,0,0"
-                                       Orientation="Horizontal"
-                                       Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"
-                                       Value="{TemplateBinding HorizontalOffset}"
-                                       Minimum="0"
-                                       Maximum="{TemplateBinding ScrollableWidth}"
-                                       ViewportSize="{TemplateBinding ViewportWidth}"
                                        SmallChange="1"
                                        LargeChange="12"
                                        Style="{StaticResource DarkScrollBarStyle}" />
