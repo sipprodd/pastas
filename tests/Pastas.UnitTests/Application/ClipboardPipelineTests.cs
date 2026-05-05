@@ -70,6 +70,22 @@ public class ClipboardPipelineTests
     }
 
     [Fact]
+    public void ClipboardCaptureState_TogglesCapturePause()
+    {
+        var state = new ClipboardCaptureState();
+
+        Assert.False(state.IsCapturePaused);
+        Assert.True(state.ToggleCapturePause());
+        Assert.True(state.IsCapturePaused);
+
+        state.ResumeCapture();
+        Assert.False(state.IsCapturePaused);
+
+        state.PauseCapture();
+        Assert.True(state.IsCapturePaused);
+    }
+
+    [Fact]
     public async Task CaptureClipboardTextUseCase_AddsNewTextItem()
     {
         var gateway = new FakeClipboardGateway { ReadValue = new ClipboardCaptureData { Text = "sample" } };
@@ -170,6 +186,71 @@ public class ClipboardPipelineTests
     }
 
     [Fact]
+    public async Task CopyTextItemToClipboardUseCase_StoresPreviousClipboardBeforeCopy()
+    {
+        var item = new ClipboardItem { ContentText = "copied", Hash = ClipboardTextHasher.Compute("copied") };
+        var repo = new FakeClipboardItemRepository();
+        repo.Items.Add(item);
+        var gateway = new FakeClipboardGateway
+        {
+            ReadValue = new ClipboardCaptureData { Type = ClipboardItemType.Text, Text = "previous" }
+        };
+        var state = new ClipboardCaptureState();
+        var useCase = new CopyTextItemToClipboardUseCase(repo, gateway, state);
+
+        var result = await useCase.ExecuteAsync(item.Id);
+
+        Assert.True(result.IsSuccess);
+        Assert.True(useCase.CanRestorePreviousClipboard);
+    }
+
+    [Fact]
+    public async Task CopyTextItemToClipboardUseCase_RestoresPreviousTextWithInternalGuard()
+    {
+        var item = new ClipboardItem { ContentText = "copied", Hash = ClipboardTextHasher.Compute("copied") };
+        var repo = new FakeClipboardItemRepository();
+        repo.Items.Add(item);
+        var gateway = new FakeClipboardGateway
+        {
+            ReadValue = new ClipboardCaptureData { Type = ClipboardItemType.Text, Text = "previous" }
+        };
+        var state = new ClipboardCaptureState();
+        var useCase = new CopyTextItemToClipboardUseCase(repo, gateway, state);
+
+        await useCase.ExecuteAsync(item.Id);
+        _ = state.ConsumeInternalClipboardWriteFlag();
+        var result = await useCase.RestorePreviousClipboardAsync();
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal("previous", gateway.WrittenText);
+        Assert.True(state.ConsumeInternalClipboardWriteFlag());
+        Assert.False(useCase.CanRestorePreviousClipboard);
+    }
+
+    [Fact]
+    public async Task CopyTextItemToClipboardUseCase_RestoresPreviousImageWithInternalGuard()
+    {
+        var item = new ClipboardItem { ContentText = "copied", Hash = ClipboardTextHasher.Compute("copied") };
+        var repo = new FakeClipboardItemRepository();
+        repo.Items.Add(item);
+        var imageBytes = new byte[] { 1, 2, 3 };
+        var gateway = new FakeClipboardGateway
+        {
+            ReadValue = new ClipboardCaptureData { Type = ClipboardItemType.Image, ImageBytes = imageBytes }
+        };
+        var state = new ClipboardCaptureState();
+        var useCase = new CopyTextItemToClipboardUseCase(repo, gateway, state);
+
+        await useCase.ExecuteAsync(item.Id);
+        _ = state.ConsumeInternalClipboardWriteFlag();
+        var result = await useCase.RestorePreviousClipboardAsync();
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(imageBytes, gateway.WrittenImageBytes);
+        Assert.True(state.ConsumeInternalClipboardWriteFlag());
+    }
+
+    [Fact]
     public async Task CopyTextItemToClipboardUseCase_WritesImagePathAndSetsInternalGuard()
     {
         var item = new ClipboardItem { ImagePath = "C:/tmp/example.png", Hash = "img-hash" };
@@ -191,6 +272,7 @@ public class ClipboardPipelineTests
         public ClipboardCaptureData? ReadValue { get; set; }
         public string? WrittenText { get; private set; }
         public string? WrittenImagePath { get; private set; }
+        public byte[]? WrittenImageBytes { get; private set; }
 
         public Task<ClipboardCaptureData?> ReadAsync(CancellationToken cancellationToken = default) => Task.FromResult(ReadValue);
 
@@ -203,6 +285,12 @@ public class ClipboardPipelineTests
         public Task WriteImageAsync(string imagePath, CancellationToken cancellationToken = default)
         {
             WrittenImagePath = imagePath;
+            return Task.CompletedTask;
+        }
+
+        public Task WriteImageBytesAsync(byte[] imageBytes, CancellationToken cancellationToken = default)
+        {
+            WrittenImageBytes = imageBytes;
             return Task.CompletedTask;
         }
 
@@ -242,5 +330,14 @@ public class ClipboardPipelineTests
 
         public Task<int> CountAsync(CancellationToken cancellationToken = default)
             => Task.FromResult(Items.Count);
+
+        public Task<StorageStats> GetStorageStatsAsync(CancellationToken cancellationToken = default)
+            => Task.FromResult(new StorageStats
+            {
+                TotalItems = Items.Count,
+                PinnedItems = Items.Count(x => x.IsPinned),
+                ImageItems = Items.Count(x => x.Type is ClipboardItemType.Image or ClipboardItemType.Screenshot),
+                ApproxUsageBytes = Items.Sum(x => Math.Max(0, x.SizeBytes))
+            });
     }
 }

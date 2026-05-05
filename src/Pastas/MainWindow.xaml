@@ -238,6 +238,7 @@
             <Setter Property="OverridesDefaultStyle" Value="True" />
             <Setter Property="Focusable" Value="False" />
             <Setter Property="IsTabStop" Value="False" />
+            <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Template">
@@ -254,6 +255,7 @@
             <Setter Property="SnapsToDevicePixels" Value="True" />
             <Setter Property="MinHeight" Value="40" />
             <Setter Property="MinWidth" Value="10" />
+            <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Thumb">
@@ -287,10 +289,14 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ScrollBar">
-                        <Grid Background="Transparent">
+                        <Grid x:Name="ScrollBarRoot"
+                              Background="Transparent"
+                              SnapsToDevicePixels="True">
                             <Border x:Name="RailBorder"
                                     Width="10"
+                                    Height="Auto"
                                     HorizontalAlignment="Center"
+                                    VerticalAlignment="Stretch"
                                     Background="{DynamicResource ScrollbarTrackBrush}"
                                     CornerRadius="5" />
 
@@ -319,6 +325,10 @@
                                 <Setter Property="Height" Value="14" />
                                 <Setter TargetName="PART_Track" Property="Orientation" Value="Horizontal" />
                                 <Setter TargetName="PART_Track" Property="IsDirectionReversed" Value="False" />
+                                <Setter TargetName="RailBorder" Property="Width" Value="Auto" />
+                                <Setter TargetName="RailBorder" Property="Height" Value="10" />
+                                <Setter TargetName="RailBorder" Property="HorizontalAlignment" Value="Stretch" />
+                                <Setter TargetName="RailBorder" Property="VerticalAlignment" Value="Center" />
                             </Trigger>
 
                             <Trigger Property="Orientation" Value="Vertical">
@@ -326,6 +336,70 @@
                                 <Setter Property="Height" Value="Auto" />
                                 <Setter TargetName="PART_Track" Property="Orientation" Value="Vertical" />
                                 <Setter TargetName="PART_Track" Property="IsDirectionReversed" Value="True" />
+                                <Setter TargetName="RailBorder" Property="Width" Value="10" />
+                                <Setter TargetName="RailBorder" Property="Height" Value="Auto" />
+                                <Setter TargetName="RailBorder" Property="HorizontalAlignment" Value="Center" />
+                                <Setter TargetName="RailBorder" Property="VerticalAlignment" Value="Stretch" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource PastasScrollBarStyle}" />
+
+        <Style TargetType="CheckBox">
+            <Setter Property="Foreground" Value="{DynamicResource CreamTextBrush}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Grid SnapsToDevicePixels="True">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Border x:Name="CheckBoxGlyph"
+                                    Width="17"
+                                    Height="17"
+                                    Background="{DynamicResource InputBackgroundBrush}"
+                                    BorderBrush="{DynamicResource SubtleBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="5"
+                                    VerticalAlignment="Center">
+                                <Path x:Name="CheckMark"
+                                      Data="M 3 8 L 7 12 L 14 4"
+                                      Stroke="{DynamicResource AccentBrush}"
+                                      StrokeThickness="2"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      Visibility="Collapsed" />
+                            </Border>
+
+                            <ContentPresenter Grid.Column="1"
+                                              Margin="9,0,0,0"
+                                              VerticalAlignment="Center"
+                                              RecognizesAccessKey="True" />
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="CheckBoxGlyph" Property="BorderBrush" Value="{DynamicResource HoverBorderBrush}" />
+                                <Setter TargetName="CheckBoxGlyph" Property="Background" Value="{DynamicResource ButtonHoverBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="CheckBoxGlyph" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="CheckBoxGlyph" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                <Setter TargetName="CheckBoxGlyph" Property="Background" Value="{DynamicResource ButtonPressedBrush}" />
+                                <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.65" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -537,8 +611,6 @@
                         <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                                       VerticalScrollBarVisibility="Auto"
                                       CanContentScroll="False">
-                            <ScrollViewer.Resources>
-                            </ScrollViewer.Resources>
                             <ItemsControl ItemsSource="{Binding Items}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
@@ -552,7 +624,25 @@
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
                                    Foreground="{DynamicResource MutedTextBrush}"
-                                   IsHitTestVisible="False" />
+                                   IsHitTestVisible="False">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsLoading}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+
+                        <TextBlock Text="Loading..."
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Foreground="{DynamicResource MutedTextBrush}"
+                                   IsHitTestVisible="False"
+                                   Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}" />
                     </Grid>
                 </Grid>
 
@@ -600,8 +690,6 @@
                                       HorizontalScrollBarVisibility="Disabled"
                                       VerticalScrollBarVisibility="Auto"
                                       CanContentScroll="False">
-                            <ScrollViewer.Resources>
-                            </ScrollViewer.Resources>
                             <StackPanel>
                                 <Border Background="{DynamicResource SurfaceElevatedBrush}"
                                         BorderBrush="{DynamicResource SubtleBorderBrush}"
@@ -761,23 +849,43 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Grid.Column="0"
                                Foreground="{DynamicResource MutedTextBrush}"
                                VerticalAlignment="Center">
-                        <Run Text="Enter - copy" />
-                        <Run Text="    " />
-                        <Run Text="Space - preview" />
-                        <Run Text="    " />
-                        <Run Text="Esc - close" />
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Text" Value="Enter - copy    Space - preview    Esc - close" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HasStatusMessage}" Value="True">
+                                        <Setter Property="Text" Value="{Binding StatusMessage}" />
+                                        <Setter Property="Foreground" Value="{DynamicResource CreamTextBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
                     </TextBlock>
 
-                    <TextBlock Grid.Column="1"
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                Margin="12,0,0,0">
+                        <Button Content="Restore"
+                                MinWidth="86"
+                                Height="30"
+                                Padding="12,0"
+                                Style="{DynamicResource ChipButtonStyle}"
+                                Command="{Binding RestorePreviousClipboardCommand}"
+                                Visibility="{Binding CanRestorePreviousClipboard, Converter={StaticResource BoolToVisibility}}" />
+                    </StackPanel>
+
+                    <TextBlock Grid.Column="2"
                                Foreground="{DynamicResource MutedTextBrush}"
                                VerticalAlignment="Center"
                                Margin="12,0,0,0"
-                               Text="РРЎРРџ-24-3 В· Р“РѕРіРѕР»РµРІ РђР№С…Р°Р» В· РЇРєСѓС‚СЃРє В· 2026" />
+                               Text="ИСИП-24-3 · Гоголев Айхал · Якутск · 2026" />
                 </Grid>
             </Border>
         </Grid>

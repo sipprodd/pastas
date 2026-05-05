@@ -23,16 +23,21 @@ public sealed class ClipboardCleanupService
         _diagnosticsLogger = diagnosticsLogger;
     }
 
-    public async Task CleanupAsync(CancellationToken cancellationToken = default)
+    public Task CleanupAsync(CancellationToken cancellationToken = default)
+        => CleanupAsync(_options.MaxItems, cancellationToken);
+
+    public async Task CleanupAsync(int maxItems, CancellationToken cancellationToken = default)
     {
-        _diagnosticsLogger?.Info("Cleanup started.");
+        if (maxItems <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(maxItems), "Max items must be positive.");
+        }
 
         try
         {
             var totalCount = await _clipboardItemRepository.CountAsync(cancellationToken);
-            if (totalCount <= _options.MaxItems)
+            if (totalCount <= maxItems)
             {
-                _diagnosticsLogger?.Info("Cleanup skipped: within max item limit.");
                 return;
             }
 
@@ -42,11 +47,13 @@ public sealed class ClipboardCleanupService
             var candidates = oldestFirst
                 .OrderBy(x => x.LastCopiedAt)
                 .ThenBy(x => x.CreatedAt)
-                .Where(x => !x.IsPinned && !x.IsProtected)
+                .Where(x => !x.IsPinned)
                 .ToList();
 
-            var remainingToDelete = totalCount - _options.MaxItems;
+            var remainingToDelete = totalCount - maxItems;
+            var deletedCount = 0;
 
+            // If pinned items alone exceed the max, preserve them and allow the total to remain above the limit.
             foreach (var item in candidates)
             {
                 if (remainingToDelete <= 0)
@@ -58,9 +65,13 @@ public sealed class ClipboardCleanupService
                 await SafeDeleteFileAsync(item.ThumbnailPath, cancellationToken);
                 await _clipboardItemRepository.DeleteAsync(item.Id, cancellationToken);
                 remainingToDelete--;
+                deletedCount++;
             }
 
-            _diagnosticsLogger?.Info("Cleanup completed.");
+            if (deletedCount > 0)
+            {
+                _diagnosticsLogger?.Info($"Cleanup removed items. Count={deletedCount}.");
+            }
         }
         catch (Exception ex)
         {

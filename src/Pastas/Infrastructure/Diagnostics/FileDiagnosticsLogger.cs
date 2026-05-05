@@ -27,7 +27,7 @@ public sealed class FileDiagnosticsLogger : IDiagnosticsLogger
     {
         var detail = exception is null
             ? message
-            : $"{message} | ExceptionType={exception.GetType().Name} Message={exception.Message}";
+            : $"{message} | ExceptionType={exception.GetType().Name} HResult={exception.HResult}";
 
         Write("ERROR", detail);
     }

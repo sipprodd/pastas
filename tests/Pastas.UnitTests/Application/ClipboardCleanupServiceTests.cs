@@ -33,14 +33,15 @@ public class ClipboardCleanupServiceTests
     }
 
     [Fact]
-    public async Task CleanupAsync_DoesNotDeleteProtectedItems()
+    public async Task CleanupAsync_AllowsTotalAboveLimit_WhenPinnedItemsExceedLimit()
     {
-        var repo = CreateRepoWithItems((false, true, null, null), (false, false, null, null), (false, false, null, null));
-        var service = new ClipboardCleanupService(repo, new FakeFileStorage(), new ClipboardCleanupOptions { MaxItems = 2 });
+        var repo = CreateRepoWithItems((true, false, null, null), (true, false, null, null), (false, false, null, null));
+        var service = new ClipboardCleanupService(repo, new FakeFileStorage(), new ClipboardCleanupOptions { MaxItems = 1 });
 
         await service.CleanupAsync();
 
-        Assert.Contains(repo.Items, x => x.IsProtected);
+        Assert.Equal(2, repo.Items.Count);
+        Assert.All(repo.Items, x => Assert.True(x.IsPinned));
     }
 
     [Fact]
@@ -111,6 +112,14 @@ public class ClipboardCleanupServiceTests
             => Task.FromResult((IReadOnlyList<ClipboardItem>)Items.OrderBy(x => x.LastCopiedAt).ToList());
         public Task<IReadOnlyList<ClipboardItem>> DeleteByCategoriesAsync(bool includeText, bool includeImages, bool includePinned, CancellationToken cancellationToken = default) => Task.FromResult((IReadOnlyList<ClipboardItem>)[]);
         public Task<int> CountAsync(CancellationToken cancellationToken = default) => Task.FromResult(Items.Count);
+        public Task<StorageStats> GetStorageStatsAsync(CancellationToken cancellationToken = default)
+            => Task.FromResult(new StorageStats
+            {
+                TotalItems = Items.Count,
+                PinnedItems = Items.Count(x => x.IsPinned),
+                ImageItems = Items.Count(x => x.Type is ClipboardItemType.Image or ClipboardItemType.Screenshot),
+                ApproxUsageBytes = Items.Sum(x => Math.Max(0, x.SizeBytes))
+            });
     }
 
     private sealed class FakeFileStorage : IFileStorage

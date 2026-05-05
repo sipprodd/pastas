@@ -62,25 +62,26 @@
                 <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,2,0,0">
                     <Button x:Name="CopyButton" Content="Copy" MinWidth="70" Style="{DynamicResource ChipButtonStyle}" Click="CopyButton_OnClick" Margin="0,0,8,0" />
-                    <Button MinWidth="66"
-        Style="{DynamicResource ChipButtonStyle}"
-        Command="{Binding TogglePinCommand}"
-        CommandParameter="{Binding SelectedItem}"
-        Margin="0,0,8,0">
-    <Button.Content>
-        <TextBlock Text="Pin">
-            <TextBlock.Style>
-                <Style TargetType="TextBlock">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding SelectedItem.IsPinned}" Value="True">
-                            <Setter Property="Text" Value="Unpin" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </TextBlock.Style>
-        </TextBlock>
-    </Button.Content>
-</Button>
+                    <Button x:Name="PinButton"
+                            MinWidth="76"
+                            Style="{DynamicResource ChipButtonStyle}"
+                            Click="PinButton_OnClick"
+                            Margin="0,0,8,0">
+                        <Button.Content>
+                            <TextBlock>
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="Pin" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SelectedItem.IsPinned}" Value="True">
+                                                <Setter Property="Text" Value="Unpin" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Button.Content>
+                    </Button>
                     <Button Content="Del" MinWidth="58" Style="{DynamicResource ChipButtonStyle}" Command="{Binding DeleteItemCommand}" CommandParameter="{Binding SelectedItem}" />
                 </StackPanel>
                 <Button Grid.Column="1" Content="Back" MinWidth="70" Style="{DynamicResource ChipButtonStyle}" Command="{Binding ClosePreviewCommand}" Margin="0,2,0,0" />

@@ -16,4 +16,5 @@ public sealed class AppSettings
     public bool ClearProtectedClipboardAfterDelay { get; init; } = false;
     public int ClearProtectedClipboardDelaySeconds { get; init; } = 60;
     public ThemeMode ThemeMode { get; init; } = ThemeMode.Chocolate;
+    public bool ClearWindowsClipboardHistoryOnStartup { get; init; } = false;
 }

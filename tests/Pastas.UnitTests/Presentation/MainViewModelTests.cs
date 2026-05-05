@@ -144,6 +144,46 @@ public sealed class MainViewModelTests
     }
 
     [Fact]
+    public async Task CopyItemCommand_SetsRestoreStatus_WhenPreviousClipboardIsAvailable()
+    {
+        var useCase = new FakeCopyTextItemToClipboardUseCase
+        {
+            ResultToReturn = Result.Success(),
+            CanRestorePreviousClipboard = true
+        };
+        var viewModel = CreateViewModel(copyUseCase: useCase);
+        var vmItem = ClipboardItemViewModel.FromEntity(new ClipboardItem
+        {
+            Id = Guid.NewGuid(),
+            Type = ClipboardItemType.Text,
+            PreviewText = "preview",
+            ContentText = "preview",
+            Hash = "hash-copy-restore",
+            LastCopiedAt = DateTime.UtcNow
+        });
+
+        viewModel.CopyItemCommand.Execute(vmItem);
+        await Task.Delay(20);
+
+        Assert.Equal("Item copied. Previous clipboard can be restored.", viewModel.StatusMessage);
+        Assert.True(viewModel.CanRestorePreviousClipboard);
+    }
+
+    [Fact]
+    public async Task RestorePreviousClipboardCommand_RestoresAndUpdatesStatus()
+    {
+        var useCase = new FakeCopyTextItemToClipboardUseCase { CanRestorePreviousClipboard = true };
+        var viewModel = CreateViewModel(copyUseCase: useCase);
+
+        viewModel.RestorePreviousClipboardCommand.Execute(null);
+        await Task.Delay(20);
+
+        Assert.True(useCase.RestoreCalled);
+        Assert.Equal("Previous clipboard restored.", viewModel.StatusMessage);
+        Assert.False(viewModel.CanRestorePreviousClipboard);
+    }
+
+    [Fact]
     public async Task CopyItemCommand_SetsFailureStatusMessage()
     {
         var useCase = new FakeCopyTextItemToClipboardUseCase
@@ -181,6 +221,27 @@ public sealed class MainViewModelTests
 
 
     [Fact]
+    public async Task ConfirmClearDataCommand_RefreshesListAndClosesPreview_WhenSelectedItemDeleted()
+    {
+        var item = new ClipboardItem { Id = Guid.NewGuid(), Type = ClipboardItemType.Text, PreviewText = "x", ContentText = "x", Hash = "x" };
+        var repository = new FakeClipboardItemRepository { SearchResults = { item }, DeletedByCategoriesResults = { item } };
+        var viewModel = CreateViewModel(repository);
+        await viewModel.RefreshAsync();
+        viewModel.OpenPreview(viewModel.Items[0]);
+        repository.SearchResults.Clear();
+
+        viewModel.OpenClearData();
+        viewModel.ClearTextSelected = true;
+        viewModel.ConfirmClearDataCommand.Execute(null);
+        await Task.Delay(20);
+
+        Assert.True(repository.DeleteByCategoriesCalled);
+        Assert.Empty(viewModel.Items);
+        Assert.False(viewModel.IsPreviewOpen);
+        Assert.False(viewModel.IsClearDataOpen);
+    }
+
+    [Fact]
     public void OpenSettings_ClosesPreviewAndClearData()
     {
         var viewModel = CreateViewModel();
@@ -206,26 +267,69 @@ public sealed class MainViewModelTests
         Assert.True(viewModel.IsMainContentVisible);
     }
 
+    [Fact]
+    public async Task SelectNextAndPreviousItem_MoveSelectedItem()
+    {
+        var first = new ClipboardItem { Id = Guid.NewGuid(), PreviewText = "a", ContentText = "a", Hash = "a" };
+        var second = new ClipboardItem { Id = Guid.NewGuid(), PreviewText = "b", ContentText = "b", Hash = "b" };
+        var repository = new FakeClipboardItemRepository { SearchResults = { first, second } };
+        var viewModel = CreateViewModel(repository);
+        await viewModel.RefreshAsync();
+
+        viewModel.SelectNextItem();
+        Assert.Equal(first.Id, viewModel.SelectedItem?.Id);
+
+        viewModel.SelectNextItem();
+        Assert.Equal(second.Id, viewModel.SelectedItem?.Id);
+
+        viewModel.SelectPreviousItem();
+        Assert.Equal(first.Id, viewModel.SelectedItem?.Id);
+    }
+
+    [Fact]
+    public void DoNotSaveNextCommand_MarksCaptureStateOnce()
+    {
+        var captureState = new ClipboardCaptureState();
+        var viewModel = CreateViewModel(captureState: captureState);
+
+        viewModel.DoNotSaveNextCommand.Execute(null);
+
+        Assert.Equal("Next clipboard change will not be saved.", viewModel.StatusMessage);
+        Assert.True(captureState.ConsumeDoNotSaveNextFlag());
+        Assert.False(captureState.ConsumeDoNotSaveNextFlag());
+    }
+
     private static MainViewModel CreateViewModel(
         FakeClipboardItemRepository? repository = null,
-        FakeCopyTextItemToClipboardUseCase? copyUseCase = null)
+        FakeCopyTextItemToClipboardUseCase? copyUseCase = null,
+        ClipboardCaptureState? captureState = null)
     {
         return new MainViewModel(
             repository ?? new FakeClipboardItemRepository(),
             copyUseCase ?? new FakeCopyTextItemToClipboardUseCase(),
             new FakeClipboardGateway(),
-            new ClipboardCaptureState());
+            captureState ?? new ClipboardCaptureState());
     }
 
     private sealed class FakeCopyTextItemToClipboardUseCase : ICopyTextItemToClipboardUseCase
     {
         public Guid? LastItemId { get; private set; }
         public Result ResultToReturn { get; set; } = Result.Success();
+        public Result RestoreResultToReturn { get; set; } = Result.Success();
+        public bool CanRestorePreviousClipboard { get; set; }
+        public bool RestoreCalled { get; private set; }
 
         public Task<Result> ExecuteAsync(Guid itemId, CancellationToken cancellationToken = default)
         {
             LastItemId = itemId;
             return Task.FromResult(ResultToReturn);
+        }
+
+        public Task<Result> RestorePreviousClipboardAsync(CancellationToken cancellationToken = default)
+        {
+            RestoreCalled = true;
+            CanRestorePreviousClipboard = false;
+            return Task.FromResult(RestoreResultToReturn);
         }
     }
 
@@ -237,6 +341,8 @@ public sealed class MainViewModelTests
         public List<Guid> DeletedIds { get; } = new();
         public List<ClipboardItem> UpdatedItems { get; } = new();
         public Dictionary<Guid, ClipboardItem> ItemsById { get; } = new();
+        public List<ClipboardItem> DeletedByCategoriesResults { get; } = new();
+        public bool DeleteByCategoriesCalled { get; private set; }
 
         public Task AddAsync(ClipboardItem item, CancellationToken cancellationToken = default) => Task.CompletedTask;
         public Task UpdateAsync(ClipboardItem item, CancellationToken cancellationToken = default)
@@ -261,7 +367,10 @@ public sealed class MainViewModelTests
 
         public Task<ClipboardItem?> FindByHashAsync(string hash, CancellationToken cancellationToken = default) => Task.FromResult<ClipboardItem?>(null);
         public Task<IReadOnlyList<ClipboardItem>> DeleteByCategoriesAsync(bool includeText, bool includeImages, bool includePinned, CancellationToken cancellationToken = default)
-            => Task.FromResult<IReadOnlyList<ClipboardItem>>(Array.Empty<ClipboardItem>());
+        {
+            DeleteByCategoriesCalled = true;
+            return Task.FromResult<IReadOnlyList<ClipboardItem>>(DeletedByCategoriesResults.ToList());
+        }
 
         public Task<IReadOnlyList<ClipboardItem>> SearchAsync(ClipboardSearchQuery query, CancellationToken cancellationToken = default)
         {
@@ -271,6 +380,14 @@ public sealed class MainViewModelTests
         }
 
         public Task<int> CountAsync(CancellationToken cancellationToken = default) => Task.FromResult(SearchResults.Count);
+        public Task<StorageStats> GetStorageStatsAsync(CancellationToken cancellationToken = default)
+            => Task.FromResult(new StorageStats
+            {
+                TotalItems = SearchResults.Count,
+                PinnedItems = SearchResults.Count(x => x.IsPinned),
+                ImageItems = SearchResults.Count(x => x.Type is ClipboardItemType.Image or ClipboardItemType.Screenshot),
+                ApproxUsageBytes = SearchResults.Sum(x => Math.Max(0, x.SizeBytes))
+            });
     }
 
     private sealed class FakeClipboardGateway : IClipboardGateway
@@ -278,6 +395,7 @@ public sealed class MainViewModelTests
         public Task ClearAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
         public Task<ClipboardCaptureData?> ReadAsync(CancellationToken cancellationToken = default) => Task.FromResult<ClipboardCaptureData?>(null);
         public Task WriteImageAsync(string imagePath, CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public Task WriteImageBytesAsync(byte[] imageBytes, CancellationToken cancellationToken = default) => Task.CompletedTask;
         public Task WriteTextAsync(string text, CancellationToken cancellationToken = default) => Task.CompletedTask;
     }
 }

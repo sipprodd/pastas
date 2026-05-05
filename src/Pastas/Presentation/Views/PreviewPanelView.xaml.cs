@@ -47,5 +47,20 @@ public partial class PreviewPanelView : System.Windows.Controls.UserControl
             _isCopyFeedbackActive = false;
         }
     }
+
+    private void PinButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel viewModel || viewModel.SelectedItem is null)
+        {
+            return;
+        }
+
+        if (!viewModel.TogglePinCommand.CanExecute(viewModel.SelectedItem))
+        {
+            return;
+        }
+
+        viewModel.TogglePinCommand.Execute(viewModel.SelectedItem);
+    }
 }
 

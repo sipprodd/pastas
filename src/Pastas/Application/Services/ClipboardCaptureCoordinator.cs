@@ -1,4 +1,5 @@
 using Pastas.Application.UseCases;
+using Pastas.Domain.Interfaces;
 
 namespace Pastas.Application.Services;
 
@@ -10,6 +11,7 @@ public sealed class ClipboardCaptureCoordinator
     private readonly ICaptureClipboardImageUseCase _captureClipboardImageUseCase;
     private readonly ClipboardCleanupService _clipboardCleanupService;
     private readonly IDiagnosticsLogger? _diagnosticsLogger;
+    private readonly ISettingsRepository? _settingsRepository;
     private readonly SemaphoreSlim _captureGate = new(1, 1);
     private readonly TimeSpan _debounceDelay;
 
@@ -18,12 +20,14 @@ public sealed class ClipboardCaptureCoordinator
         ICaptureClipboardImageUseCase captureClipboardImageUseCase,
         ClipboardCleanupService clipboardCleanupService,
         IDiagnosticsLogger? diagnosticsLogger = null,
-        TimeSpan? debounceDelay = null)
+        TimeSpan? debounceDelay = null,
+        ISettingsRepository? settingsRepository = null)
     {
         _captureClipboardTextUseCase = captureClipboardTextUseCase;
         _captureClipboardImageUseCase = captureClipboardImageUseCase;
         _clipboardCleanupService = clipboardCleanupService;
         _diagnosticsLogger = diagnosticsLogger;
+        _settingsRepository = settingsRepository;
         _debounceDelay = debounceDelay ?? DefaultDebounceDelay;
     }
 
@@ -35,15 +39,16 @@ public sealed class ClipboardCaptureCoordinator
             return;
         }
 
-        _diagnosticsLogger?.Info("Clipboard capture started.");
-
         try
         {
             await Task.Delay(_debounceDelay, cancellationToken);
             await SafeExecuteAsync("text", () => _captureClipboardTextUseCase.ExecuteAsync(cancellationToken));
             await SafeExecuteAsync("image", () => _captureClipboardImageUseCase.ExecuteAsync(cancellationToken));
-            await SafeExecuteAsync("cleanup", () => _clipboardCleanupService.CleanupAsync(cancellationToken));
-            _diagnosticsLogger?.Info("Clipboard capture completed.");
+            await SafeExecuteAsync("cleanup", async () =>
+            {
+                var settings = _settingsRepository is null ? null : await _settingsRepository.GetAsync(cancellationToken);
+                await _clipboardCleanupService.CleanupAsync(settings?.MaxItems ?? new ClipboardCleanupOptions().MaxItems, cancellationToken);
+            });
         }
         catch (OperationCanceledException)
         {

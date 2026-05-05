@@ -1,4 +1,4 @@
-using Pastas.Domain.Entities;
+﻿using Pastas.Domain.Entities;
 using Pastas.Domain.Enums;
 
 namespace Pastas.Presentation.ViewModels;
@@ -17,6 +17,8 @@ public sealed class ClipboardItemViewModel : ViewModelBase
     public string TypeLabel { get; private init; } = string.Empty;
     public string SourceLabel { get; private init; } = string.Empty;
     public string TimeLabel { get; private init; } = string.Empty;
+    public string CopyCountLabel { get; private init; } = string.Empty;
+    public string MetadataLine { get; private init; } = string.Empty;
     public bool IsPinned { get; private init; }
     public bool IsProtected { get; private init; }
     public bool IsImage { get; private init; }
@@ -26,8 +28,6 @@ public sealed class ClipboardItemViewModel : ViewModelBase
     public string FullText { get; private init; } = string.Empty;
     public bool HasThumbnail { get; private init; }
     public bool HasImagePath { get; private init; }
-    public string? ThumbnailOrImagePath { get; private init; }
-    public bool HasThumbnailOrImagePath { get; private init; }
 
     public string PreviewBodyText => string.IsNullOrWhiteSpace(FullText) ? PreviewText : FullText;
 
@@ -37,8 +37,6 @@ public sealed class ClipboardItemViewModel : ViewModelBase
         set => SetProperty(ref _isSelected, value);
     }
 
-    public string ItemGlyph => IsProtected ? "🔒" : IsImage ? "🖼" : "T";
-
     public static ClipboardItemViewModel FromEntity(ClipboardItem item)
     {
         var isImage = item.Type is ClipboardItemType.Image or ClipboardItemType.Screenshot;
@@ -46,7 +44,9 @@ public sealed class ClipboardItemViewModel : ViewModelBase
         var thumbnailPath = isImage && !string.IsNullOrWhiteSpace(item.ThumbnailPath)
             ? item.ThumbnailPath
             : null;
-        var thumbnailOrImagePath = thumbnailPath ?? (isImage && !string.IsNullOrWhiteSpace(item.ImagePath) ? item.ImagePath : null);
+        var sourceLabel = BuildSourceLabel(item);
+        var timeLabel = BuildTimeLabel(item.LastCopiedAt);
+        var copyCountLabel = BuildCopyCountLabel(item.CopyCount);
 
         return new ClipboardItemViewModel
         {
@@ -54,8 +54,10 @@ public sealed class ClipboardItemViewModel : ViewModelBase
             Title = isImage ? "Image item" : "Text item",
             PreviewText = BuildPreview(item, isImage, isProtected),
             TypeLabel = isImage ? "Image" : "Text",
-            SourceLabel = BuildSourceLabel(item),
-            TimeLabel = item.LastCopiedAt.ToLocalTime().ToString("g"),
+            SourceLabel = sourceLabel,
+            TimeLabel = timeLabel,
+            CopyCountLabel = copyCountLabel,
+            MetadataLine = $"{sourceLabel} · {timeLabel} · {copyCountLabel}",
             IsPinned = item.IsPinned,
             IsProtected = isProtected,
             IsImage = isImage,
@@ -64,9 +66,7 @@ public sealed class ClipboardItemViewModel : ViewModelBase
             ImagePath = isImage ? item.ImagePath : null,
             FullText = item.ContentText ?? string.Empty,
             HasThumbnail = !string.IsNullOrWhiteSpace(thumbnailPath),
-            HasImagePath = isImage && !string.IsNullOrWhiteSpace(item.ImagePath),
-            ThumbnailOrImagePath = thumbnailOrImagePath,
-            HasThumbnailOrImagePath = !string.IsNullOrWhiteSpace(thumbnailOrImagePath)
+            HasImagePath = isImage && !string.IsNullOrWhiteSpace(item.ImagePath)
         };
     }
 
@@ -94,16 +94,50 @@ public sealed class ClipboardItemViewModel : ViewModelBase
 
     private static string BuildSourceLabel(ClipboardItem item)
     {
-        if (!string.IsNullOrWhiteSpace(item.SourceApp))
-        {
-            return item.SourceApp.Trim();
-        }
-
         if (!string.IsNullOrWhiteSpace(item.SourceWindowTitle))
         {
             return item.SourceWindowTitle.Trim();
         }
 
-        return "Unknown source";
+        if (!string.IsNullOrWhiteSpace(item.SourceApp))
+        {
+            return item.SourceApp.Trim();
+        }
+
+        return "Unknown window";
     }
+
+    private static string BuildTimeLabel(DateTime lastCopiedAt)
+    {
+        var local = lastCopiedAt == default ? DateTime.Now : lastCopiedAt.ToLocalTime();
+        var now = DateTime.Now;
+        var elapsed = now - local;
+
+        if (elapsed.TotalSeconds >= 0 && elapsed.TotalSeconds < 60)
+        {
+            return "Just now";
+        }
+
+        if (elapsed.TotalMinutes >= 0 && elapsed.TotalMinutes < 60)
+        {
+            var minutes = Math.Max(1, (int)Math.Floor(elapsed.TotalMinutes));
+            return $"{minutes}m ago";
+        }
+
+        if (elapsed.TotalHours >= 0 && elapsed.TotalHours < 24)
+        {
+            var hours = Math.Max(1, (int)Math.Floor(elapsed.TotalHours));
+            return $"{hours}h ago";
+        }
+
+        if (local.Date == now.Date.AddDays(-1))
+        {
+            return $"Yesterday {local:HH:mm}";
+        }
+
+        return local.ToString("MMM d, HH:mm");
+    }
+
+    private static string BuildCopyCountLabel(int copyCount)
+        => $"Copied {Math.Max(1, copyCount)}x";
 }

@@ -52,6 +52,8 @@ public sealed class MainViewModel : ViewModelBase
         DeleteItemCommand = new AsyncRelayCommand(DeleteItemAsync);
         TogglePinCommand = new AsyncRelayCommand(TogglePinAsync);
         CopyItemCommand = new AsyncRelayCommand(CopyItemAsync);
+        RestorePreviousClipboardCommand = new AsyncRelayCommand(RestorePreviousClipboardAsync, _ => CanRestorePreviousClipboard);
+        DoNotSaveNextCommand = new RelayCommand(_ => MarkDoNotSaveNext());
         SelectItemCommand = new RelayCommand(SelectItem);
         OpenPreviewCommand = new RelayCommand(OpenPreview);
         ClosePreviewCommand = new RelayCommand(_ => ClosePreview());
@@ -188,6 +190,7 @@ public sealed class MainViewModel : ViewModelBase
     }
 
     public bool HasStatusMessage => !string.IsNullOrWhiteSpace(StatusMessage);
+    public bool CanRestorePreviousClipboard => _copyTextItemToClipboardUseCase.CanRestorePreviousClipboard;
 
     public ICommand RefreshCommand { get; }
     public ICommand SearchCommand { get; }
@@ -196,6 +199,8 @@ public sealed class MainViewModel : ViewModelBase
     public ICommand DeleteItemCommand { get; }
     public ICommand TogglePinCommand { get; }
     public ICommand CopyItemCommand { get; }
+    public ICommand RestorePreviousClipboardCommand { get; }
+    public ICommand DoNotSaveNextCommand { get; }
     public ICommand SelectItemCommand { get; }
     public ICommand OpenPreviewCommand { get; }
     public ICommand ClosePreviewCommand { get; }
@@ -204,6 +209,8 @@ public sealed class MainViewModel : ViewModelBase
     public ICommand OpenClearDataCommand { get; }
     public ICommand CloseClearDataCommand { get; }
     public ICommand ConfirmClearDataCommand { get; }
+
+    public event EventHandler? HistoryChanged;
 
     public void SetStatusMessage(string message)
     {
@@ -227,6 +234,7 @@ public sealed class MainViewModel : ViewModelBase
 
             var items = await _clipboardItemRepository.SearchAsync(query);
             ApplyItems(items);
+            HistoryChanged?.Invoke(this, EventArgs.Empty);
         }
         catch
         {
@@ -317,12 +325,44 @@ public sealed class MainViewModel : ViewModelBase
         try
         {
             var result = await _copyTextItemToClipboardUseCase.ExecuteAsync(item.Id);
-            SetStatusMessage(result.IsSuccess ? "Copied to clipboard." : "Could not copy item.");
+            if (result.IsSuccess && CanRestorePreviousClipboard)
+            {
+                SetStatusMessage("Item copied. Previous clipboard can be restored.");
+            }
+            else
+            {
+                SetStatusMessage(result.IsSuccess ? "Copied to clipboard." : "Could not copy item.");
+            }
+
+            OnPropertyChanged(nameof(CanRestorePreviousClipboard));
+            NotifyRestorePreviousClipboardCanExecuteChanged();
         }
         catch
         {
             SetStatusMessage("Could not copy item.");
         }
+    }
+
+    private async Task RestorePreviousClipboardAsync(object? parameter)
+    {
+        try
+        {
+            var result = await _copyTextItemToClipboardUseCase.RestorePreviousClipboardAsync();
+            SetStatusMessage(result.IsSuccess ? "Previous clipboard restored." : "Could not restore previous clipboard.");
+        }
+        catch
+        {
+            SetStatusMessage("Could not restore previous clipboard.");
+        }
+
+        OnPropertyChanged(nameof(CanRestorePreviousClipboard));
+        NotifyRestorePreviousClipboardCanExecuteChanged();
+    }
+
+    private void MarkDoNotSaveNext()
+    {
+        _captureState.MarkDoNotSaveNextCapture();
+        SetStatusMessage("Next clipboard change will not be saved.");
     }
 
     private void SelectItem(object? parameter)
@@ -358,6 +398,16 @@ public sealed class MainViewModel : ViewModelBase
     public void ClosePreview()
     {
         IsPreviewOpen = false;
+    }
+
+    public void SelectNextItem()
+    {
+        MoveSelection(1);
+    }
+
+    public void SelectPreviousItem()
+    {
+        MoveSelection(-1);
     }
 
     public void OpenSettings()
@@ -435,8 +485,42 @@ public sealed class MainViewModel : ViewModelBase
         }
 
         EmptyStateText = Items.Count == 0
-            ? "No items match your current search and filters."
+            ? BuildEmptyStateText()
             : string.Empty;
+    }
+
+    private string BuildEmptyStateText()
+    {
+        if (string.IsNullOrWhiteSpace(SearchQuery) && SelectedFilter == ClipboardFilter.All)
+        {
+            return "No clipboard items yet.";
+        }
+
+        return "No items match your current search and filters.";
+    }
+
+    private void MoveSelection(int delta)
+    {
+        if (Items.Count == 0)
+        {
+            SelectedItem = null;
+            return;
+        }
+
+        var currentIndex = SelectedItem is null ? -1 : Items.IndexOf(SelectedItem);
+        var nextIndex = currentIndex < 0
+            ? 0
+            : Math.Clamp(currentIndex + delta, 0, Items.Count - 1);
+
+        SelectItem(Items[nextIndex]);
+    }
+
+    private void NotifyRestorePreviousClipboardCanExecuteChanged()
+    {
+        if (RestorePreviousClipboardCommand is AsyncRelayCommand asyncCommand)
+        {
+            asyncCommand.NotifyCanExecuteChanged();
+        }
     }
 
     private static ClipboardItem CloneWithPinned(ClipboardItem item, bool isPinned)

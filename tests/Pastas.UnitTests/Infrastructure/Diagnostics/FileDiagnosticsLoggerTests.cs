@@ -28,4 +28,18 @@ public sealed class FileDiagnosticsLoggerTests
 
         Assert.Null(ex);
     }
+
+    [Fact]
+    public void Error_DoesNotWriteExceptionMessage()
+    {
+        var tempDirectory = Path.Combine(Path.GetTempPath(), "pastas-tests", Guid.NewGuid().ToString("N"));
+        var logPath = Path.Combine(tempDirectory, "pastas.log");
+        var logger = new FileDiagnosticsLogger(logPath);
+
+        logger.Error("Copy failed.", new InvalidOperationException("secret clipboard text"));
+
+        var content = File.ReadAllText(logPath);
+        Assert.Contains("ExceptionType=InvalidOperationException", content);
+        Assert.DoesNotContain("secret clipboard text", content);
+    }
 }

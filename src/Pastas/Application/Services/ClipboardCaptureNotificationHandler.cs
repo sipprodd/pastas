@@ -26,6 +26,11 @@ public sealed class ClipboardCaptureNotificationHandler
 
     public async Task HandleClipboardChangedAsync(CancellationToken cancellationToken = default)
     {
+        if (_captureState.IsCapturePaused)
+        {
+            return;
+        }
+
         if (_captureState.ConsumeInternalClipboardWriteFlag() || _captureState.ConsumeDoNotSaveNextFlag())
         {
             return;

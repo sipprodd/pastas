@@ -32,7 +32,7 @@ public sealed class SqliteSettingsRepository : ISettingsRepository
         return new AppSettings
         {
             Hotkey = GetValue(values, "Hotkey", defaults.Hotkey),
-            MaxItems = GetInt(values, "MaxItems", defaults.MaxItems),
+            MaxItems = GetPositiveInt(values, "MaxItems", defaults.MaxItems),
             MaxItemSizeBytes = GetLong(values, "MaxItemSizeBytes", defaults.MaxItemSizeBytes),
             MaxCacheSizeBytes = GetLong(values, "MaxCacheSizeBytes", defaults.MaxCacheSizeBytes),
             NotificationsEnabled = GetBool(values, "NotificationsEnabled", defaults.NotificationsEnabled),
@@ -42,8 +42,22 @@ public sealed class SqliteSettingsRepository : ISettingsRepository
             RevealProtectedSeconds = GetInt(values, "RevealProtectedSeconds", defaults.RevealProtectedSeconds),
             ClearProtectedClipboardAfterDelay = GetBool(values, "ClearProtectedClipboardAfterDelay", defaults.ClearProtectedClipboardAfterDelay),
             ClearProtectedClipboardDelaySeconds = GetInt(values, "ClearProtectedClipboardDelaySeconds", defaults.ClearProtectedClipboardDelaySeconds),
-            ThemeMode = GetEnum(values, "ThemeMode", defaults.ThemeMode)
+            ThemeMode = GetEnum(values, "ThemeMode", defaults.ThemeMode),
+            ClearWindowsClipboardHistoryOnStartup = GetBool(values, "ClearWindowsClipboardHistoryOnStartup", defaults.ClearWindowsClipboardHistoryOnStartup)
         };
+    }
+
+    public async Task<bool> HasValueAsync(string key, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
+
+        await using var connection = await _connectionFactory.OpenConnectionAsync(cancellationToken);
+        await using var command = connection.CreateCommand();
+        command.CommandText = "SELECT 1 FROM app_settings WHERE key = @key LIMIT 1;";
+        command.Parameters.AddWithValue("@key", key);
+
+        var value = await command.ExecuteScalarAsync(cancellationToken);
+        return value is not null;
     }
 
     public async Task SaveAsync(AppSettings settings, CancellationToken cancellationToken = default)
@@ -61,7 +75,8 @@ public sealed class SqliteSettingsRepository : ISettingsRepository
             ["RevealProtectedSeconds"] = settings.RevealProtectedSeconds.ToString(),
             ["ClearProtectedClipboardAfterDelay"] = settings.ClearProtectedClipboardAfterDelay.ToString(),
             ["ClearProtectedClipboardDelaySeconds"] = settings.ClearProtectedClipboardDelaySeconds.ToString(),
-            ["ThemeMode"] = settings.ThemeMode.ToString()
+            ["ThemeMode"] = settings.ThemeMode.ToString(),
+            ["ClearWindowsClipboardHistoryOnStartup"] = settings.ClearWindowsClipboardHistoryOnStartup.ToString()
         };
 
         await using var connection = await _connectionFactory.OpenConnectionAsync(cancellationToken);
@@ -85,6 +100,9 @@ public sealed class SqliteSettingsRepository : ISettingsRepository
 
     private static int GetInt(IReadOnlyDictionary<string, string> values, string key, int defaultValue)
         => values.TryGetValue(key, out var value) && int.TryParse(value, out var parsed) ? parsed : defaultValue;
+
+    private static int GetPositiveInt(IReadOnlyDictionary<string, string> values, string key, int defaultValue)
+        => values.TryGetValue(key, out var value) && int.TryParse(value, out var parsed) && parsed > 0 ? parsed : defaultValue;
 
     private static long GetLong(IReadOnlyDictionary<string, string> values, string key, long defaultValue)
         => values.TryGetValue(key, out var value) && long.TryParse(value, out var parsed) ? parsed : defaultValue;

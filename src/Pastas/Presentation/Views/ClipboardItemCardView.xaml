@@ -4,7 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             d:DesignHeight="78"
+             d:DesignHeight="74"
              d:DesignWidth="640">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
@@ -20,8 +20,11 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" BorderBrush="Transparent" BorderThickness="0">
-                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="Transparent"
+                                BorderThickness="0">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                         </Border>
                     </ControlTemplate>
                 </Setter.Value>
@@ -48,7 +51,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="9">
+                                CornerRadius="8">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                         <ControlTemplate.Triggers>
@@ -61,8 +64,8 @@
                                 <Setter TargetName="IconButtonBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
                             </Trigger>
                             <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="IconButtonBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
                                 <Setter TargetName="IconButtonBorder" Property="Background" Value="{DynamicResource ButtonHoverBrush}" />
+                                <Setter TargetName="IconButtonBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -71,11 +74,18 @@
         </Style>
     </UserControl.Resources>
 
-    <Border x:Name="ItemCard" Margin="0,0,0,8" Padding="12,10" CornerRadius="14" MinHeight="78" Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource SubtleBorderBrush}" BorderThickness="1">
+    <Border x:Name="ItemCard"
+            Margin="0,0,0,8"
+            Padding="12,9"
+            MinHeight="74"
+            CornerRadius="12"
+            Background="{DynamicResource CardBackgroundBrush}"
+            BorderBrush="{DynamicResource SubtleBorderBrush}"
+            BorderThickness="1">
         <Border.Style>
             <Style TargetType="Border">
-                <Setter Property="BorderBrush" Value="{DynamicResource SubtleBorderBrush}" />
                 <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource SubtleBorderBrush}" />
                 <Setter Property="BorderThickness" Value="1" />
                 <Style.Triggers>
                     <Trigger Property="IsMouseOver" Value="True">
@@ -84,39 +94,18 @@
                     </Trigger>
                     <DataTrigger Binding="{Binding IsPinned}" Value="True">
                         <Setter Property="BorderBrush" Value="{DynamicResource PinnedBorderBrush}" />
-                        <Setter Property="BorderThickness" Value="1" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding IsSelected}" Value="True">
                         <Setter Property="Background" Value="{DynamicResource CardSelectedBackgroundBrush}" />
                         <Setter Property="BorderBrush" Value="{DynamicResource SelectedBorderBrush}" />
-                        <Setter Property="BorderThickness" Value="1" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding ElementName=CardSelectButton, Path=IsKeyboardFocusWithin}" Value="True">
                         <Setter Property="Background" Value="{DynamicResource CardSelectedBackgroundBrush}" />
                         <Setter Property="BorderBrush" Value="{DynamicResource SelectedBorderBrush}" />
-                        <Setter Property="BorderThickness" Value="1" />
                     </DataTrigger>
                     <MultiDataTrigger>
                         <MultiDataTrigger.Conditions>
                             <Condition Binding="{Binding IsPinned}" Value="True" />
-                            <Condition Binding="{Binding IsSelected}" Value="True" />
-                        </MultiDataTrigger.Conditions>
-                        <Setter Property="Background" Value="{DynamicResource CardSelectedBackgroundBrush}" />
-                        <Setter Property="BorderBrush" Value="{DynamicResource SelectedBorderBrush}" />
-                        <Setter Property="BorderThickness" Value="1" />
-                    </MultiDataTrigger>
-                    <MultiDataTrigger>
-                        <MultiDataTrigger.Conditions>
-                            <Condition Binding="{Binding IsPinned}" Value="True" />
-                            <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True" />
-                        </MultiDataTrigger.Conditions>
-                        <Setter Property="Background" Value="{DynamicResource CardSelectedBackgroundBrush}" />
-                        <Setter Property="BorderBrush" Value="{DynamicResource SelectedBorderBrush}" />
-                        <Setter Property="BorderThickness" Value="1" />
-                    </MultiDataTrigger>
-                    <MultiDataTrigger>
-                        <MultiDataTrigger.Conditions>
-                            <Condition Binding="{Binding IsSelected}" Value="True" />
                             <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True" />
                         </MultiDataTrigger.Conditions>
                         <Setter Property="Background" Value="{DynamicResource CardSelectedBackgroundBrush}" />
@@ -130,35 +119,37 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="204" />
             </Grid.ColumnDefinitions>
 
-            <Grid Grid.ColumnSpan="3" IsHitTestVisible="False">
-                <Border Width="5"
-                        Height="50"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Center"
-                        CornerRadius="3"
-                        Background="{DynamicResource SelectedAccentMarkerBrush}"
-                        Visibility="{Binding IsSelected, Converter={StaticResource BoolToVisibility}}"
-                        Margin="-7,0,0,0" />
-            </Grid>
+            <Border Grid.ColumnSpan="3"
+                    Width="4"
+                    Height="48"
+                    Margin="-7,0,0,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    CornerRadius="2"
+                    Background="{DynamicResource SelectedAccentMarkerBrush}"
+                    Visibility="{Binding IsSelected, Converter={StaticResource BoolToVisibility}}"
+                    IsHitTestVisible="False" />
 
-            <Grid VerticalAlignment="Center" Margin="0,0,10,0">
-                <Border Width="40"
-                        Height="40"
+            <Grid Grid.Column="0" VerticalAlignment="Center" Margin="0,0,10,0">
+                <Border Width="44"
+                        Height="44"
                         CornerRadius="10"
                         Background="{DynamicResource InputBackgroundBrush}"
                         BorderBrush="{DynamicResource SubtleBorderBrush}"
                         BorderThickness="1"
                         ClipToBounds="True">
                     <Grid>
-                        <Image Source="{Binding ThumbnailOrImagePath}" Stretch="UniformToFill">
+                        <Image Source="{Binding ThumbnailPath}"
+                               Stretch="UniformToFill"
+                               RenderOptions.BitmapScalingMode="LowQuality">
                             <Image.Style>
                                 <Style TargetType="Image">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding HasThumbnailOrImagePath}" Value="True">
+                                        <DataTrigger Binding="{Binding HasThumbnail}" Value="True">
                                             <Setter Property="Visibility" Value="Visible" />
                                         </DataTrigger>
                                     </Style.Triggers>
@@ -168,7 +159,7 @@
                         <TextBlock HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
                                    Foreground="{DynamicResource AccentBrush}"
-                                   FontSize="14"
+                                   FontSize="12"
                                    FontWeight="SemiBold">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
@@ -182,7 +173,7 @@
                                             <Setter Property="Opacity" Value="1" />
                                             <Setter Property="FontWeight" Value="Bold" />
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding HasThumbnailOrImagePath}" Value="True">
+                                        <DataTrigger Binding="{Binding HasThumbnail}" Value="True">
                                             <Setter Property="Visibility" Value="Collapsed" />
                                         </DataTrigger>
                                     </Style.Triggers>
@@ -191,21 +182,19 @@
                         </TextBlock>
                     </Grid>
                 </Border>
-                <Border Width="12"
-                        Height="12"
+
+                <Border HorizontalAlignment="Left"
+                        VerticalAlignment="Bottom"
+                        Margin="2,0,0,-5"
+                        Padding="5,1"
                         CornerRadius="6"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Top"
-                        Margin="0,-2,-2,0"
                         Background="{DynamicResource InputBackgroundBrush}"
                         BorderBrush="{DynamicResource PinnedBorderBrush}"
                         BorderThickness="1"
                         Visibility="{Binding IsPinned, Converter={StaticResource BoolToVisibility}}">
-                    <TextBlock Text="P"
-                               FontSize="8"
+                    <TextBlock Text="Pinned"
+                               FontSize="8.5"
                                FontWeight="Bold"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
                                Foreground="{DynamicResource AccentBrush}" />
                 </Border>
             </Grid>
@@ -217,42 +206,62 @@
                     Command="{Binding DataContext.SelectItemCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                     CommandParameter="{Binding}">
                 <Button.InputBindings>
-                    <MouseBinding Gesture="RightClick" Command="{Binding DataContext.OpenPreviewCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
-                    <MouseBinding Gesture="LeftDoubleClick" Command="{Binding DataContext.CopyItemCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                    <MouseBinding Gesture="RightClick"
+                                  Command="{Binding DataContext.OpenPreviewCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                  CommandParameter="{Binding}" />
+                    <MouseBinding Gesture="LeftDoubleClick"
+                                  Command="{Binding DataContext.CopyItemCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                  CommandParameter="{Binding}" />
                 </Button.InputBindings>
-                <StackPanel Margin="2,0,8,0" VerticalAlignment="Center">
-                    <TextBlock Text="{Binding PreviewText}" Foreground="{DynamicResource CreamTextBrush}" FontSize="13" Margin="0,0,0,4" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" MaxHeight="20" />
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding SourceLabel}"
-                                   FontSize="11"
-                                   TextTrimming="CharacterEllipsis"
-                                   TextWrapping="NoWrap"
-                                   MaxWidth="240">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding SourceLabel}" Value="Unknown source">
-                                            <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                        <TextBlock Text=" · " Foreground="{DynamicResource MutedTextBrush}" FontSize="11" />
-                        <TextBlock Text="{Binding TimeLabel}" Foreground="{DynamicResource MutedTextBrush}" FontSize="11" TextWrapping="NoWrap" />
-                    </StackPanel>
+                <StackPanel Margin="2,0,12,0" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding PreviewText}"
+                               Foreground="{DynamicResource CreamTextBrush}"
+                               FontSize="13"
+                               FontWeight="SemiBold"
+                               Margin="0,0,0,5"
+                               TextWrapping="NoWrap"
+                               TextTrimming="CharacterEllipsis"
+                               MaxHeight="20" />
+                    <TextBlock Text="{Binding MetadataLine}"
+                               Foreground="{DynamicResource MutedTextBrush}"
+                               FontSize="11"
+                               TextWrapping="NoWrap"
+                               TextTrimming="CharacterEllipsis" />
                 </StackPanel>
             </Button>
 
             <StackPanel x:Name="Actions"
                         Grid.Column="2"
                         Orientation="Horizontal"
+                        HorizontalAlignment="Right"
                         VerticalAlignment="Center"
-                        Margin="8,0,0,0"
-                        Visibility="{Binding ElementName=ItemCard, Path=IsMouseOver, Converter={StaticResource BoolToVisibility}}">
-                <Button Content="View" ToolTip="Preview" Style="{DynamicResource CardActionIconButtonStyle}" Command="{Binding DataContext.OpenPreviewCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
-                <Button ToolTip="Pin or unpin" MinWidth="60" Command="{Binding DataContext.TogglePinCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}">
+                        Margin="8,0,0,0">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Opacity" Value="0" />
+                        <Setter Property="IsHitTestVisible" Value="False" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=ItemCard, Path=IsMouseOver}" Value="True">
+                                <Setter Property="Opacity" Value="1" />
+                                <Setter Property="IsHitTestVisible" Value="True" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding ElementName=CardSelectButton, Path=IsKeyboardFocusWithin}" Value="True">
+                                <Setter Property="Opacity" Value="1" />
+                                <Setter Property="IsHitTestVisible" Value="True" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+
+                <Button Content="View"
+                        ToolTip="Preview"
+                        Style="{DynamicResource CardActionIconButtonStyle}"
+                        Command="{Binding DataContext.OpenPreviewCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                        CommandParameter="{Binding}" />
+                <Button ToolTip="Pin or unpin"
+                        MinWidth="60"
+                        Command="{Binding DataContext.TogglePinCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                        CommandParameter="{Binding}">
                     <Button.Style>
                         <Style TargetType="Button" BasedOn="{StaticResource CardActionIconButtonStyle}">
                             <Setter Property="Content" Value="Pin" />
@@ -264,7 +273,12 @@
                         </Style>
                     </Button.Style>
                 </Button>
-                <Button Content="Del" ToolTip="Delete" Style="{DynamicResource CardActionIconButtonStyle}" Command="{Binding DataContext.DeleteItemCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                <Button Content="Delete"
+                        MinWidth="64"
+                        ToolTip="Delete"
+                        Style="{DynamicResource CardActionIconButtonStyle}"
+                        Command="{Binding DataContext.DeleteItemCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                        CommandParameter="{Binding}" />
             </StackPanel>
         </Grid>
     </Border>

@@ -154,6 +154,7 @@ public class ClipboardCaptureCoordinatorTests
         public Task<IReadOnlyList<ClipboardItem>> SearchAsync(ClipboardSearchQuery query, CancellationToken cancellationToken = default) => Task.FromResult((IReadOnlyList<ClipboardItem>)[]);
         public Task<IReadOnlyList<ClipboardItem>> DeleteByCategoriesAsync(bool includeText, bool includeImages, bool includePinned, CancellationToken cancellationToken = default) => Task.FromResult((IReadOnlyList<ClipboardItem>)[]);
         public virtual Task<int> CountAsync(CancellationToken cancellationToken = default) => Task.FromResult(0);
+        public virtual Task<StorageStats> GetStorageStatsAsync(CancellationToken cancellationToken = default) => Task.FromResult(new StorageStats());
     }
 
     private sealed class ThrowingClipboardItemRepository : FakeClipboardItemRepository

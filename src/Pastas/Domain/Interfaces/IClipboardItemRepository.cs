@@ -13,4 +13,5 @@ public interface IClipboardItemRepository
     Task<IReadOnlyList<ClipboardItem>> DeleteByCategoriesAsync(bool includeText, bool includeImages, bool includePinned, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<ClipboardItem>> SearchAsync(ClipboardSearchQuery query, CancellationToken cancellationToken = default);
     Task<int> CountAsync(CancellationToken cancellationToken = default);
+    Task<StorageStats> GetStorageStatsAsync(CancellationToken cancellationToken = default);
 }

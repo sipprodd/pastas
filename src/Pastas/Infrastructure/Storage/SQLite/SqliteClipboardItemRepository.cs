@@ -195,6 +195,32 @@ WHERE id = @id;";
         return Convert.ToInt32(value);
     }
 
+    public async Task<StorageStats> GetStorageStatsAsync(CancellationToken cancellationToken = default)
+    {
+        await using var connection = await _connectionFactory.OpenConnectionAsync(cancellationToken);
+        await using var command = connection.CreateCommand();
+        command.CommandText = @"SELECT
+COUNT(*) AS total_items,
+COALESCE(SUM(CASE WHEN is_pinned = 1 THEN 1 ELSE 0 END), 0) AS pinned_items,
+COALESCE(SUM(CASE WHEN type IN ('Image', 'Screenshot') THEN 1 ELSE 0 END), 0) AS image_items,
+COALESCE(SUM(CASE WHEN size_bytes > 0 THEN size_bytes ELSE 0 END), 0) AS approx_usage_bytes
+FROM clipboard_items;";
+
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+        if (!await reader.ReadAsync(cancellationToken))
+        {
+            return new StorageStats();
+        }
+
+        return new StorageStats
+        {
+            TotalItems = (int)Math.Max(0, reader.GetInt64(reader.GetOrdinal("total_items"))),
+            PinnedItems = (int)Math.Max(0, reader.GetInt64(reader.GetOrdinal("pinned_items"))),
+            ImageItems = (int)Math.Max(0, reader.GetInt64(reader.GetOrdinal("image_items"))),
+            ApproxUsageBytes = Math.Max(0, reader.GetInt64(reader.GetOrdinal("approx_usage_bytes")))
+        };
+    }
+
     private async Task ExecuteNonQueryForItemAsync(string sql, ClipboardItem item, CancellationToken cancellationToken)
     {
         await using var connection = await _connectionFactory.OpenConnectionAsync(cancellationToken);

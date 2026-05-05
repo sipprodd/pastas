@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -42,24 +41,24 @@ public partial class MainWindow : Window
         },
         [ThemeMode.White] = new Dictionary<string, string>
         {
-            ["ShellBrush"] = "#FFF5F3EF", ["SurfaceBrush"] = "#FFFFFFFF", ["SurfaceElevatedBrush"] = "#FFF8F7F4",
-            ["CardBackgroundBrush"] = "#FFFFFFFF", ["CardHoverBackgroundBrush"] = "#FFF2F5FA", ["CardSelectedBackgroundBrush"] = "#FFE8EEF7",
-            ["SubtleBorderBrush"] = "#FFD8DDE6", ["HoverBorderBrush"] = "#FFA9B8CC", ["SelectedBorderBrush"] = "#FF111111",
-            ["SelectedAccentMarkerBrush"] = "#FF111111", ["CreamTextBrush"] = "#FF1A202C", ["MutedTextBrush"] = "#FF5D6778",
-            ["AccentBrush"] = "#FF111111", ["PinnedBorderBrush"] = "#FF111111", ["InputBackgroundBrush"] = "#FFFFFFFF",
-            ["ButtonBackgroundBrush"] = "#FFF7F3ED", ["ButtonHoverBrush"] = "#FFEFE8DE", ["ButtonPressedBrush"] = "#FFE4D9CB",
-            ["SortPopupBackgroundBrush"] = "#FFFFFFFF", ["ScrollbarTrackBrush"] = "#FFE6EBF2", ["ScrollbarThumbBrush"] = "#FF5F6368",
-            ["ScrollbarThumbHoverBrush"] = "#FF111111", ["OverlayBrush"] = "#99E7EAF0"
+            ["ShellBrush"] = "#FFF7F7F5", ["SurfaceBrush"] = "#FFFFFFFF", ["SurfaceElevatedBrush"] = "#FFF2F2EF",
+            ["CardBackgroundBrush"] = "#FFFFFFFF", ["CardHoverBackgroundBrush"] = "#FFF1F1EE", ["CardSelectedBackgroundBrush"] = "#FFEAEAE6",
+            ["SubtleBorderBrush"] = "#FFC8C8C2", ["HoverBorderBrush"] = "#FF4A4A46", ["SelectedBorderBrush"] = "#FF000000",
+            ["SelectedAccentMarkerBrush"] = "#FF000000", ["CreamTextBrush"] = "#FF0B0B0B", ["MutedTextBrush"] = "#FF4B4B47",
+            ["AccentBrush"] = "#FF000000", ["PinnedBorderBrush"] = "#FF1D1D1B", ["InputBackgroundBrush"] = "#FFFFFFFF",
+            ["ButtonBackgroundBrush"] = "#FFF4F4F1", ["ButtonHoverBrush"] = "#FFE9E9E4", ["ButtonPressedBrush"] = "#FFDCDCD5",
+            ["SortPopupBackgroundBrush"] = "#FFFFFFFF", ["ScrollbarTrackBrush"] = "#FFE2E2DD", ["ScrollbarThumbBrush"] = "#FF3F3F3B",
+            ["ScrollbarThumbHoverBrush"] = "#FF000000", ["OverlayBrush"] = "#99E8E8E2"
         },
         [ThemeMode.Black] = new Dictionary<string, string>
         {
-            ["ShellBrush"] = "#FF000000", ["SurfaceBrush"] = "#FF050505", ["SurfaceElevatedBrush"] = "#FF0A0A0A",
-            ["CardBackgroundBrush"] = "#FF101214", ["CardHoverBackgroundBrush"] = "#FF171D22", ["CardSelectedBackgroundBrush"] = "#FF102636",
-            ["SubtleBorderBrush"] = "#FF232A31", ["HoverBorderBrush"] = "#FF35505F", ["SelectedBorderBrush"] = "#FFFFFFFF",
-            ["SelectedAccentMarkerBrush"] = "#FFFFFFFF", ["CreamTextBrush"] = "#FFF3F7FA", ["MutedTextBrush"] = "#FF9AA8B5",
-            ["AccentBrush"] = "#FFFFFFFF", ["PinnedBorderBrush"] = "#FFECEFF1", ["InputBackgroundBrush"] = "#FF0D1013",
-            ["ButtonBackgroundBrush"] = "#FF111111", ["ButtonHoverBrush"] = "#FF1C1C1C", ["ButtonPressedBrush"] = "#FF080808",
-            ["SortPopupBackgroundBrush"] = "#FF111111", ["ScrollbarTrackBrush"] = "#FF080D12", ["ScrollbarThumbBrush"] = "#FFB0BEC5",
+            ["ShellBrush"] = "#FF000000", ["SurfaceBrush"] = "#FF000000", ["SurfaceElevatedBrush"] = "#FF070707",
+            ["CardBackgroundBrush"] = "#FF080808", ["CardHoverBackgroundBrush"] = "#FF111111", ["CardSelectedBackgroundBrush"] = "#FF171717",
+            ["SubtleBorderBrush"] = "#FF242424", ["HoverBorderBrush"] = "#FF7A7A7A", ["SelectedBorderBrush"] = "#FFFFFFFF",
+            ["SelectedAccentMarkerBrush"] = "#FFFFFFFF", ["CreamTextBrush"] = "#FFF7F7F7", ["MutedTextBrush"] = "#FFA7A7A7",
+            ["AccentBrush"] = "#FFFFFFFF", ["PinnedBorderBrush"] = "#FFFFFFFF", ["InputBackgroundBrush"] = "#FF050505",
+            ["ButtonBackgroundBrush"] = "#FF0B0B0B", ["ButtonHoverBrush"] = "#FF171717", ["ButtonPressedBrush"] = "#FF000000",
+            ["SortPopupBackgroundBrush"] = "#FF060606", ["ScrollbarTrackBrush"] = "#FF050505", ["ScrollbarThumbBrush"] = "#FFBDBDBD",
             ["ScrollbarThumbHoverBrush"] = "#FFFFFFFF", ["OverlayBrush"] = "#AA000000"
         }
     };
@@ -70,6 +69,9 @@ public partial class MainWindow : Window
     private IGlobalHotkeyService? _hotkeyService;
     private ITrayService? _trayService;
     private ISettingsRepository? _settingsRepository;
+    private ClipboardCleanupService? _clipboardCleanupService;
+    private StorageStatsService? _storageStatsService;
+    private ClipboardCaptureState? _captureState;
     private AppSettings _settings = new();
     private string _pendingHotkey = "Alt+V";
     private ThemeMode _pendingThemeMode = ThemeMode.Chocolate;
@@ -77,6 +79,7 @@ public partial class MainWindow : Window
     private bool _isExiting;
     private bool _isCleanedUp;
     private bool _isCompositionInitialized;
+    private bool _runtimeServicesStarted;
     private bool _suppressSortToggle;
 
     public MainWindow()
@@ -194,9 +197,42 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (e.Key == Key.Space && !_viewModel.IsPreviewOpen)
+        var isTextInput = e.OriginalSource is DependencyObject source && IsTextInputSource(source);
+
+        if (!isTextInput && e.Key == Key.Enter && !_viewModel.IsSettingsOpen && !_viewModel.IsClearDataOpen)
         {
+            if (_viewModel.SelectedItem is not null && _viewModel.CopyItemCommand.CanExecute(_viewModel.SelectedItem))
+            {
+                _viewModel.CopyItemCommand.Execute(_viewModel.SelectedItem);
+                e.Handled = true;
+            }
+
+            return;
+        }
+
+        if (e.Key == Key.Space && _viewModel.IsMainContentVisible)
+        {
+            if (isTextInput)
+            {
+                return;
+            }
+
             _viewModel.OpenPreview();
+            e.Handled = true;
+            return;
+        }
+
+        if (!isTextInput && _viewModel.IsMainContentVisible && e.Key is Key.Down or Key.Up)
+        {
+            if (e.Key == Key.Down)
+            {
+                _viewModel.SelectNextItem();
+            }
+            else
+            {
+                _viewModel.SelectPreviousItem();
+            }
+
             e.Handled = true;
             return;
         }
@@ -213,13 +249,6 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (_viewModel.IsSettingsOpen)
-        {
-            _viewModel.CloseSettings();
-            e.Handled = true;
-            return;
-        }
-
         if (_viewModel.IsClearDataOpen)
         {
             _viewModel.CloseClearData();
@@ -227,8 +256,33 @@ public partial class MainWindow : Window
             return;
         }
 
+        if (_viewModel.IsSettingsOpen)
+        {
+            _viewModel.CloseSettings();
+            e.Handled = true;
+            return;
+        }
+
         Hide();
         e.Handled = true;
+    }
+
+    private static bool IsTextInputSource(DependencyObject source)
+    {
+        var node = source;
+        while (node is not null)
+        {
+            if (node is System.Windows.Controls.TextBox
+                or System.Windows.Controls.PasswordBox
+                or System.Windows.Controls.ComboBox)
+            {
+                return true;
+            }
+
+            node = GetParentObject(node);
+        }
+
+        return false;
     }
 
 
@@ -319,11 +373,12 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
         if (!_isCompositionInitialized)
         {
             _diagnosticsLogger.Info("MainWindow loaded: before CreateCompositionAsync(this).");
-            (_viewModel, _diagnosticsLogger, _clipboardCaptureNotificationHandler, _clipboardChangeWatcher, _hotkeyService, _trayService, _settingsRepository) = await CreateCompositionAsync(this);
+            (_viewModel, _diagnosticsLogger, _clipboardCaptureNotificationHandler, _clipboardChangeWatcher, _hotkeyService, _trayService, _settingsRepository, _clipboardCleanupService, _storageStatsService, _captureState) = await CreateCompositionAsync(this);
             _diagnosticsLogger.Info("MainWindow loaded: after CreateCompositionAsync(this).");
 
             _diagnosticsLogger.Info("MainWindow loaded: before DataContext assignment.");
             DataContext = _viewModel;
+            _viewModel.HistoryChanged += OnHistoryChangedAsync;
             _diagnosticsLogger.Info("MainWindow loaded: after DataContext assignment.");
 
             _diagnosticsLogger.Info("MainWindow loaded: before clipboard watcher event subscription.");
@@ -344,26 +399,32 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
             if (_trayService is not null)
             {
                 _trayService.ShowRequested += OnTrayShowRequestedAsync;
+                _trayService.SettingsRequested += OnTraySettingsRequestedAsync;
+                _trayService.CapturePauseToggleRequested += OnTrayCapturePauseToggleRequested;
                 _trayService.ExitRequested += OnTrayExitRequestedAsync;
-                if (_trayService is WindowsTrayService windowsTrayService)
-                {
-                    windowsTrayService.SettingsRequested += OnTraySettingsRequestedAsync;
-                }
             }
             _diagnosticsLogger.Info("MainWindow loaded: after tray event subscription.");
 
             _isCompositionInitialized = true;
         }
 
-        _clipboardChangeWatcher?.Start();
-        _trayService?.Start();
-
         await LoadAndApplySettingsAsync();
 
-        if (_viewModel is not null)
+        StartRuntimeServicesOnce();
+    }
+
+    private void StartRuntimeServicesOnce()
+    {
+        if (_runtimeServicesStarted)
         {
-            await _viewModel.RefreshAsync();
+            return;
         }
+
+        _clipboardChangeWatcher?.Start();
+        _trayService?.SetCapturePaused(_captureState?.IsCapturePaused == true);
+        _trayService?.Start();
+        _runtimeServicesStarted = true;
+        _diagnosticsLogger.Info("Runtime services started.");
     }
 
     private async Task LoadAndApplySettingsAsync()
@@ -394,8 +455,9 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
 
         if (_viewModel is not null)
         {
+            await EnforceStorageLimitsAsync();
             await _viewModel.RefreshAsync();
-            UpdateStorageSummary();
+            await UpdateStorageSummaryAsync();
         }
     }
 
@@ -413,14 +475,32 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
         UpdateThemeChipSelection(mode);
     }
 
-    private void UpdateStorageSummary()
+    private async Task UpdateStorageSummaryAsync()
     {
-        if (_viewModel is null) return;
-        var total = _viewModel.Items.Count;
-        var pinned = _viewModel.Items.Count(x => x.IsPinned);
-        var images = _viewModel.Items.Count(x => x.IsImage);
-        var approx = _viewModel.Items.Sum(x => ((x.PreviewText?.Length ?? 0) + (x.PreviewBodyText?.Length ?? 0)) * 2) / (1024d * 1024d);
-        StorageSummaryText.Text = $"Total items: {total}\nPinned: {pinned}\nImages: {images}\nApprox. usage: {approx:F2} MB";
+        if (_storageStatsService is null)
+        {
+            StorageSummaryText.Text = "Total items: 0\nPinned: 0\nImages: 0\nApprox. usage: 0.00 MB";
+            return;
+        }
+
+        var stats = await _storageStatsService.GetStatsAsync();
+        var usageMegabytes = Math.Max(0, stats.ApproxUsageBytes) / (1024d * 1024d);
+        StorageSummaryText.Text = $"Total items: {Math.Max(0, stats.TotalItems)}\nPinned: {Math.Max(0, stats.PinnedItems)}\nImages: {Math.Max(0, stats.ImageItems)}\nApprox. usage: {usageMegabytes:F2} MB";
+    }
+
+    private async Task EnforceStorageLimitsAsync()
+    {
+        if (_clipboardCleanupService is null)
+        {
+            return;
+        }
+
+        await _clipboardCleanupService.CleanupAsync(_settings.MaxItems);
+    }
+
+    private async void OnHistoryChangedAsync(object? sender, EventArgs e)
+    {
+        await UpdateStorageSummaryAsync();
     }
 
     private async void OnClipboardChangedAsync(object? sender, EventArgs e)
@@ -435,6 +515,7 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
         if (_viewModel is not null)
         {
             await _viewModel.RefreshAsync();
+            await UpdateStorageSummaryAsync();
         }
     }
 
@@ -451,6 +532,19 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
     private async void OnTraySettingsRequestedAsync(object? sender, EventArgs e)
     {
         await ShowWindowAsync(openSettings: true);
+    }
+
+    private void OnTrayCapturePauseToggleRequested(object? sender, EventArgs e)
+    {
+        if (_captureState is null)
+        {
+            return;
+        }
+
+        var isPaused = _captureState.ToggleCapturePause();
+        _trayService?.SetCapturePaused(isPaused);
+        _viewModel?.SetStatusMessage(isPaused ? "Clipboard capture paused." : "Clipboard capture resumed.");
+        _diagnosticsLogger.Info(isPaused ? "Clipboard capture paused." : "Clipboard capture resumed.");
     }
 
     private async void OnTrayExitRequestedAsync(object? sender, EventArgs e)
@@ -585,6 +679,11 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
 
         _isCleanedUp = true;
 
+        if (_viewModel is not null)
+        {
+            _viewModel.HistoryChanged -= OnHistoryChangedAsync;
+        }
+
         if (_clipboardChangeWatcher is not null)
         {
             _clipboardChangeWatcher.ClipboardChanged -= OnClipboardChangedAsync;
@@ -600,17 +699,15 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
         if (_trayService is not null)
         {
             _trayService.ShowRequested -= OnTrayShowRequestedAsync;
+            _trayService.SettingsRequested -= OnTraySettingsRequestedAsync;
+            _trayService.CapturePauseToggleRequested -= OnTrayCapturePauseToggleRequested;
             _trayService.ExitRequested -= OnTrayExitRequestedAsync;
-            if (_trayService is WindowsTrayService windowsTrayService)
-            {
-                windowsTrayService.SettingsRequested -= OnTraySettingsRequestedAsync;
-            }
             _trayService.Stop();
             _trayService.Dispose();
         }
     }
 
-    private static async Task<(MainViewModel ViewModel, IDiagnosticsLogger DiagnosticsLogger, ClipboardCaptureNotificationHandler? NotificationHandler, IClipboardChangeWatcher? Watcher, IGlobalHotkeyService? HotkeyService, ITrayService? TrayService, ISettingsRepository? SettingsRepository)> CreateCompositionAsync(Window window)
+    private static async Task<(MainViewModel ViewModel, IDiagnosticsLogger DiagnosticsLogger, ClipboardCaptureNotificationHandler? NotificationHandler, IClipboardChangeWatcher? Watcher, IGlobalHotkeyService? HotkeyService, ITrayService? TrayService, ISettingsRepository? SettingsRepository, ClipboardCleanupService? CleanupService, StorageStatsService? StorageStatsService, ClipboardCaptureState CaptureState)> CreateCompositionAsync(Window window)
     {
         var diagnosticsLogger = new FileDiagnosticsLogger();
 
@@ -676,8 +773,11 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
             var cleanupService = new ClipboardCleanupService(repository, fileStorage, cleanupOptions, diagnosticsLogger);
             diagnosticsLogger.Info("CreateComposition: after ClipboardCleanupService.");
 
+            var settingsRepository = new SqliteSettingsRepository(connectionFactory);
+            var storageStatsService = new StorageStatsService(repository);
+
             diagnosticsLogger.Info("CreateComposition: before ClipboardCaptureCoordinator.");
-            var coordinator = new ClipboardCaptureCoordinator(captureTextUseCase, captureImageUseCase, cleanupService, diagnosticsLogger);
+            var coordinator = new ClipboardCaptureCoordinator(captureTextUseCase, captureImageUseCase, cleanupService, diagnosticsLogger, settingsRepository: settingsRepository);
             diagnosticsLogger.Info("CreateComposition: after ClipboardCaptureCoordinator.");
 
             diagnosticsLogger.Info("CreateComposition: before WindowsClipboardChangeWatcher.");
@@ -692,8 +792,6 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
             var trayService = new WindowsTrayService(diagnosticsLogger);
             diagnosticsLogger.Info("CreateComposition: after WindowsTrayService.");
 
-            var settingsRepository = new SqliteSettingsRepository(connectionFactory);
-
             diagnosticsLogger.Info("CreateComposition: before MainViewModel.");
             var viewModel = new MainViewModel(repository, copyUseCase, clipboardGateway, captureState);
             diagnosticsLogger.Info("CreateComposition: after MainViewModel.");
@@ -707,7 +805,7 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
             diagnosticsLogger.Info("CreateComposition: after ClipboardCaptureNotificationHandler.");
 
             diagnosticsLogger.Info("Application composition succeeded.");
-            return (viewModel, diagnosticsLogger, notificationHandler, watcher, hotkeyService, trayService, settingsRepository);
+            return (viewModel, diagnosticsLogger, notificationHandler, watcher, hotkeyService, trayService, settingsRepository, cleanupService, storageStatsService, captureState);
         }
         catch (Exception ex)
         {
@@ -722,7 +820,7 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
             var hotkeyService = new WindowsHotkeyService(window, diagnosticsLogger);
             var trayService = new WindowsTrayService(diagnosticsLogger);
 
-            return (new MainViewModel(repository, copyUseCase, clipboardGateway, captureState), diagnosticsLogger, null, null, hotkeyService, trayService, null);
+            return (new MainViewModel(repository, copyUseCase, clipboardGateway, captureState), diagnosticsLogger, null, null, hotkeyService, trayService, null, null, new StorageStatsService(repository), captureState);
         }
     }
 
@@ -775,9 +873,9 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
     private async void SaveSettings_OnClick(object sender, RoutedEventArgs e)
     {
         var previous = _settings.Hotkey;
-        if (!int.TryParse(MaxItemsTextBox.Text, out var maxItems) || maxItems <= 0)
+        if (!AppSettingsValidator.TryParseMaxItems(MaxItemsTextBox.Text, out var maxItems, out var maxItemsError))
         {
-            HotkeyStatusText.Text = "Max items must be a positive number.";
+            HotkeyStatusText.Text = maxItemsError;
             return;
         }
         var newTheme = _pendingThemeMode;
@@ -786,6 +884,7 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
         {
             HotkeyStatusText.Text = "Invalid hotkey. Previous hotkey kept.";
             _pendingHotkey = previous;
+            HotkeyTextBox.Text = previous;
             return;
         }
 
@@ -796,15 +895,19 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
             {
                 await windowsHotkeyService.TryRegisterAsync(previous);
                 _pendingHotkey = previous;
+                HotkeyTextBox.Text = previous;
                 HotkeyStatusText.Text = "Could not register hotkey.";
                 return;
             }
         }
+        else if (_hotkeyService is not null)
+        {
+            await _hotkeyService.RegisterAsync(_pendingHotkey);
+        }
 
         ApplyTheme(newTheme);
-        HotkeyStatusText.Text = "Settings saved.";
 
-        _settings = new AppSettings
+        var savedSettings = new AppSettings
         {
             Hotkey = _pendingHotkey,
             ThemeMode = newTheme,
@@ -819,8 +922,20 @@ private async void OnLoadedAsync(object? sender, RoutedEventArgs e)
             ClearProtectedClipboardAfterDelay = _settings.ClearProtectedClipboardAfterDelay,
             ClearProtectedClipboardDelaySeconds = _settings.ClearProtectedClipboardDelaySeconds
         };
-        if (_settingsRepository is not null) await _settingsRepository.SaveAsync(_settings);
-        UpdateStorageSummary();
+        if (_settingsRepository is not null)
+        {
+            await _settingsRepository.SaveAsync(savedSettings);
+        }
+
+        _settings = savedSettings;
+        await EnforceStorageLimitsAsync();
+        if (_viewModel is not null)
+        {
+            await _viewModel.RefreshAsync();
+        }
+
+        await UpdateStorageSummaryAsync();
+        HotkeyStatusText.Text = "Settings saved.";
     }
 
     private void BackSettings_OnClick(object sender, RoutedEventArgs e)

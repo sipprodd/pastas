@@ -14,4 +14,5 @@ public sealed class EmptyClipboardItemRepository : IClipboardItemRepository
     public Task<IReadOnlyList<ClipboardItem>> SearchAsync(ClipboardSearchQuery query, CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<ClipboardItem>>(Array.Empty<ClipboardItem>());
     public Task<IReadOnlyList<ClipboardItem>> DeleteByCategoriesAsync(bool includeText, bool includeImages, bool includePinned, CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<ClipboardItem>>(Array.Empty<ClipboardItem>());
     public Task<int> CountAsync(CancellationToken cancellationToken = default) => Task.FromResult(0);
+    public Task<StorageStats> GetStorageStatsAsync(CancellationToken cancellationToken = default) => Task.FromResult(new StorageStats());
 }

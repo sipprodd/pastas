@@ -184,6 +184,23 @@ public sealed class SqliteStorageTests : IDisposable
     }
 
     [Fact]
+    public async Task ClipboardRepository_GetStorageStats_ReturnsStoredCountsAndSizeBytes()
+    {
+        var repository = new SqliteClipboardItemRepository(_connectionFactory);
+        await repository.AddAsync(BuildTextItem("hash-stats-text", sizeBytes: 100));
+        await repository.AddAsync(BuildTextItem("hash-stats-pinned", isPinned: true, sizeBytes: 200));
+        await repository.AddAsync(BuildImageItem("hash-stats-image", sizeBytes: 300));
+        await repository.AddAsync(BuildImageItem("hash-stats-negative-size", sizeBytes: -400));
+
+        var stats = await repository.GetStorageStatsAsync();
+
+        Assert.Equal(4, stats.TotalItems);
+        Assert.Equal(1, stats.PinnedItems);
+        Assert.Equal(2, stats.ImageItems);
+        Assert.Equal(600, stats.ApproxUsageBytes);
+    }
+
+    [Fact]
     public async Task SettingsRepository_ReturnsDefaults_WhenEmpty()
     {
         var repository = new SqliteSettingsRepository(_connectionFactory);
@@ -236,7 +253,7 @@ public sealed class SqliteStorageTests : IDisposable
         }
     }
 
-    private static ClipboardItem BuildTextItem(string hash, bool isPinned = false)
+    private static ClipboardItem BuildTextItem(string hash, bool isPinned = false, long sizeBytes = 0)
         => new()
         {
             Id = Guid.NewGuid(),
@@ -245,12 +262,13 @@ public sealed class SqliteStorageTests : IDisposable
             ContentText = "hello world content",
             Hash = hash,
             IsPinned = isPinned,
+            SizeBytes = sizeBytes,
             LastCopiedAt = DateTime.UtcNow,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
 
-    private static ClipboardItem BuildImageItem(string hash, bool isPinned = false)
+    private static ClipboardItem BuildImageItem(string hash, bool isPinned = false, long sizeBytes = 0)
         => new()
         {
             Id = Guid.NewGuid(),
@@ -258,6 +276,7 @@ public sealed class SqliteStorageTests : IDisposable
             ImagePath = "image.png",
             Hash = hash,
             IsPinned = isPinned,
+            SizeBytes = sizeBytes,
             LastCopiedAt = DateTime.UtcNow,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow

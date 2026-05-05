@@ -76,6 +76,31 @@ public sealed class ClipboardCaptureNotificationHandlerTests
         Assert.Null(notificationService.LastNotification);
     }
 
+    [Fact]
+    public async Task HandleClipboardChangedAsync_SkipsCapture_WhenPaused()
+    {
+        var repository = new FakeClipboardItemRepository();
+        var textUseCase = new CountingCaptureClipboardTextUseCase();
+        var imageUseCase = new CountingCaptureClipboardImageUseCase();
+        var coordinator = new ClipboardCaptureCoordinator(
+            textUseCase,
+            imageUseCase,
+            new ClipboardCleanupService(repository, new FakeFileStorage(), new ClipboardCleanupOptions()),
+            null,
+            TimeSpan.Zero);
+
+        var notificationService = new FakeNotificationService();
+        var state = new ClipboardCaptureState();
+        state.PauseCapture();
+        var handler = new ClipboardCaptureNotificationHandler(coordinator, notificationService, repository, state);
+
+        await handler.HandleClipboardChangedAsync();
+
+        Assert.Equal(0, textUseCase.CallCount);
+        Assert.Equal(0, imageUseCase.CallCount);
+        Assert.Null(notificationService.LastNotification);
+    }
+
     private sealed class FakeCaptureClipboardTextUseCase : ICaptureClipboardTextUseCase
     {
         public Task<Result> ExecuteAsync(CancellationToken cancellationToken = default) => Task.FromResult(Result.Success());
@@ -84,6 +109,28 @@ public sealed class ClipboardCaptureNotificationHandlerTests
     private sealed class FakeCaptureClipboardImageUseCase : ICaptureClipboardImageUseCase
     {
         public Task<Result> ExecuteAsync(CancellationToken cancellationToken = default) => Task.FromResult(Result.Success());
+    }
+
+    private sealed class CountingCaptureClipboardTextUseCase : ICaptureClipboardTextUseCase
+    {
+        public int CallCount { get; private set; }
+
+        public Task<Result> ExecuteAsync(CancellationToken cancellationToken = default)
+        {
+            CallCount++;
+            return Task.FromResult(Result.Success());
+        }
+    }
+
+    private sealed class CountingCaptureClipboardImageUseCase : ICaptureClipboardImageUseCase
+    {
+        public int CallCount { get; private set; }
+
+        public Task<Result> ExecuteAsync(CancellationToken cancellationToken = default)
+        {
+            CallCount++;
+            return Task.FromResult(Result.Success());
+        }
     }
 
     private sealed class FakeNotificationService : Pastas.Application.Services.INotificationService
@@ -116,6 +163,14 @@ public sealed class ClipboardCaptureNotificationHandlerTests
         public Task<IReadOnlyList<ClipboardItem>> DeleteByCategoriesAsync(bool includeText, bool includeImages, bool includePinned, CancellationToken cancellationToken = default)
             => Task.FromResult((IReadOnlyList<ClipboardItem>)[]);
         public Task<int> CountAsync(CancellationToken cancellationToken = default) => Task.FromResult(TotalCount);
+        public Task<StorageStats> GetStorageStatsAsync(CancellationToken cancellationToken = default)
+            => Task.FromResult(new StorageStats
+            {
+                TotalItems = TotalCount,
+                PinnedItems = LatestItem?.IsPinned == true ? 1 : 0,
+                ImageItems = LatestItem?.Type is ClipboardItemType.Image or ClipboardItemType.Screenshot ? 1 : 0,
+                ApproxUsageBytes = Math.Max(0, LatestItem?.SizeBytes ?? 0)
+            });
     }
 
     private sealed class FakeFileStorage : IFileStorage

@@ -178,6 +178,7 @@ public class ClipboardImagePipelineTests
         public Task<ClipboardCaptureData?> ReadAsync(CancellationToken cancellationToken = default) => Task.FromResult(ReadValue);
         public Task WriteTextAsync(string text, CancellationToken cancellationToken = default) => Task.CompletedTask;
         public Task WriteImageAsync(string imagePath, CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public Task WriteImageBytesAsync(byte[] imageBytes, CancellationToken cancellationToken = default) => Task.CompletedTask;
         public Task ClearAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
     }
 
@@ -206,5 +207,13 @@ public class ClipboardImagePipelineTests
         public Task<IReadOnlyList<ClipboardItem>> SearchAsync(ClipboardSearchQuery query, CancellationToken cancellationToken = default) => Task.FromResult((IReadOnlyList<ClipboardItem>)Items);
         public Task<IReadOnlyList<ClipboardItem>> DeleteByCategoriesAsync(bool includeText, bool includeImages, bool includePinned, CancellationToken cancellationToken = default) => Task.FromResult((IReadOnlyList<ClipboardItem>)[]);
         public Task<int> CountAsync(CancellationToken cancellationToken = default) => Task.FromResult(Items.Count);
+        public Task<StorageStats> GetStorageStatsAsync(CancellationToken cancellationToken = default)
+            => Task.FromResult(new StorageStats
+            {
+                TotalItems = Items.Count,
+                PinnedItems = Items.Count(x => x.IsPinned),
+                ImageItems = Items.Count(x => x.Type is ClipboardItemType.Image or ClipboardItemType.Screenshot),
+                ApproxUsageBytes = Items.Sum(x => Math.Max(0, x.SizeBytes))
+            });
     }
 }

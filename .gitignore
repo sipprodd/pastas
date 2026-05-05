@@ -2,6 +2,8 @@
 bin/
 obj/
 out/
+publish/
+artifacts/
 
 # User-specific files
 *.user
@@ -31,6 +33,15 @@ packages/
 
 # Logs
 *.log
+
+# Local Pastas runtime data
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.cache
 
 # OS files
 .DS_Store

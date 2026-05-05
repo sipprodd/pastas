@@ -1,4 +1,5 @@
 using System.Drawing;
+using System.Windows.Forms;
 using Pastas.Application.Services;
 
 namespace Pastas.Infrastructure.Tray;
@@ -7,10 +8,13 @@ public sealed class WindowsTrayService : ITrayService
 {
     private readonly IDiagnosticsLogger? _diagnosticsLogger;
     private NotifyIcon? _notifyIcon;
+    private ToolStripMenuItem? _pauseCaptureMenuItem;
     private bool _isStarted;
+    private bool _isCapturePaused;
 
     public event EventHandler? ShowRequested;
     public event EventHandler? SettingsRequested;
+    public event EventHandler? CapturePauseToggleRequested;
     public event EventHandler? ExitRequested;
 
     public WindowsTrayService(IDiagnosticsLogger? diagnosticsLogger = null)
@@ -28,8 +32,11 @@ public sealed class WindowsTrayService : ITrayService
         try
         {
             var menu = new System.Windows.Forms.ContextMenuStrip();
-            menu.Items.Add("Open", null, (_, _) => ShowRequested?.Invoke(this, EventArgs.Empty));
+            menu.Items.Add("Open Pastas", null, (_, _) => ShowRequested?.Invoke(this, EventArgs.Empty));
             menu.Items.Add("Settings", null, (_, _) => SettingsRequested?.Invoke(this, EventArgs.Empty));
+            _pauseCaptureMenuItem = new ToolStripMenuItem(BuildPauseCaptureText(), null, (_, _) => CapturePauseToggleRequested?.Invoke(this, EventArgs.Empty));
+            menu.Items.Add(_pauseCaptureMenuItem);
+            menu.Items.Add(new ToolStripSeparator());
             menu.Items.Add("Exit", null, (_, _) => ExitRequested?.Invoke(this, EventArgs.Empty));
 
             var icon = Icon.ExtractAssociatedIcon(Environment.ProcessPath ?? string.Empty) ?? SystemIcons.Application;
@@ -75,6 +82,15 @@ public sealed class WindowsTrayService : ITrayService
         _diagnosticsLogger?.Info("Tray stopped.");
     }
 
+    public void SetCapturePaused(bool isPaused)
+    {
+        _isCapturePaused = isPaused;
+        if (_pauseCaptureMenuItem is not null)
+        {
+            _pauseCaptureMenuItem.Text = BuildPauseCaptureText();
+        }
+    }
+
     public void Dispose()
     {
         if (!_isStarted && _notifyIcon is null)
@@ -94,4 +110,7 @@ public sealed class WindowsTrayService : ITrayService
             ShowRequested?.Invoke(this, EventArgs.Empty);
         }
     }
+
+    private string BuildPauseCaptureText()
+        => _isCapturePaused ? "Resume capture" : "Pause capture";
 }

@@ -34,7 +34,7 @@ public partial class App : System.Windows.Application
         catch (Exception ex)
         {
             LogException("MainWindow creation failed.", ex);
-            System.Windows.MessageBox.Show(ex.ToString(), "Startup error", MessageBoxButton.OK, MessageBoxImage.Error);
+            System.Windows.MessageBox.Show("Pastas could not start. Check the diagnostics log for details.", "Startup error", MessageBoxButton.OK, MessageBoxImage.Error);
             Shutdown();
         }
     }
@@ -42,20 +42,20 @@ public partial class App : System.Windows.Application
     private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
         LogException("Dispatcher unhandled exception.", e.Exception);
-        System.Windows.MessageBox.Show(e.Exception.ToString(), "Unhandled exception", MessageBoxButton.OK, MessageBoxImage.Error);
+        System.Windows.MessageBox.Show("Pastas encountered an unexpected error and will close. Check the diagnostics log for details.", "Unhandled exception", MessageBoxButton.OK, MessageBoxImage.Error);
         e.Handled = true;
         Shutdown();
     }
 
     private void OnCurrentDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
     {
-        var exceptionText = e.ExceptionObject is Exception ex ? ex.ToString() : e.ExceptionObject?.ToString() ?? "Unknown exception";
+        var exceptionType = e.ExceptionObject is Exception ex ? ex.GetType().Name : e.ExceptionObject?.GetType().Name ?? "Unknown";
 
-        _diagnosticsLogger?.Error($"AppDomain unhandled exception. IsTerminating={e.IsTerminating}. {exceptionText}");
+        _diagnosticsLogger?.Error($"AppDomain unhandled exception. IsTerminating={e.IsTerminating}. ExceptionType={exceptionType}.");
 
         try
         {
-            System.Windows.MessageBox.Show(exceptionText, "Fatal exception", MessageBoxButton.OK, MessageBoxImage.Error);
+            System.Windows.MessageBox.Show("Pastas encountered a fatal error. Check the diagnostics log for details.", "Fatal exception", MessageBoxButton.OK, MessageBoxImage.Error);
         }
         catch
         {
