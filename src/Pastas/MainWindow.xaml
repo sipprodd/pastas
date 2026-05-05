@@ -136,7 +136,7 @@
             <Setter Property="FontSize" Value="11" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Foreground" Value="{DynamicResource CreamTextBrush}" />
-            <Setter Property="Background" Value="#FF2C2823" />
+            <Setter Property="Background" Value="{DynamicResource ButtonBackgroundBrush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource SubtleBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Template">
@@ -151,8 +151,8 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="IconButtonBorder" Property="Background" Value="#FF38322C" />
-                                <Setter TargetName="IconButtonBorder" Property="BorderBrush" Value="#FF5A5147" />
+                                <Setter TargetName="IconButtonBorder" Property="Background" Value="{DynamicResource ButtonHoverBrush}" />
+                                <Setter TargetName="IconButtonBorder" Property="BorderBrush" Value="{DynamicResource HoverBorderBrush}" />
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="IconButtonBorder" Property="Background" Value="{DynamicResource ButtonPressedBrush}" />
@@ -297,9 +297,43 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+        </Style>
+
         <Style x:Key="ThemeChipButtonStyle" TargetType="Button" BasedOn="{StaticResource ChipButtonStyle}">
             <Setter Property="Margin" Value="0,0,8,0" />
             <Setter Property="Padding" Value="14,0" />
+        </Style>
+
+        <Style x:Key="ThemedScrollViewerStyle" TargetType="ScrollViewer">
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+            <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollViewer">
+                        <Grid SnapsToDevicePixels="True">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ScrollContentPresenter Grid.Column="0"
+                                                    Margin="{TemplateBinding Padding}"
+                                                    CanContentScroll="{TemplateBinding CanContentScroll}" />
+                            <ScrollBar Grid.Column="1"
+                                       Margin="6,0,0,0"
+                                       Orientation="Vertical"
+                                       Width="11"
+                                       Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
+                                       Value="{TemplateBinding VerticalOffset}"
+                                       Minimum="0"
+                                       Maximum="{TemplateBinding ScrollableHeight}"
+                                       ViewportSize="{TemplateBinding ViewportHeight}"
+                                       SmallChange="1"
+                                       LargeChange="12"
+                                       Style="{DynamicResource DarkScrollBarStyle}" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
     </Window.Resources>
@@ -397,10 +431,7 @@
             <Grid Grid.Row="3">
                 <Grid Visibility="{Binding IsMainContentVisible, Converter={DynamicResource BoolToVisibility}}">
                     <Grid>
-                        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" CanContentScroll="True">
-    <ScrollViewer.Resources>
-        <Style TargetType="{x:Type ScrollBar}" BasedOn="{DynamicResource DarkScrollBarStyle}" />
-    </ScrollViewer.Resources>
+                        <ScrollViewer Style="{DynamicResource ThemedScrollViewerStyle}" CanContentScroll="True">
                             <ItemsControl ItemsSource="{Binding Items}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
@@ -424,7 +455,7 @@
                             <Button Grid.Column="1" Content="Save" Width="90" Margin="0,0,8,0" Style="{DynamicResource ChipButtonStyle}" Click="SaveSettings_OnClick" />
                             <Button Grid.Column="2" Content="Back" MinWidth="82" Style="{DynamicResource ChipButtonStyle}" Click="BackSettings_OnClick" />
                         </Grid>
-                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <ScrollViewer Grid.Row="1" Style="{DynamicResource ThemedScrollViewerStyle}">
                             <StackPanel>
                                 <Border Background="{DynamicResource SurfaceElevatedBrush}" BorderBrush="{DynamicResource SubtleBorderBrush}" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,0,0,10"><StackPanel><TextBlock Text="Hotkey" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource CreamTextBrush}" /><TextBlock Text="Press a key combination with modifier(s)." Foreground="{DynamicResource MutedTextBrush}" Margin="0,8,0,8" /><TextBox x:Name="HotkeyTextBox" Style="{DynamicResource RoundedTextBoxStyle}" PreviewKeyDown="CaptureHotkey_OnPreviewKeyDown" /><TextBlock x:Name="HotkeyStatusText" Foreground="{DynamicResource MutedTextBrush}" Margin="0,8,0,0" /></StackPanel></Border>
                                 <Border Background="{DynamicResource SurfaceElevatedBrush}" BorderBrush="{DynamicResource SubtleBorderBrush}" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,0,0,10"><StackPanel><TextBlock Text="Theme" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource CreamTextBrush}" /><WrapPanel Margin="0,8,0,0"><Button x:Name="ThemeChocolateButton" Content="Chocolate" Tag="Chocolate" MinWidth="106" Style="{DynamicResource ThemeChipButtonStyle}" Click="ThemeChip_OnClick" /><Button x:Name="ThemeWhiteButton" Content="White" Tag="White" MinWidth="86" Style="{DynamicResource ThemeChipButtonStyle}" Click="ThemeChip_OnClick" /><Button x:Name="ThemeBlackButton" Content="Black" Tag="Black" MinWidth="86" Style="{DynamicResource ThemeChipButtonStyle}" Click="ThemeChip_OnClick" /></WrapPanel></StackPanel></Border>

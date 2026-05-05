@@ -173,9 +173,14 @@
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="Text" Value="T" />
+                                    <Setter Property="Opacity" Value="0.92" />
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsImage}" Value="True">
                                             <Setter Property="Text" Value="IMG" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                            <Setter Property="Opacity" Value="1" />
+                                            <Setter Property="FontWeight" Value="Bold" />
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding HasThumbnailOrImagePath}" Value="True">
                                             <Setter Property="Visibility" Value="Collapsed" />

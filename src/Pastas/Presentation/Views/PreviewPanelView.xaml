@@ -8,36 +8,6 @@
              d:DesignWidth="680">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
-        <Style x:Key="PreviewDarkScrollBarThumbStyle" TargetType="Thumb">
-            <Setter Property="OverridesDefaultStyle" Value="True" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Thumb">
-                        <Border x:Name="ThumbBorder" Background="{DynamicResource ScrollbarThumbBrush}" CornerRadius="6" />
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="ThumbBorder" Property="Background" Value="{DynamicResource ScrollbarThumbHoverBrush}" /></Trigger>
-                            <Trigger Property="IsDragging" Value="True"><Setter TargetName="ThumbBorder" Property="Background" Value="{DynamicResource ScrollbarThumbHoverBrush}" /></Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style x:Key="PreviewDarkScrollBarStyle" TargetType="ScrollBar">
-            <Setter Property="Width" Value="11" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ScrollBar">
-                        <Border Background="{DynamicResource ScrollbarTrackBrush}" CornerRadius="6" Padding="1">
-                            <Track x:Name="PART_Track" IsDirectionReversed="True">
-                                <Track.DecreaseRepeatButton><RepeatButton Command="ScrollBar.PageUpCommand" Opacity="0" IsTabStop="False" /></Track.DecreaseRepeatButton>
-                                <Track.Thumb><Thumb Style="{DynamicResource PreviewDarkScrollBarThumbStyle}" MinHeight="28" /></Track.Thumb>
-                                <Track.IncreaseRepeatButton><RepeatButton Command="ScrollBar.PageDownCommand" Opacity="0" IsTabStop="False" /></Track.IncreaseRepeatButton>
-                            </Track>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
     </UserControl.Resources>
     <Border Visibility="{Binding IsPreviewOpen, Converter={DynamicResource BoolToVisibility}}"
             Background="{DynamicResource SurfaceBrush}"
@@ -51,8 +21,7 @@
                 <TextBlock Text="Preview" Foreground="{DynamicResource CreamTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" FontWeight="SemiBold" />
             </Grid>
             <Border Grid.Row="1" Margin="0,8,0,10" Background="{DynamicResource SurfaceElevatedBrush}" CornerRadius="12" Padding="16">
-                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                    <ScrollViewer.Resources><Style TargetType="{x:Type ScrollBar}" BasedOn="{DynamicResource PreviewDarkScrollBarStyle}" /></ScrollViewer.Resources>
+                <ScrollViewer Style="{DynamicResource ThemedScrollViewerStyle}">
                     <StackPanel>
                         <StackPanel>
                             <StackPanel.Style>
@@ -117,5 +86,4 @@
         </Grid>
     </Border>
 </UserControl>
-
 

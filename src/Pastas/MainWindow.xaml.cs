@@ -43,24 +43,24 @@ public partial class MainWindow : Window
         [ThemeMode.White] = new Dictionary<string, string>
         {
             ["ShellBrush"] = "#FFF5F3EF", ["SurfaceBrush"] = "#FFFFFFFF", ["SurfaceElevatedBrush"] = "#FFF8F7F4",
-            ["CardBackgroundBrush"] = "#FFFFFFFF", ["CardHoverBackgroundBrush"] = "#FFF4F1EC", ["CardSelectedBackgroundBrush"] = "#FFEDE6DC",
-            ["SubtleBorderBrush"] = "#FFD8D2C9", ["HoverBorderBrush"] = "#FFC8BDAE", ["SelectedBorderBrush"] = "#FFAE8E64",
-            ["SelectedAccentMarkerBrush"] = "#FFD1A764", ["CreamTextBrush"] = "#FF1E1A15", ["MutedTextBrush"] = "#FF655E57",
-            ["AccentBrush"] = "#FF8C6538", ["PinnedBorderBrush"] = "#FFB08957", ["InputBackgroundBrush"] = "#FFFFFFFF",
+            ["CardBackgroundBrush"] = "#FFFFFFFF", ["CardHoverBackgroundBrush"] = "#FFF2F5FA", ["CardSelectedBackgroundBrush"] = "#FFE8EEF7",
+            ["SubtleBorderBrush"] = "#FFD8DDE6", ["HoverBorderBrush"] = "#FFA9B8CC", ["SelectedBorderBrush"] = "#FF2F3B4F",
+            ["SelectedAccentMarkerBrush"] = "#FF2F3B4F", ["CreamTextBrush"] = "#FF1A202C", ["MutedTextBrush"] = "#FF5D6778",
+            ["AccentBrush"] = "#FF2F3B4F", ["PinnedBorderBrush"] = "#FF6E809A", ["InputBackgroundBrush"] = "#FFFFFFFF",
             ["ButtonBackgroundBrush"] = "#FFF7F3ED", ["ButtonHoverBrush"] = "#FFEFE8DE", ["ButtonPressedBrush"] = "#FFE4D9CB",
-            ["SortPopupBackgroundBrush"] = "#FFFFFFFF", ["ScrollbarTrackBrush"] = "#FFEAE5DD", ["ScrollbarThumbBrush"] = "#FFC5B8A7",
-            ["ScrollbarThumbHoverBrush"] = "#FFAD9C87", ["OverlayBrush"] = "#99E7E1D7"
+            ["SortPopupBackgroundBrush"] = "#FFFFFFFF", ["ScrollbarTrackBrush"] = "#FFE6EBF2", ["ScrollbarThumbBrush"] = "#FF8A98AD",
+            ["ScrollbarThumbHoverBrush"] = "#FF6D7E96", ["OverlayBrush"] = "#99E7EAF0"
         },
         [ThemeMode.Black] = new Dictionary<string, string>
         {
             ["ShellBrush"] = "#FF000000", ["SurfaceBrush"] = "#FF050505", ["SurfaceElevatedBrush"] = "#FF0A0A0A",
-            ["CardBackgroundBrush"] = "#FF101010", ["CardHoverBackgroundBrush"] = "#FF191919", ["CardSelectedBackgroundBrush"] = "#FF25201A",
-            ["SubtleBorderBrush"] = "#FF2B2B2B", ["HoverBorderBrush"] = "#FF3B3B3B", ["SelectedBorderBrush"] = "#FFB18D58",
-            ["SelectedAccentMarkerBrush"] = "#FFE0B878", ["CreamTextBrush"] = "#FFF3F3F3", ["MutedTextBrush"] = "#FF9C9C9C",
-            ["AccentBrush"] = "#FFE0B878", ["PinnedBorderBrush"] = "#FFCFA568", ["InputBackgroundBrush"] = "#FF0F0F0F",
+            ["CardBackgroundBrush"] = "#FF101214", ["CardHoverBackgroundBrush"] = "#FF171D22", ["CardSelectedBackgroundBrush"] = "#FF102636",
+            ["SubtleBorderBrush"] = "#FF232A31", ["HoverBorderBrush"] = "#FF35505F", ["SelectedBorderBrush"] = "#FF79C8F2",
+            ["SelectedAccentMarkerBrush"] = "#FF79C8F2", ["CreamTextBrush"] = "#FFF3F7FA", ["MutedTextBrush"] = "#FF9AA8B5",
+            ["AccentBrush"] = "#FF79C8F2", ["PinnedBorderBrush"] = "#FF5AA5CD", ["InputBackgroundBrush"] = "#FF0D1013",
             ["ButtonBackgroundBrush"] = "#FF111111", ["ButtonHoverBrush"] = "#FF1C1C1C", ["ButtonPressedBrush"] = "#FF080808",
-            ["SortPopupBackgroundBrush"] = "#FF111111", ["ScrollbarTrackBrush"] = "#FF090909", ["ScrollbarThumbBrush"] = "#FF3B3B3B",
-            ["ScrollbarThumbHoverBrush"] = "#FF585858", ["OverlayBrush"] = "#AA000000"
+            ["SortPopupBackgroundBrush"] = "#FF111111", ["ScrollbarTrackBrush"] = "#FF080D12", ["ScrollbarThumbBrush"] = "#FF2E5E76",
+            ["ScrollbarThumbHoverBrush"] = "#FF3F7FA0", ["OverlayBrush"] = "#AA000000"
         }
     };
     private MainViewModel? _viewModel;
