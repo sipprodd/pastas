@@ -252,13 +252,13 @@
         <Style x:Key="PastasScrollBarThumbStyle" TargetType="Thumb">
             <Setter Property="OverridesDefaultStyle" Value="True" />
             <Setter Property="SnapsToDevicePixels" Value="True" />
-            <Setter Property="MinHeight" Value="34" />
-            <Setter Property="MinWidth" Value="34" />
+            <Setter Property="MinHeight" Value="28" />
+            <Setter Property="MinWidth" Value="10" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Thumb">
                         <Border x:Name="ThumbBorder"
-                                Margin="1"
+                                Margin="1,0"
                                 Background="{DynamicResource ScrollbarThumbBrush}"
                                 CornerRadius="999" />
                         <ControlTemplate.Triggers>
@@ -277,8 +277,8 @@
         <Style x:Key="PastasScrollBarStyle" TargetType="ScrollBar">
             <Setter Property="OverridesDefaultStyle" Value="True" />
             <Setter Property="SnapsToDevicePixels" Value="True" />
-            <Setter Property="Width" Value="10" />
-            <Setter Property="Height" Value="10" />
+            <Setter Property="Width" Value="11" />
+            <Setter Property="Height" Value="11" />
             <Setter Property="Background" Value="{DynamicResource ScrollbarTrackBrush}" />
             <Setter Property="Template">
                 <Setter.Value>
@@ -286,10 +286,10 @@
                         <Grid Background="Transparent">
                             <Border Background="{DynamicResource ScrollbarTrackBrush}"
                                     CornerRadius="999"
-                                    Margin="1" />
+                                    Margin="1,0" />
 
                             <Track x:Name="PART_Track"
-                                   Margin="1"
+                                   Margin="1,0"
                                    Focusable="False"
                                    IsDirectionReversed="True">
                                 <Track.DecreaseRepeatButton>
@@ -311,13 +311,13 @@
                         <ControlTemplate.Triggers>
                             <Trigger Property="Orientation" Value="Horizontal">
                                 <Setter Property="Width" Value="Auto" />
-                                <Setter Property="Height" Value="10" />
+                                <Setter Property="Height" Value="11" />
                                 <Setter TargetName="PART_Track" Property="Orientation" Value="Horizontal" />
                                 <Setter TargetName="PART_Track" Property="IsDirectionReversed" Value="False" />
                             </Trigger>
 
                             <Trigger Property="Orientation" Value="Vertical">
-                                <Setter Property="Width" Value="10" />
+                                <Setter Property="Width" Value="11" />
                                 <Setter Property="Height" Value="Auto" />
                                 <Setter TargetName="PART_Track" Property="Orientation" Value="Vertical" />
                                 <Setter TargetName="PART_Track" Property="IsDirectionReversed" Value="True" />
@@ -534,6 +534,9 @@
                         <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                                       VerticalScrollBarVisibility="Auto"
                                       CanContentScroll="False">
+                            <ScrollViewer.Resources>
+                                <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource PastasScrollBarStyle}" />
+                            </ScrollViewer.Resources>
                             <ItemsControl ItemsSource="{Binding Items}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
@@ -595,6 +598,9 @@
                                       HorizontalScrollBarVisibility="Disabled"
                                       VerticalScrollBarVisibility="Auto"
                                       CanContentScroll="False">
+                            <ScrollViewer.Resources>
+                                <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource PastasScrollBarStyle}" />
+                            </ScrollViewer.Resources>
                             <StackPanel>
                                 <Border Background="{DynamicResource SurfaceElevatedBrush}"
                                         BorderBrush="{DynamicResource SubtleBorderBrush}"

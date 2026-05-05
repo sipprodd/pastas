@@ -21,7 +21,12 @@
                 <TextBlock Text="Preview" Foreground="{DynamicResource CreamTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" FontWeight="SemiBold" />
             </Grid>
             <Border Grid.Row="1" Margin="0,8,0,10" Background="{DynamicResource SurfaceElevatedBrush}" CornerRadius="12" Padding="16">
-                <ScrollViewer Style="{DynamicResource ThemedScrollViewerStyle}">
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                              VerticalScrollBarVisibility="Auto"
+                              CanContentScroll="False">
+                    <ScrollViewer.Resources>
+                        <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource PastasScrollBarStyle}" />
+                    </ScrollViewer.Resources>
                     <StackPanel>
                         <StackPanel>
                             <StackPanel.Style>
@@ -86,4 +91,3 @@
         </Grid>
     </Border>
 </UserControl>
-
