@@ -217,7 +217,7 @@
         </Style>
 
 
-        <Style x:Key="DarkScrollBarRepeatButtonStyle" TargetType="RepeatButton">
+        <Style x:Key="PastasScrollBarRepeatButtonStyle" TargetType="RepeatButton">
             <Setter Property="OverridesDefaultStyle" Value="True" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Template">
@@ -229,13 +229,14 @@
             </Setter>
         </Style>
 
-        <Style x:Key="DarkScrollBarThumbStyle" TargetType="Thumb">
+        <Style x:Key="PastasScrollBarThumbStyle" TargetType="Thumb">
             <Setter Property="OverridesDefaultStyle" Value="True" />
-            <Setter Property="MinHeight" Value="34" />
+            <Setter Property="MinHeight" Value="26" />
+            <Setter Property="MinWidth" Value="26" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Thumb">
-                        <Border x:Name="ThumbBorder" Margin="1" Background="{DynamicResource ScrollbarThumbBrush}" CornerRadius="5" />
+                        <Border x:Name="ThumbBorder" Margin="1" Background="{DynamicResource ScrollbarThumbBrush}" CornerRadius="999" />
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="ThumbBorder" Property="Background" Value="{DynamicResource ScrollbarThumbHoverBrush}" />
@@ -249,41 +250,45 @@
             </Setter>
         </Style>
 
-        <Style x:Key="DarkScrollBarStyle" TargetType="ScrollBar">
-            <Setter Property="Width" Value="12" />
-            <Setter Property="Height" Value="12" />
+        <Style x:Key="PastasScrollBarStyle" TargetType="ScrollBar">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Width" Value="10" />
+            <Setter Property="Height" Value="10" />
             <Setter Property="Background" Value="{DynamicResource ScrollbarTrackBrush}" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ScrollBar">
-                        <Border Background="{DynamicResource ScrollbarTrackBrush}" CornerRadius="6" Padding="1">
-                            <Track x:Name="PART_Track">
+                        <Grid Background="Transparent">
+                            <Border x:Name="TrackBorder" Background="{DynamicResource ScrollbarTrackBrush}" CornerRadius="999" Margin="1" />
+                            <Track x:Name="PART_Track" Margin="1">
                                 <Track.DecreaseRepeatButton>
-                                    <RepeatButton Command="ScrollBar.PageUpCommand" Style="{StaticResource DarkScrollBarRepeatButtonStyle}" IsTabStop="False" />
+                                    <RepeatButton Command="ScrollBar.PageUpCommand" Style="{StaticResource PastasScrollBarRepeatButtonStyle}" IsTabStop="False" />
                                 </Track.DecreaseRepeatButton>
                                 <Track.Thumb>
-                                    <Thumb Style="{StaticResource DarkScrollBarThumbStyle}" />
+                                    <Thumb Style="{StaticResource PastasScrollBarThumbStyle}" />
                                 </Track.Thumb>
                                 <Track.IncreaseRepeatButton>
-                                    <RepeatButton Command="ScrollBar.PageDownCommand" Style="{StaticResource DarkScrollBarRepeatButtonStyle}" IsTabStop="False" />
+                                    <RepeatButton Command="ScrollBar.PageDownCommand" Style="{StaticResource PastasScrollBarRepeatButtonStyle}" IsTabStop="False" />
                                 </Track.IncreaseRepeatButton>
                             </Track>
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="Orientation" Value="Horizontal">
                                 <Setter Property="Width" Value="Auto" />
-                                <Setter Property="Height" Value="12" />
-                                <Setter TargetName="PART_Track" Property="IsDirectionReversed" Value="False" />
+                                <Setter Property="Height" Value="10" />
+                                <Setter TargetName="PART_Track" Property="Orientation" Value="Horizontal" />
                             </Trigger>
                             <Trigger Property="Orientation" Value="Vertical">
-                                <Setter Property="Width" Value="12" />
+                                <Setter Property="Width" Value="10" />
                                 <Setter Property="Height" Value="Auto" />
+                                <Setter TargetName="PART_Track" Property="Orientation" Value="Vertical" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource PastasScrollBarStyle}" />
 
         <Style x:Key="SortMenuItemButtonStyle" TargetType="Button">
             <Setter Property="Height" Value="30" />
@@ -359,7 +364,7 @@
                                        ViewportSize="{TemplateBinding ViewportHeight}"
                                        SmallChange="1"
                                        LargeChange="12"
-                                       Style="{StaticResource DarkScrollBarStyle}" />
+                                       Style="{StaticResource PastasScrollBarStyle}" />
                         </Grid>
                     </ControlTemplate>
                 </Setter.Value>
