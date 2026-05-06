@@ -1,0 +1,894 @@
+﻿<Window x:Class="Pastas.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:domain="clr-namespace:Pastas.Domain.Enums"
+        xmlns:views="clr-namespace:Pastas.Presentation.Views"
+        mc:Ignorable="d"
+        Title="Pastas"
+        Width="700"
+        Height="590"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        AllowsTransparency="True"
+        Background="Transparent"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+
+        <SolidColorBrush x:Key="ShellBrush" Color="#FF171613" />
+        <SolidColorBrush x:Key="SurfaceBrush" Color="#FF23201C" />
+        <SolidColorBrush x:Key="SurfaceElevatedBrush" Color="#FF2A2622" />
+        <SolidColorBrush x:Key="SubtleBorderBrush" Color="#FF3F3932" />
+        <SolidColorBrush x:Key="CreamTextBrush" Color="#FFF4EBDD" />
+        <SolidColorBrush x:Key="MutedTextBrush" Color="#FFC6B9A6" />
+        <SolidColorBrush x:Key="AccentBrush" Color="#FFD1A764" />
+        <SolidColorBrush x:Key="PinnedBorderBrush" Color="#FFE1BC7A" />
+
+        <SolidColorBrush x:Key="CardBackgroundBrush" Color="#FF2A241F" />
+        <SolidColorBrush x:Key="CardHoverBackgroundBrush" Color="#FF342D26" />
+        <SolidColorBrush x:Key="CardSelectedBackgroundBrush" Color="#FF47392B" />
+        <SolidColorBrush x:Key="HoverBorderBrush" Color="#FF6A5A4C" />
+        <SolidColorBrush x:Key="SelectedBorderBrush" Color="#FFCDAF7A" />
+        <SolidColorBrush x:Key="SelectedAccentMarkerBrush" Color="#FFE8C47A" />
+
+        <SolidColorBrush x:Key="InputBackgroundBrush" Color="#FF2A2622" />
+        <SolidColorBrush x:Key="ButtonBackgroundBrush" Color="#FF2D2823" />
+        <SolidColorBrush x:Key="ButtonHoverBrush" Color="#FF373029" />
+        <SolidColorBrush x:Key="ButtonPressedBrush" Color="#FF221E1A" />
+        <SolidColorBrush x:Key="SortPopupBackgroundBrush" Color="#FF2E2924" />
+
+        <SolidColorBrush x:Key="ScrollbarTrackBrush" Color="#FF1C1916" />
+        <SolidColorBrush x:Key="ScrollbarThumbBrush" Color="#FF625648" />
+        <SolidColorBrush x:Key="ScrollbarThumbHoverBrush" Color="#FF766857" />
+        <SolidColorBrush x:Key="OverlayBrush" Color="#AA151310" />
+
+        <Style x:Key="ChipButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="34" />
+            <Setter Property="Foreground" Value="{DynamicResource CreamTextBrush}" />
+            <Setter Property="Background" Value="{DynamicResource ButtonBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SubtleBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="16,0" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="ChipBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="12">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ChipBorder" Property="Background" Value="{DynamicResource ButtonHoverBrush}" />
+                                <Setter TargetName="ChipBorder" Property="BorderBrush" Value="{DynamicResource HoverBorderBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ChipBorder" Property="Background" Value="{DynamicResource ButtonPressedBrush}" />
+                                <Setter TargetName="ChipBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="ChipBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="ChipBorder" Property="Opacity" Value="0.7" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="RoundedTextBoxStyle" TargetType="TextBox">
+            <Setter Property="Height" Value="33" />
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource CreamTextBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SubtleBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="12,6" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="CaretBrush" Value="{DynamicResource CreamTextBrush}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="TextBoxBorder"
+                                CornerRadius="10"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ScrollViewer x:Name="PART_ContentHost" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="TextBoxBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="CardSelectButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground" Value="{DynamicResource CreamTextBrush}" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="Transparent" BorderThickness="0">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="CardActionIconButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="42" />
+            <Setter Property="Height" Value="26" />
+            <Setter Property="Margin" Value="4,0,0,0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Foreground" Value="{DynamicResource CreamTextBrush}" />
+            <Setter Property="Background" Value="{DynamicResource ButtonBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SubtleBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="IconButtonBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="IconButtonBorder" Property="Background" Value="{DynamicResource ButtonHoverBrush}" />
+                                <Setter TargetName="IconButtonBorder" Property="BorderBrush" Value="{DynamicResource HoverBorderBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="IconButtonBorder" Property="Background" Value="{DynamicResource ButtonPressedBrush}" />
+                                <Setter TargetName="IconButtonBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="IconButtonBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SortMenuButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="170" />
+            <Setter Property="Height" Value="34" />
+            <Setter Property="Foreground" Value="{DynamicResource CreamTextBrush}" />
+            <Setter Property="Background" Value="{DynamicResource ButtonBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SubtleBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="16,0,14,0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="SortBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="11">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="28" />
+                                </Grid.ColumnDefinitions>
+                                <ContentPresenter Grid.Column="0"
+                                                  Margin="10,0,0,0"
+                                                  VerticalAlignment="Center"
+                                                  HorizontalAlignment="Left" />
+                                <Path Grid.Column="1"
+                                      Width="10"
+                                      Height="6"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"
+                                      Fill="{DynamicResource CreamTextBrush}"
+                                      Opacity="0.85"
+                                      Data="M 0 0 L 5 5 L 10 0 Z" />
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="SortBorder" Property="Background" Value="{DynamicResource ButtonHoverBrush}" />
+                                <Setter TargetName="SortBorder" Property="BorderBrush" Value="{DynamicResource HoverBorderBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="SortBorder" Property="Background" Value="{DynamicResource ButtonPressedBrush}" />
+                                <Setter TargetName="SortBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="SortBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                            </Trigger>
+                            <Trigger Property="Tag" Value="Open">
+                                <Setter TargetName="SortBorder" Property="Background" Value="{DynamicResource ButtonHoverBrush}" />
+                                <Setter TargetName="SortBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="PastasScrollBarRepeatButtonStyle" TargetType="RepeatButton">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="IsTabStop" Value="False" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RepeatButton">
+                        <Border Background="Transparent" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="PastasScrollBarThumbStyle" TargetType="Thumb">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="MinHeight" Value="40" />
+            <Setter Property="MinWidth" Value="10" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Thumb">
+                        <Border x:Name="ThumbBorder"
+                                Width="10"
+                                HorizontalAlignment="Center"
+                                Background="{DynamicResource ScrollbarThumbBrush}"
+                                BorderBrush="{DynamicResource AccentBrush}"
+                                BorderThickness="1"
+                                CornerRadius="5" />
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ThumbBorder" Property="Background" Value="{DynamicResource ScrollbarThumbHoverBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsDragging" Value="True">
+                                <Setter TargetName="ThumbBorder" Property="Background" Value="{DynamicResource AccentBrush}" />
+                                <Setter TargetName="ThumbBorder" Property="BorderBrush" Value="{DynamicResource ScrollbarThumbHoverBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="PastasScrollBarStyle" TargetType="ScrollBar">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="Width" Value="14" />
+            <Setter Property="Height" Value="14" />
+            <Setter Property="Background" Value="{DynamicResource ScrollbarTrackBrush}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid x:Name="ScrollBarRoot"
+                              Background="Transparent"
+                              SnapsToDevicePixels="True">
+                            <Border x:Name="RailBorder"
+                                    Width="10"
+                                    Height="Auto"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Stretch"
+                                    Background="{DynamicResource ScrollbarTrackBrush}"
+                                    CornerRadius="5" />
+
+                            <Track x:Name="PART_Track"
+                                   Focusable="False"
+                                   IsDirectionReversed="True">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.PageUpCommand"
+                                                  Style="{StaticResource PastasScrollBarRepeatButtonStyle}" />
+                                </Track.DecreaseRepeatButton>
+
+                                <Track.Thumb>
+                                    <Thumb Style="{StaticResource PastasScrollBarThumbStyle}" />
+                                </Track.Thumb>
+
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.PageDownCommand"
+                                                  Style="{StaticResource PastasScrollBarRepeatButtonStyle}" />
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Orientation" Value="Horizontal">
+                                <Setter Property="Width" Value="Auto" />
+                                <Setter Property="Height" Value="14" />
+                                <Setter TargetName="PART_Track" Property="Orientation" Value="Horizontal" />
+                                <Setter TargetName="PART_Track" Property="IsDirectionReversed" Value="False" />
+                                <Setter TargetName="RailBorder" Property="Width" Value="Auto" />
+                                <Setter TargetName="RailBorder" Property="Height" Value="10" />
+                                <Setter TargetName="RailBorder" Property="HorizontalAlignment" Value="Stretch" />
+                                <Setter TargetName="RailBorder" Property="VerticalAlignment" Value="Center" />
+                            </Trigger>
+
+                            <Trigger Property="Orientation" Value="Vertical">
+                                <Setter Property="Width" Value="14" />
+                                <Setter Property="Height" Value="Auto" />
+                                <Setter TargetName="PART_Track" Property="Orientation" Value="Vertical" />
+                                <Setter TargetName="PART_Track" Property="IsDirectionReversed" Value="True" />
+                                <Setter TargetName="RailBorder" Property="Width" Value="10" />
+                                <Setter TargetName="RailBorder" Property="Height" Value="Auto" />
+                                <Setter TargetName="RailBorder" Property="HorizontalAlignment" Value="Center" />
+                                <Setter TargetName="RailBorder" Property="VerticalAlignment" Value="Stretch" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource PastasScrollBarStyle}" />
+
+        <Style TargetType="CheckBox">
+            <Setter Property="Foreground" Value="{DynamicResource CreamTextBrush}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Grid SnapsToDevicePixels="True">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Border x:Name="CheckBoxGlyph"
+                                    Width="17"
+                                    Height="17"
+                                    Background="{DynamicResource InputBackgroundBrush}"
+                                    BorderBrush="{DynamicResource SubtleBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="5"
+                                    VerticalAlignment="Center">
+                                <Path x:Name="CheckMark"
+                                      Data="M 3 8 L 7 12 L 14 4"
+                                      Stroke="{DynamicResource AccentBrush}"
+                                      StrokeThickness="2"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      Visibility="Collapsed" />
+                            </Border>
+
+                            <ContentPresenter Grid.Column="1"
+                                              Margin="9,0,0,0"
+                                              VerticalAlignment="Center"
+                                              RecognizesAccessKey="True" />
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="CheckBoxGlyph" Property="BorderBrush" Value="{DynamicResource HoverBorderBrush}" />
+                                <Setter TargetName="CheckBoxGlyph" Property="Background" Value="{DynamicResource ButtonHoverBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="CheckBoxGlyph" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="CheckBoxGlyph" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                <Setter TargetName="CheckBoxGlyph" Property="Background" Value="{DynamicResource ButtonPressedBrush}" />
+                                <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.65" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SortMenuItemButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Foreground" Value="{DynamicResource CreamTextBrush}" />
+            <Setter Property="Background" Value="{DynamicResource ButtonBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="Margin" Value="0,0,0,3" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="SortItemBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Left" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="SortItemBorder" Property="Background" Value="{DynamicResource ButtonHoverBrush}" />
+                                <Setter TargetName="SortItemBorder" Property="BorderBrush" Value="{DynamicResource HoverBorderBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="SortItemBorder" Property="Background" Value="{DynamicResource ButtonPressedBrush}" />
+                                <Setter TargetName="SortItemBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="SortItemBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ThemeChipButtonStyle" TargetType="Button" BasedOn="{StaticResource ChipButtonStyle}">
+            <Setter Property="Margin" Value="0,0,8,0" />
+            <Setter Property="Padding" Value="14,0" />
+        </Style>
+    </Window.Resources>
+
+    <Border CornerRadius="22"
+            Background="{DynamicResource ShellBrush}"
+            BorderBrush="{DynamicResource SubtleBorderBrush}"
+            BorderThickness="1"
+            Padding="16"
+            MouseLeftButtonDown="WindowSurface_OnMouseLeftButtonDown">
+        <Grid Width="660">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0"
+                  Margin="0,0,0,10"
+                  MouseLeftButtonDown="Header_OnMouseLeftButtonDown">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="pastas"
+                               FontSize="24"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource CreamTextBrush}" />
+                    <TextBlock Text="clipboard"
+                               Margin="8,0,0,0"
+                               VerticalAlignment="Bottom"
+                               Foreground="{DynamicResource MutedTextBrush}" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="Settings"
+                            MinWidth="96"
+                            Command="{Binding OpenSettingsCommand}"
+                            Style="{DynamicResource ChipButtonStyle}" />
+                    <Button Content="Close"
+                            MinWidth="82"
+                            Style="{DynamicResource ChipButtonStyle}"
+                            Margin="0"
+                            Click="CloseButton_OnClick" />
+                </StackPanel>
+            </Grid>
+
+            <Grid Grid.Row="1"
+                  Visibility="{Binding IsMainContentVisible, Converter={StaticResource BoolToVisibility}}"
+                  Margin="0,0,0,8">
+                <Grid>
+                    <TextBox x:Name="SearchTextBox"
+                             Style="{DynamicResource RoundedTextBoxStyle}"
+                             Padding="14,6,12,6"
+                             Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Text="Search"
+                               Margin="14,0,0,0"
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource MutedTextBrush}"
+                               IsHitTestVisible="False">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding SearchQuery}" Value="" />
+                                            <Condition Binding="{Binding ElementName=SearchTextBox, Path=IsKeyboardFocusWithin}" Value="False" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+            </Grid>
+
+            <Grid Grid.Row="2"
+                  Visibility="{Binding IsMainContentVisible, Converter={StaticResource BoolToVisibility}}"
+                  Margin="0,0,0,8"
+                  MinHeight="36">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <WrapPanel Grid.Column="0" VerticalAlignment="Center">
+                    <Button Content="All"
+                            MinWidth="62"
+                            Style="{DynamicResource ChipButtonStyle}"
+                            Command="{Binding SetFilterCommand}"
+                            CommandParameter="{x:Static domain:ClipboardFilter.All}" />
+                    <Button Content="Text"
+                            MinWidth="66"
+                            Style="{DynamicResource ChipButtonStyle}"
+                            Command="{Binding SetFilterCommand}"
+                            CommandParameter="{x:Static domain:ClipboardFilter.Text}" />
+                    <Button Content="Images"
+                            MinWidth="78"
+                            Style="{DynamicResource ChipButtonStyle}"
+                            Command="{Binding SetFilterCommand}"
+                            CommandParameter="{x:Static domain:ClipboardFilter.Images}" />
+                    <Button Content="Pinned"
+                            MinWidth="78"
+                            Style="{DynamicResource ChipButtonStyle}"
+                            Command="{Binding SetFilterCommand}"
+                            CommandParameter="{x:Static domain:ClipboardFilter.Pinned}" />
+                </WrapPanel>
+
+                <Button x:Name="SortMenuButton"
+                        Grid.Column="1"
+                        Style="{DynamicResource SortMenuButtonStyle}"
+                        Margin="8,0,0,0"
+                        VerticalAlignment="Center"
+                        Content="Recent"
+                        PreviewMouseLeftButtonDown="SortMenuButton_OnPreviewMouseLeftButtonDown"
+                        Click="SortMenuButton_OnClick" />
+
+                <Popup x:Name="SortMenuPopup"
+                       Grid.Column="1"
+                       Placement="Bottom"
+                       PlacementTarget="{Binding ElementName=SortMenuButton}"
+                       StaysOpen="False"
+                       AllowsTransparency="True"
+                       HorizontalOffset="0"
+                       VerticalOffset="2"
+                       Opened="SortMenuPopup_OnOpened"
+                       Closed="SortMenuPopup_OnClosed"
+                       PopupAnimation="Fade">
+                    <Border Width="{Binding ActualWidth, ElementName=SortMenuButton}"
+                            Padding="6,6,6,5"
+                            Background="{DynamicResource SortPopupBackgroundBrush}"
+                            BorderBrush="{DynamicResource SubtleBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="11"
+                            SnapsToDevicePixels="True">
+                        <StackPanel>
+                            <Button Content="Recent"
+                                    Style="{DynamicResource SortMenuItemButtonStyle}"
+                                    Click="SortRecent_OnClick" />
+                            <Button Content="Oldest"
+                                    Style="{DynamicResource SortMenuItemButtonStyle}"
+                                    Click="SortOldest_OnClick" />
+                            <Button Content="Most copied"
+                                    Margin="0"
+                                    Style="{DynamicResource SortMenuItemButtonStyle}"
+                                    Click="SortMostCopied_OnClick" />
+                        </StackPanel>
+                    </Border>
+                </Popup>
+            </Grid>
+
+            <Grid Grid.Row="3">
+                <Grid Visibility="{Binding IsMainContentVisible, Converter={StaticResource BoolToVisibility}}">
+                    <Grid>
+                        <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                                      VerticalScrollBarVisibility="Auto"
+                                      CanContentScroll="False">
+                            <ItemsControl ItemsSource="{Binding Items}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <views:ClipboardItemCardView />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+
+                        <TextBlock Text="{Binding EmptyStateText}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Foreground="{DynamicResource MutedTextBrush}"
+                                   IsHitTestVisible="False">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsLoading}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+
+                        <TextBlock Text="Loading..."
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Foreground="{DynamicResource MutedTextBrush}"
+                                   IsHitTestVisible="False"
+                                   Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}" />
+                    </Grid>
+                </Grid>
+
+                <views:PreviewPanelView />
+
+                <Border Visibility="{Binding IsSettingsOpen, Converter={StaticResource BoolToVisibility}}"
+                        Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource SubtleBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="14"
+                        Padding="16">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0" Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Text="Settings"
+                                       FontSize="22"
+                                       Foreground="{DynamicResource CreamTextBrush}"
+                                       VerticalAlignment="Center" />
+
+                            <Button Grid.Column="1"
+                                    Content="Save"
+                                    Width="90"
+                                    Margin="0,0,8,0"
+                                    Style="{DynamicResource ChipButtonStyle}"
+                                    Click="SaveSettings_OnClick" />
+
+                            <Button Grid.Column="2"
+                                    Content="Back"
+                                    MinWidth="82"
+                                    Style="{DynamicResource ChipButtonStyle}"
+                                    Click="BackSettings_OnClick" />
+                        </Grid>
+
+                        <ScrollViewer Grid.Row="1"
+                                      HorizontalScrollBarVisibility="Disabled"
+                                      VerticalScrollBarVisibility="Auto"
+                                      CanContentScroll="False">
+                            <StackPanel>
+                                <Border Background="{DynamicResource SurfaceElevatedBrush}"
+                                        BorderBrush="{DynamicResource SubtleBorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="10"
+                                        Padding="12"
+                                        Margin="0,0,0,10">
+                                    <StackPanel>
+                                        <TextBlock Text="Hotkey"
+                                                   FontSize="16"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource CreamTextBrush}" />
+                                        <TextBlock Text="Press a key combination with modifier(s)."
+                                                   Foreground="{DynamicResource MutedTextBrush}"
+                                                   Margin="0,8,0,8" />
+                                        <TextBox x:Name="HotkeyTextBox"
+                                                 Style="{DynamicResource RoundedTextBoxStyle}"
+                                                 PreviewKeyDown="CaptureHotkey_OnPreviewKeyDown" />
+                                        <TextBlock x:Name="HotkeyStatusText"
+                                                   Foreground="{DynamicResource MutedTextBrush}"
+                                                   Margin="0,8,0,0" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Background="{DynamicResource SurfaceElevatedBrush}"
+                                        BorderBrush="{DynamicResource SubtleBorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="10"
+                                        Padding="12"
+                                        Margin="0,0,0,10">
+                                    <StackPanel>
+                                        <TextBlock Text="Theme"
+                                                   FontSize="16"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource CreamTextBrush}" />
+                                        <WrapPanel Margin="0,8,0,0">
+                                            <Button x:Name="ThemeChocolateButton"
+                                                    Content="Chocolate"
+                                                    Tag="Chocolate"
+                                                    MinWidth="106"
+                                                    Style="{DynamicResource ThemeChipButtonStyle}"
+                                                    Click="ThemeChip_OnClick" />
+                                            <Button x:Name="ThemeWhiteButton"
+                                                    Content="White"
+                                                    Tag="White"
+                                                    MinWidth="86"
+                                                    Style="{DynamicResource ThemeChipButtonStyle}"
+                                                    Click="ThemeChip_OnClick" />
+                                            <Button x:Name="ThemeBlackButton"
+                                                    Content="Black"
+                                                    Tag="Black"
+                                                    MinWidth="86"
+                                                    Style="{DynamicResource ThemeChipButtonStyle}"
+                                                    Click="ThemeChip_OnClick" />
+                                        </WrapPanel>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Background="{DynamicResource SurfaceElevatedBrush}"
+                                        BorderBrush="{DynamicResource SubtleBorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="10"
+                                        Padding="12">
+                                    <StackPanel>
+                                        <TextBlock Text="Storage"
+                                                   FontSize="16"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource CreamTextBrush}" />
+                                        <TextBlock x:Name="StorageSummaryText"
+                                                   Foreground="{DynamicResource MutedTextBrush}"
+                                                   Margin="0,8,0,10" />
+
+                                        <WrapPanel>
+                                            <StackPanel Margin="0,0,12,8">
+                                                <TextBlock Text="Max items"
+                                                           Foreground="{DynamicResource CreamTextBrush}"
+                                                           Margin="0,0,0,4" />
+                                                <TextBox x:Name="MaxItemsTextBox"
+                                                         Width="120"
+                                                         Style="{DynamicResource RoundedTextBoxStyle}" />
+                                            </StackPanel>
+
+                                            <Button Content="Clear data"
+                                                    Width="140"
+                                                    Height="33"
+                                                    Style="{DynamicResource ChipButtonStyle}"
+                                                    Command="{Binding OpenClearDataCommand}"
+                                                    Margin="0,22,0,8" />
+                                        </WrapPanel>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+
+                <Border Visibility="{Binding IsClearDataOpen, Converter={StaticResource BoolToVisibility}}"
+                        Background="{DynamicResource OverlayBrush}">
+                    <Grid>
+                        <Border Width="410"
+                                Background="{DynamicResource SurfaceElevatedBrush}"
+                                BorderBrush="{DynamicResource SubtleBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="14"
+                                Padding="18"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                            <StackPanel>
+                                <TextBlock Text="Clear data"
+                                           FontSize="22"
+                                           Foreground="{DynamicResource CreamTextBrush}" />
+                                <TextBlock Text="Choose what to delete from Pastas history. This cannot be undone."
+                                           TextWrapping="Wrap"
+                                           Foreground="{DynamicResource MutedTextBrush}"
+                                           Margin="0,10,0,16" />
+                                <CheckBox Content="Text"
+                                          Foreground="{DynamicResource CreamTextBrush}"
+                                          VerticalContentAlignment="Center"
+                                          IsChecked="{Binding ClearTextSelected}"
+                                          Margin="0,0,0,8" />
+                                <CheckBox Content="Images"
+                                          Foreground="{DynamicResource CreamTextBrush}"
+                                          VerticalContentAlignment="Center"
+                                          IsChecked="{Binding ClearImagesSelected}"
+                                          Margin="0,0,0,8" />
+                                <CheckBox Content="Pinned objects"
+                                          Foreground="{DynamicResource CreamTextBrush}"
+                                          VerticalContentAlignment="Center"
+                                          IsChecked="{Binding ClearPinnedSelected}"
+                                          Margin="0,0,0,18" />
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <Button Content="Cancel"
+                                            Width="90"
+                                            Style="{DynamicResource ChipButtonStyle}"
+                                            Command="{Binding CloseClearDataCommand}" />
+                                    <Button Content="Delete selected"
+                                            Width="130"
+                                            Margin="0"
+                                            Style="{DynamicResource ChipButtonStyle}"
+                                            Command="{Binding ConfirmClearDataCommand}"
+                                            IsEnabled="{Binding CanConfirmClearData}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <Border Grid.Row="4"
+                    Margin="0,10,0,0"
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource SubtleBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="10"
+                    Padding="10,6">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                               Foreground="{DynamicResource MutedTextBrush}"
+                               VerticalAlignment="Center">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Text" Value="Enter - copy    Space - preview    Esc - close" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HasStatusMessage}" Value="True">
+                                        <Setter Property="Text" Value="{Binding StatusMessage}" />
+                                        <Setter Property="Foreground" Value="{DynamicResource CreamTextBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                Margin="12,0,0,0">
+                        <Button Content="Restore"
+                                MinWidth="86"
+                                Height="30"
+                                Padding="12,0"
+                                Style="{DynamicResource ChipButtonStyle}"
+                                Command="{Binding RestorePreviousClipboardCommand}"
+                                Visibility="{Binding CanRestorePreviousClipboard, Converter={StaticResource BoolToVisibility}}" />
+                    </StackPanel>
+
+                    <TextBlock Grid.Column="2"
+                               Foreground="{DynamicResource MutedTextBrush}"
+                               VerticalAlignment="Center"
+                               Margin="12,0,0,0"
+                               Text="ИСИП-24-3 · Гоголев Айхал · Якутск · 2026" />
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>
+

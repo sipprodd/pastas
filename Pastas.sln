@@ -1,0 +1,27 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pastas", "src\Pastas\Pastas.csproj", "{D1F1A3D2-3A5C-4E75-9A17-3FE0B7D4A111}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pastas.UnitTests", "tests\Pastas.UnitTests\Pastas.UnitTests.csproj", "{A7B9C4D8-58CC-4B7D-9A52-5378A41D2222}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D1F1A3D2-3A5C-4E75-9A17-3FE0B7D4A111}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1F1A3D2-3A5C-4E75-9A17-3FE0B7D4A111}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1F1A3D2-3A5C-4E75-9A17-3FE0B7D4A111}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1F1A3D2-3A5C-4E75-9A17-3FE0B7D4A111}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7B9C4D8-58CC-4B7D-9A52-5378A41D2222}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7B9C4D8-58CC-4B7D-9A52-5378A41D2222}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7B9C4D8-58CC-4B7D-9A52-5378A41D2222}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7B9C4D8-58CC-4B7D-9A52-5378A41D2222}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
